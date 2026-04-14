@@ -9,10 +9,7 @@ export function packageJsonTemplate(ctx: ScaffoldContext): string {
     description: ctx.description,
     license: 'MIT',
     scripts: {
-      build:
-        ctx.executionContext === 'split'
-          ? 'tsup && cp plugin.json dist/'
-          : 'tsup && cp plugin.json dist/',
+      build: 'tsup',
       dev: 'tsup --watch',
       typecheck: 'tsc --noEmit',
       clean: 'rm -rf dist .turbo',
@@ -27,6 +24,7 @@ export function packageJsonTemplate(ctx: ScaffoldContext): string {
       '@types/react': '^19.0.0',
       '@vibe-ctl/extension-api': '^1.0.0',
       '@vibe-ctl/tsconfig': '^1.0.0',
+      '@vibe-ctl/tsup-plugin-preset': '^1.0.0',
       react: '^19.0.0',
       tsup: '^8.3.0',
       typescript: '^5.7.0',

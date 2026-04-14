@@ -1,18 +1,5 @@
-import { defineConfig } from 'tsup';
+import { definePluginConfig } from '@vibe-ctl/tsup-plugin-preset';
 
-export default defineConfig({
+export default definePluginConfig({
   entry: { main: 'src/main.ts', renderer: 'src/renderer.ts' },
-  format: ['esm'],
-  target: 'es2022',
-  clean: true,
-  sourcemap: true,
-  dts: false,
-  external: [
-    '@vibe-ctl/extension-api',
-    '@jamesyong42/infinite-canvas',
-    '@jamesyong42/reactive-ecs',
-    '@vibecook/truffle',
-    'react',
-    'react-dom',
-  ],
 });
