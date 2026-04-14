@@ -64,9 +64,9 @@ importers:
       '@jamesyong42/reactive-ecs':
         specifier: ^0.1.1
         version: 0.1.1
-      '@vibe-ctl/extension-api':
+      '@vibe-ctl/plugin-api':
         specifier: workspace:*
-        version: link:../extension-api
+        version: link:../plugin-api
       '@vibecook/truffle':
         specifier: ^0.4.2
         version: 0.4.3
@@ -93,7 +93,7 @@ importers:
         specifier: ^5.7.0
         version: 5.9.3
 
-  core/extension-api:
+  core/plugin-api:
     dependencies:
       '@vibecook/truffle':
         specifier: ^0.4.2
@@ -127,17 +127,17 @@ importers:
   core/runtime:
     dependencies:
       '@jamesyong42/infinite-canvas':
-        specifier: ^0.1.0
-        version: 0.1.0(react@19.2.5)
+        specifier: link:/Users/jamesyong/Projects/project100/infinite-canvas/packages/infinite-canvas
+        version: link:../../../infinite-canvas/packages/infinite-canvas
       '@jamesyong42/reactive-ecs':
-        specifier: ^0.1.1
-        version: 0.1.1
-      '@vibe-ctl/extension-api':
+        specifier: link:/Users/jamesyong/Projects/project100/reactive-ecs
+        version: link:../../../reactive-ecs
+      '@vibe-ctl/plugin-api':
         specifier: workspace:*
-        version: link:../extension-api
+        version: link:../plugin-api
       '@vibecook/truffle':
-        specifier: ^0.4.2
-        version: 0.4.3
+        specifier: link:/Users/jamesyong/Projects/project100/p008/truffle/crates/truffle-napi
+        version: link:../../../p008/truffle/crates/truffle-napi
       chokidar:
         specifier: ^4.0.0
         version: 4.0.3
@@ -169,9 +169,9 @@ importers:
       '@vibe-ctl/canvas':
         specifier: workspace:*
         version: link:../canvas
-      '@vibe-ctl/extension-api':
+      '@vibe-ctl/plugin-api':
         specifier: workspace:*
-        version: link:../extension-api
+        version: link:../plugin-api
       '@vibe-ctl/runtime':
         specifier: workspace:*
         version: link:../runtime
@@ -219,8 +219,8 @@ importers:
         specifier: ^0.1.1
         version: 0.1.1
       '@vibecook/spaghetti-sdk':
-        specifier: ^0.5.1
-        version: 0.5.1(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+        specifier: link:/Users/jamesyong/Projects/project100/p008/spaghetti/packages/sdk
+        version: link:../../../p008/spaghetti/packages/sdk
       '@vibecook/truffle':
         specifier: ^0.4.2
         version: 0.4.3
@@ -234,9 +234,9 @@ importers:
       '@types/react':
         specifier: ^19.0.0
         version: 19.2.14
-      '@vibe-ctl/extension-api':
+      '@vibe-ctl/plugin-api':
         specifier: workspace:*
-        version: link:../../core/extension-api
+        version: link:../../core/plugin-api
       '@vibe-ctl/tsconfig':
         specifier: workspace:*
         version: link:../../tooling/tsconfig
@@ -268,9 +268,9 @@ importers:
       '@types/react':
         specifier: ^19.0.0
         version: 19.2.14
-      '@vibe-ctl/extension-api':
+      '@vibe-ctl/plugin-api':
         specifier: workspace:*
-        version: link:../../core/extension-api
+        version: link:../../core/plugin-api
       '@vibe-ctl/tsconfig':
         specifier: workspace:*
         version: link:../../tooling/tsconfig
@@ -305,9 +305,9 @@ importers:
       '@types/react':
         specifier: ^19.0.0
         version: 19.2.14
-      '@vibe-ctl/extension-api':
+      '@vibe-ctl/plugin-api':
         specifier: workspace:*
-        version: link:../../core/extension-api
+        version: link:../../core/plugin-api
       '@vibe-ctl/tsconfig':
         specifier: workspace:*
         version: link:../../tooling/tsconfig
@@ -339,9 +339,9 @@ importers:
       '@types/react':
         specifier: ^19.0.0
         version: 19.2.14
-      '@vibe-ctl/extension-api':
+      '@vibe-ctl/plugin-api':
         specifier: workspace:*
-        version: link:../../core/extension-api
+        version: link:../../core/plugin-api
       '@vibe-ctl/tsconfig':
         specifier: workspace:*
         version: link:../../tooling/tsconfig
@@ -376,9 +376,9 @@ importers:
       '@types/react':
         specifier: ^19.0.0
         version: 19.2.14
-      '@vibe-ctl/extension-api':
+      '@vibe-ctl/plugin-api':
         specifier: workspace:*
-        version: link:../../core/extension-api
+        version: link:../../core/plugin-api
       '@vibe-ctl/tsconfig':
         specifier: workspace:*
         version: link:../../tooling/tsconfig
@@ -410,9 +410,9 @@ importers:
       '@types/react':
         specifier: ^19.0.0
         version: 19.2.14
-      '@vibe-ctl/extension-api':
+      '@vibe-ctl/plugin-api':
         specifier: workspace:*
-        version: link:../../core/extension-api
+        version: link:../../core/plugin-api
       '@vibe-ctl/tsconfig':
         specifier: workspace:*
         version: link:../../tooling/tsconfig
@@ -444,9 +444,9 @@ importers:
       '@types/react':
         specifier: ^19.0.0
         version: 19.2.14
-      '@vibe-ctl/extension-api':
+      '@vibe-ctl/plugin-api':
         specifier: workspace:*
-        version: link:../../core/extension-api
+        version: link:../../core/plugin-api
       '@vibe-ctl/tsconfig':
         specifier: workspace:*
         version: link:../../tooling/tsconfig
@@ -478,9 +478,9 @@ importers:
       '@types/react':
         specifier: ^19.0.0
         version: 19.2.14
-      '@vibe-ctl/extension-api':
+      '@vibe-ctl/plugin-api':
         specifier: workspace:*
-        version: link:../../core/extension-api
+        version: link:../../core/plugin-api
       '@vibe-ctl/tsconfig':
         specifier: workspace:*
         version: link:../../tooling/tsconfig
@@ -503,8 +503,8 @@ importers:
         specifier: ^0.1.1
         version: 0.1.1
       '@vibecook/avocado-sdk':
-        specifier: ^0.2.0
-        version: 0.2.1(@vibecook/truffle@0.4.3)(react@19.2.5)
+        specifier: link:/Users/jamesyong/Projects/project100/p008/avocado/packages/sdk
+        version: link:../../../p008/avocado/packages/sdk
       '@vibecook/truffle':
         specifier: ^0.4.2
         version: 0.4.3
@@ -518,9 +518,9 @@ importers:
       '@types/react':
         specifier: ^19.0.0
         version: 19.2.14
-      '@vibe-ctl/extension-api':
+      '@vibe-ctl/plugin-api':
         specifier: workspace:*
-        version: link:../../core/extension-api
+        version: link:../../core/plugin-api
       '@vibe-ctl/tsconfig':
         specifier: workspace:*
         version: link:../../tooling/tsconfig
@@ -552,9 +552,9 @@ importers:
       '@types/react':
         specifier: ^19.0.0
         version: 19.2.14
-      '@vibe-ctl/extension-api':
+      '@vibe-ctl/plugin-api':
         specifier: workspace:*
-        version: link:../../core/extension-api
+        version: link:../../core/plugin-api
       '@vibe-ctl/tsconfig':
         specifier: workspace:*
         version: link:../../tooling/tsconfig
@@ -568,7 +568,7 @@ importers:
         specifier: ^5.7.0
         version: 5.9.3
 
-  tooling/create-vibe-plugin:
+  tooling/create-plugin:
     dependencies:
       kleur:
         specifier: ^4.1.5
@@ -593,11 +593,11 @@ importers:
         specifier: ^5.7.0
         version: 5.9.3
 
-  tooling/plugin-registry-tools:
+  tooling/plugin-cli:
     dependencies:
-      '@vibe-ctl/extension-api':
+      '@vibe-ctl/plugin-api':
         specifier: workspace:*
-        version: link:../../core/extension-api
+        version: link:../../core/plugin-api
       kleur:
         specifier: ^4.1.5
         version: 4.1.5
@@ -1267,10 +1267,6 @@ packages:
   '@manypkg/get-packages@1.1.3':
     resolution: {integrity: sha512-fo+QhuU3qE/2TQMQmbVMqaQ6EWbMhi4ABWP+O4AM1NqPBuy0OrApV5LO6BrrgnhtAHS2NH6RrVk9OL181tTi8A==}
 
-  '@msgpack/msgpack@3.1.3':
-    resolution: {integrity: sha512-47XIizs9XZXvuJgoaJUIE2lFoID8ugvc0jzSHP+Ptfk8nTbnR8g788wv48N03Kx0UkAv559HWRQ3yzOgzlRNUA==}
-    engines: {node: '>= 18'}
-
   '@nodelib/fs.scandir@2.1.5':
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
     engines: {node: '>= 8'}
@@ -1548,54 +1544,6 @@ packages:
   '@types/yauzl@2.10.3':
     resolution: {integrity: sha512-oJoftv0LSuaDZE3Le4DbKX+KS9G36NzOeSap90UIK0yMA/NhKJhqlSGtNDORNRaIbQfzjXDrQa0ytJ6mNRGz/Q==}
 
-  '@vibecook/avocado-sdk@0.2.1':
-    resolution: {integrity: sha512-dB/O8VekHA7IY1g2tcxm/o/s+EdZCL5BO3Do9oU3Y9fvQzRlVOjAkopZXq8yLOPvjfsoQF363bAiC+LJJmBDdg==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      '@react-three/fiber': 9.5.0
-      '@react-three/postprocessing': '>=3.0.0'
-      '@vibecook/truffle': ^0.4.0
-      '@xterm/addon-fit': '>=0.10.0'
-      '@xterm/addon-webgl': '>=0.18.0'
-      node-pty: '>=1.0.0'
-      postprocessing: '>=6.37.0'
-      react: 19.2.5
-      three: 0.183.2
-      xterm: '>=5.0.0'
-    peerDependenciesMeta:
-      '@react-three/fiber':
-        optional: true
-      '@react-three/postprocessing':
-        optional: true
-      '@vibecook/truffle':
-        optional: true
-      '@xterm/addon-fit':
-        optional: true
-      '@xterm/addon-webgl':
-        optional: true
-      node-pty:
-        optional: true
-      postprocessing:
-        optional: true
-      react:
-        optional: true
-      three:
-        optional: true
-      xterm:
-        optional: true
-
-  '@vibecook/spaghetti-sdk@0.5.1':
-    resolution: {integrity: sha512-8cf3HE1E1VvBDwUeODs651Q0/n7d4R5KNOR/kR3DxcFl9X9cyEfBWtPgJmufeDk61qxQXTkT5p006AVygXr/MQ==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      react: 19.2.5
-      react-dom: 19.2.5
-    peerDependenciesMeta:
-      react:
-        optional: true
-      react-dom:
-        optional: true
-
   '@vibecook/truffle-native@0.4.3':
     resolution: {integrity: sha512-r5QsxihvqmfQtYFQtJXr7Ob4o0k/NDERER66101c3WAqfhaxojhr+YLHUMBbFrFSwWydl0HZYOVlaL92neZEWA==}
     engines: {node: '>=18'}
@@ -1786,13 +1734,6 @@ packages:
     resolution: {integrity: sha512-pbnl5XzGBdrFU/wT4jqmJVPn2B6UHPBOhzMQkY/SPUPB6QtUXtmBHBIwCbXJol93mOpGMnQyP/+BB19q04xj7g==}
     engines: {node: '>=4'}
 
-  better-sqlite3@12.9.0:
-    resolution: {integrity: sha512-wqUv4Gm3toFpHDQmaKD4QhZm3g1DjUBI0yzS4UBl6lElUmXFYdTQmmEDpAFa5o8FiFiymURypEnfVHzILKaxqQ==}
-    engines: {node: 20.x || 22.x || 23.x || 24.x || 25.x}
-
-  bindings@1.5.0:
-    resolution: {integrity: sha512-p2q/t/mhvuOj/UeLlV6566GD/guowlr0hHxClI0W9m7MWYkL1F0hLo+0Aexs9HSPCtR1SXQ0TD3MMKrXZajbiQ==}
-
   bl@4.1.0:
     resolution: {integrity: sha512-1W07cM9gS6DcLperZfFSj+bWLtaPGSOHWhPiGzXmvVJbRLdG82sH/Kn8EtW1VqWVA54AKf2h5k5BbnIbwF3h6w==}
 
@@ -1882,9 +1823,6 @@ packages:
   chokidar@4.0.3:
     resolution: {integrity: sha512-Qgzu8kfBvo+cA4962jnP1KkS6Dop5NS6g7R5LFYJr4b8Ub94PPQXUksCw9PvXoeXPRRddRNC5C1JQUR2SMGtnA==}
     engines: {node: '>= 14.16.0'}
-
-  chownr@1.1.4:
-    resolution: {integrity: sha512-jJ0bqzaylmJtVnNgzTeSOs8DPavpbYgEr/b0YL8/2GO3xJEhInFmhKMUnEJQjZumK7KXGFhUy89PrsJWlakBVg==}
 
   chownr@3.0.0:
     resolution: {integrity: sha512-+IxzY9BZOQd/XuYPRmrvEVjF/nqj5kgT4kEq7VofrDoM1MxoRjEWkrCC3EtLi59TVawxTAn+orJwFQcrqEN1+g==}
@@ -2007,10 +1945,6 @@ packages:
   decompress-response@6.0.0:
     resolution: {integrity: sha512-aW35yZM6Bb/4oJlZncMH2LCoZtJXTRxES17vE3hoRiowU2kWHaJKFkSBDnDR+cm9J+9QhXmREyIfv0pji9ejCQ==}
     engines: {node: '>=10'}
-
-  deep-extend@0.6.0:
-    resolution: {integrity: sha512-LOHxIOaPYdHlJRtCQfDIVZtfw/ufM8+rVj649RIHzcm/vGwQRXFt6OPqIFWsm2XEMrNIEtWR64sY1LEKD2vAOA==}
-    engines: {node: '>=4.0.0'}
 
   defaults@1.0.4:
     resolution: {integrity: sha512-eFuaLoy/Rxalv2kr+lqMlUnrDWV+3j4pljOIJgLIhI058IQfWJ7vXhyEIHu+HtC738klGALYxOKDO0bQP3tg8A==}
@@ -2197,10 +2131,6 @@ packages:
     resolution: {integrity: sha512-VyhnebXciFV2DESc+p6B+y0LjSm0krU4OgJN44qFAhBY0TJ+1V61tYD2+wHusZ6F9n5K+vl8k0sTy7PEfV4qpg==}
     engines: {node: '>=16.17'}
 
-  expand-template@2.0.3:
-    resolution: {integrity: sha512-XYfuKMvj4O35f/pOXLObndIRvyQ+/+6AhODh+OKWj9S9498pHHn/IMszH+gt0fBCRWMNfk1ZSp5x3AifmnI2vg==}
-    engines: {node: '>=6'}
-
   expect-type@1.3.0:
     resolution: {integrity: sha512-knvyeauYhqjOYvQ66MznSMs83wmHrCycNEN6Ao+2AeYEfxUIkuiVxdEa1qlGEPK+We3n0THiDciYSsCcgW/DoA==}
     engines: {node: '>=12.0.0'}
@@ -2245,9 +2175,6 @@ packages:
       picomatch:
         optional: true
 
-  file-uri-to-path@1.0.0:
-    resolution: {integrity: sha512-0Zt+s3L7Vf1biwWZ29aARiVYLx7iMGnEUl9x33fbB/j3jR81u/O2LbqK+Bm1CDSNDKVtJ/YjwY7TUd5SkeLQLw==}
-
   filelist@1.0.6:
     resolution: {integrity: sha512-5giy2PkLYY1cP39p17Ech+2xlpTRL9HLspOfEgm0L6CwBXBTgsK5ou0JtzYuepxkaQ/tvhCFIJ5uXo0OrM2DxA==}
 
@@ -2269,9 +2196,6 @@ packages:
   form-data@4.0.5:
     resolution: {integrity: sha512-8RipRLol37bNs2bhoV67fiTEvdTrbMUYcFTiy3+wuuOnUog2QBHCZWXDRijWQfAkhBj2Uf5UnVaiWwA5vdd82w==}
     engines: {node: '>= 6'}
-
-  fs-constants@1.0.0:
-    resolution: {integrity: sha512-y6OAwoSIf7FyjMIv94u+b5rdheZEjzR63GTyZJm5qh4Bi+2YgwLCcI/fPFZkL5PSixOt6ZNKm+w+Hfp/Bciwow==}
 
   fs-extra@10.1.0:
     resolution: {integrity: sha512-oRXApq54ETRj4eMiFzGnHWGy+zo5raudjuxN0b8H7s/RU2oW0Wvsx9O0ACRN/kRq9E8Vu/ReskGB5o3ji+FzHQ==}
@@ -2335,9 +2259,6 @@ packages:
   get-stream@8.0.1:
     resolution: {integrity: sha512-VaUJspBffn/LMCJVoMvSAdmscJyS1auj5Zulnn5UoYcY531UWmdwhRWkcGKnGU93m5HSXP9LP2usOryrBtQowA==}
     engines: {node: '>=16'}
-
-  github-from-package@0.0.0:
-    resolution: {integrity: sha512-SyHy3T1v2NUXn29OsWdxmK6RwHD+vkj3v8en8AOBZ1wBQ/hCAQ5bAQTD02kW4W9tUp/3Qh6J8r9EvntiyCmOOw==}
 
   glob-parent@5.1.2:
     resolution: {integrity: sha512-AOIgSQCepiJYwP3ARnGx+5VnTu2HBYdzbGP45eLw1vr3zB3vZLeyed1sC9hnbcOc9/SrMyM5RPQrkGz4aS9Zow==}
@@ -2456,9 +2377,6 @@ packages:
 
   inherits@2.0.4:
     resolution: {integrity: sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ==}
-
-  ini@1.3.8:
-    resolution: {integrity: sha512-JV/yugV2uzW5iMRSiZAyDtQd+nxtUnjeLt0acNdw98kKLrvuRVyB80tsREOE7yvGVgalhZ6RNXCmEHkUKBKxew==}
 
   ip-address@10.1.0:
     resolution: {integrity: sha512-XXADHxXmvT9+CRxhXg56LJovE+bmWnEWB78LB83VZTprKTmaC5QfruXocxzTZ2Kl0DNwKuBdlIhjL8LeY8Sf8Q==}
@@ -2750,9 +2668,6 @@ packages:
     resolution: {integrity: sha512-KZxYo1BUkWD2TVFLr0MQoM8vUUigWD3LlD83a/75BqC+4qE0Hb1Vo5v1FgcfaNXvfXzr+5EhQ6ing/CaBijTlw==}
     engines: {node: '>= 18'}
 
-  mkdirp-classic@0.5.3:
-    resolution: {integrity: sha512-gKLcREMhtuZRwRAfqP3RFW+TK4JqApVBtOIftVgjuABpAtpxhPGaDcfvbhNvD0B8iD1oUr/txX35NjcaY6Ns/A==}
-
   mkdirp@0.5.6:
     resolution: {integrity: sha512-FP+p8RB8OWpF3YZBCrP5gtADmtXApB5AMLn+vdyA+PyxCjrCs00mjyUozssO33cwDeT3wNGdLxJ5M//YqtHAJw==}
     hasBin: true
@@ -2775,16 +2690,9 @@ packages:
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
 
-  napi-build-utils@2.0.0:
-    resolution: {integrity: sha512-GEbrYkbfF7MoNaoh2iGG84Mnf/WZfB0GdGEsM8wz7Expx/LlWf5U8t9nvJKXSp3qr5IsEbK04cBGhol/KwOsWA==}
-
   negotiator@1.0.0:
     resolution: {integrity: sha512-8Ofs/AUQh8MaEcrlq5xOX0CQ9ypTF5dl78mjlMNfOK08fzpgTHQRQPBxcPlEtIw0yRpws+Zo/3r+5WRby7u3Gg==}
     engines: {node: '>= 0.6'}
-
-  node-abi@3.89.0:
-    resolution: {integrity: sha512-6u9UwL0HlAl21+agMN3YAMXcKByMqwGx+pq+P76vii5f7hTPtKDp08/H9py6DY+cfDw7kQNTGEj/rly3IgbNQA==}
-    engines: {node: '>=10'}
 
   node-abi@4.28.0:
     resolution: {integrity: sha512-Qfp5XZL1cJDOabOT8H5gnqMTmM4NjvYzHp4I/Kt/Sl76OVkOBBHRFlPspGV0hYvMoqQsypFjT/Yp7Km0beXW9g==}
@@ -2980,12 +2888,6 @@ packages:
     engines: {node: '>=14.0.0'}
     hasBin: true
 
-  prebuild-install@7.1.3:
-    resolution: {integrity: sha512-8Mf2cbV7x1cXPUILADGI3wuhfqWvtiLA1iclTDbFRZkgRQS0NqsPZphna9V+HyTEadheuPmjaJMsbzKQFOzLug==}
-    engines: {node: '>=10'}
-    deprecated: No longer maintained. Please contact the author of the relevant native addon; alternatives are available.
-    hasBin: true
-
   prettier@2.8.8:
     resolution: {integrity: sha512-tdN8qQGvNjw4CHbY+XXk0JgCXn9QiF21a55rBe5LJAU+kDyC4WQn4+awm2Xfk2lQMk5fKup9XgzTZtGkjBdP9Q==}
     engines: {node: '>=10.13.0'}
@@ -3026,10 +2928,6 @@ packages:
   quick-lru@5.1.1:
     resolution: {integrity: sha512-WuyALRjWPDGtt/wzJiadO5AXY+8hZ80hVpe6MyivgraREW751X3SbhRvG3eLKOYN+8VEvqLcf3wdnt44Z4S4SA==}
     engines: {node: '>=10'}
-
-  rc@1.2.8:
-    resolution: {integrity: sha512-y3bGgqKj3QBdxLbLkomlohkvsA8gdAiUQlSBJnBhfn+BPxg4bc62d8TcBW15wavDfgexCgccckhcZvywyQYPOw==}
-    hasBin: true
 
   react-dom@19.2.5:
     resolution: {integrity: sha512-J5bAZz+DXMMwW/wV3xzKke59Af6CHY7G4uYLN1OvBcKEsWOs4pQExj86BBKamxl/Ik5bx9whOrvBlSDfWzgSag==}
@@ -3168,12 +3066,6 @@ packages:
     resolution: {integrity: sha512-bzyZ1e88w9O1iNJbKnOlvYTrWPDl46O1bG0D3XInv+9tkPrxrN8jUUTiFlDkkmKWgn1M6CfIA13SuGqOa9Korw==}
     engines: {node: '>=14'}
 
-  simple-concat@1.0.1:
-    resolution: {integrity: sha512-cSFtAPtRhljv69IK0hTVZQ+OfE9nePi/rtJmw5UjHeVyVroEqJXP1sFztKUy1qU+xvz3u/sfYJLa947b7nAN2Q==}
-
-  simple-get@4.0.1:
-    resolution: {integrity: sha512-brv7p5WgH0jmQJr1ZDDfKDOSeWWg+OVypG99A/5vYGPqJ6pxiaHLy8nxtFjBA7oMa01ebA9gfh1uMCFqOuXxvA==}
-
   simple-update-notifier@2.0.0:
     resolution: {integrity: sha512-a2B9Y0KlNXl9u/vsW6sTIu9vGEpfKu2wRV6l1H3XEas/0gUIzGzBoP/IouTcUQbm9JWZLH3COxyn03TYlFax6w==}
     engines: {node: '>=10'}
@@ -3282,10 +3174,6 @@ packages:
     resolution: {integrity: sha512-dOESqjYr96iWYylGObzd39EuNTa5VJxyvVAEm5Jnh7KGo75V43Hk1odPQkNDyXNmUR6k+gEiDVXnjB8HJ3crXw==}
     engines: {node: '>=12'}
 
-  strip-json-comments@2.0.1:
-    resolution: {integrity: sha512-4gB8na07fecVVkOI6Rs4e7T6NOTki5EmL7TUduTs6bu3EdnSycntVJ4re8kgZA+wx9IueI2Y11bfbgwtzuE0KQ==}
-    engines: {node: '>=0.10.0'}
-
   sucrase@3.35.1:
     resolution: {integrity: sha512-DhuTmvZWux4H1UOnWMB3sk0sbaCVOoQZjv8u1rDoTV0HTdGem9hkAZtl4JZy8P2z4Bg0nT+YMeOFyVr4zcG5Tw==}
     engines: {node: '>=16 || 14 >=14.17'}
@@ -3298,13 +3186,6 @@ packages:
   supports-color@7.2.0:
     resolution: {integrity: sha512-qpCAvRl9stuOHveKsn7HncJRvv501qIacKzQlO/+Lwxc9+0q2wLyv4Dfvt80/DPn2pqOBsJdDiogXGR9+OvwRw==}
     engines: {node: '>=8'}
-
-  tar-fs@2.1.4:
-    resolution: {integrity: sha512-mDAjwmZdh7LTT6pNleZ05Yt65HC3E+NiQzl672vQG38jIrehtJk/J3mNwIg+vShQPcLF/LV7CMnDW6vjj6sfYQ==}
-
-  tar-stream@2.2.0:
-    resolution: {integrity: sha512-ujeqbceABgwMZxEJnk2HDY2DlnUZ+9oEcb1KzTVfYHio0UE6dG71n60d8D2I4qNvleWrrXpmjpt7vZeF1LnMZQ==}
-    engines: {node: '>=6'}
 
   tar@7.5.13:
     resolution: {integrity: sha512-tOG/7GyXpFevhXVh8jOPJrmtRpOTsYqUIkVdVooZYJS/z8WhfQUX8RJILmeuJNinGAMSu1veBr4asSHFt5/hng==}
@@ -3388,9 +3269,6 @@ packages:
         optional: true
       typescript:
         optional: true
-
-  tunnel-agent@0.6.0:
-    resolution: {integrity: sha512-McnNiV1l8RYeY8tBgEpuodCC1mLUdbSN+CYBL7kJsJNInOP8UjDDEwdk6Mw60vdLLrr5NHKZhMAOSrR2NZuQ+w==}
 
   turbo@2.9.6:
     resolution: {integrity: sha512-+v2QJey7ZUeUiuigkU+uFfklvNUyPI2VO2vBpMYJA+a1hKFLFiKtUYlRHdb3P9CrAvMzi0upbjI4WT+zKtqkBg==}
@@ -3559,18 +3437,6 @@ packages:
 
   wrappy@1.0.2:
     resolution: {integrity: sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==}
-
-  ws@8.20.0:
-    resolution: {integrity: sha512-sAt8BhgNbzCtgGbt2OxmpuryO63ZoDk/sqaB/znQm94T4fCEsy/yV+7CdC1kJhOU9lboAEU7R3kquuycDoibVA==}
-    engines: {node: '>=10.0.0'}
-    peerDependencies:
-      bufferutil: ^4.0.1
-      utf-8-validate: '>=5.0.2'
-    peerDependenciesMeta:
-      bufferutil:
-        optional: true
-      utf-8-validate:
-        optional: true
 
   xmlbuilder@15.1.1:
     resolution: {integrity: sha512-yMqGBqtXyeN1e3TGYvgNgDVZ3j84W4cwkOXQswghol6APgZWaff9lnbvN7MHYJOiXsvGPXtjTYJEiC9J2wv9Eg==}
@@ -4249,8 +4115,6 @@ snapshots:
       globby: 11.1.0
       read-yaml-file: 1.1.0
 
-  '@msgpack/msgpack@3.1.3': {}
-
   '@nodelib/fs.scandir@2.1.5':
     dependencies:
       '@nodelib/fs.stat': 2.0.5
@@ -4475,25 +4339,6 @@ snapshots:
       '@types/node': 24.12.2
     optional: true
 
-  '@vibecook/avocado-sdk@0.2.1(@vibecook/truffle@0.4.3)(react@19.2.5)':
-    dependencies:
-      '@msgpack/msgpack': 3.1.3
-    optionalDependencies:
-      '@vibecook/truffle': 0.4.3
-      react: 19.2.5
-
-  '@vibecook/spaghetti-sdk@0.5.1(react-dom@19.2.5(react@19.2.5))(react@19.2.5)':
-    dependencies:
-      better-sqlite3: 12.9.0
-      chokidar: 4.0.3
-      ws: 8.20.0
-    optionalDependencies:
-      react: 19.2.5
-      react-dom: 19.2.5(react@19.2.5)
-    transitivePeerDependencies:
-      - bufferutil
-      - utf-8-validate
-
   '@vibecook/truffle-native@0.4.3': {}
 
   '@vibecook/truffle-sidecar-darwin-arm64@0.3.25':
@@ -4692,15 +4537,6 @@ snapshots:
     dependencies:
       is-windows: 1.0.2
 
-  better-sqlite3@12.9.0:
-    dependencies:
-      bindings: 1.5.0
-      prebuild-install: 7.1.3
-
-  bindings@1.5.0:
-    dependencies:
-      file-uri-to-path: 1.0.0
-
   bl@4.1.0:
     dependencies:
       buffer: 5.7.1
@@ -4828,8 +4664,6 @@ snapshots:
     dependencies:
       readdirp: 4.1.2
 
-  chownr@1.1.4: {}
-
   chownr@3.0.0: {}
 
   chromium-pickle-js@0.2.0: {}
@@ -4928,8 +4762,6 @@ snapshots:
   decompress-response@6.0.0:
     dependencies:
       mimic-response: 3.1.0
-
-  deep-extend@0.6.0: {}
 
   defaults@1.0.4:
     dependencies:
@@ -5213,8 +5045,6 @@ snapshots:
       signal-exit: 4.1.0
       strip-final-newline: 3.0.0
 
-  expand-template@2.0.3: {}
-
   expect-type@1.3.0: {}
 
   exponential-backoff@3.1.3: {}
@@ -5258,8 +5088,6 @@ snapshots:
     optionalDependencies:
       picomatch: 4.0.4
 
-  file-uri-to-path@1.0.0: {}
-
   filelist@1.0.6:
     dependencies:
       minimatch: 5.1.9
@@ -5291,8 +5119,6 @@ snapshots:
       es-set-tostringtag: 2.1.0
       hasown: 2.0.2
       mime-types: 2.1.35
-
-  fs-constants@1.0.0: {}
 
   fs-extra@10.1.0:
     dependencies:
@@ -5365,8 +5191,6 @@ snapshots:
       pump: 3.0.4
 
   get-stream@8.0.1: {}
-
-  github-from-package@0.0.0: {}
 
   glob-parent@5.1.2:
     dependencies:
@@ -5507,8 +5331,6 @@ snapshots:
       wrappy: 1.0.2
 
   inherits@2.0.4: {}
-
-  ini@1.3.8: {}
 
   ip-address@10.1.0: {}
 
@@ -5775,8 +5597,6 @@ snapshots:
     dependencies:
       minipass: 7.1.3
 
-  mkdirp-classic@0.5.3: {}
-
   mkdirp@0.5.6:
     dependencies:
       minimist: 1.2.8
@@ -5800,13 +5620,7 @@ snapshots:
 
   nanoid@3.3.11: {}
 
-  napi-build-utils@2.0.0: {}
-
   negotiator@1.0.0: {}
-
-  node-abi@3.89.0:
-    dependencies:
-      semver: 7.7.4
 
   node-abi@4.28.0:
     dependencies:
@@ -5977,21 +5791,6 @@ snapshots:
       commander: 9.5.0
     optional: true
 
-  prebuild-install@7.1.3:
-    dependencies:
-      detect-libc: 2.1.2
-      expand-template: 2.0.3
-      github-from-package: 0.0.0
-      minimist: 1.2.8
-      mkdirp-classic: 0.5.3
-      napi-build-utils: 2.0.0
-      node-abi: 3.89.0
-      pump: 3.0.4
-      rc: 1.2.8
-      simple-get: 4.0.1
-      tar-fs: 2.1.4
-      tunnel-agent: 0.6.0
-
   prettier@2.8.8: {}
 
   proc-log@5.0.0: {}
@@ -6026,13 +5825,6 @@ snapshots:
   queue-microtask@1.2.3: {}
 
   quick-lru@5.1.1: {}
-
-  rc@1.2.8:
-    dependencies:
-      deep-extend: 0.6.0
-      ini: 1.3.8
-      minimist: 1.2.8
-      strip-json-comments: 2.0.1
 
   react-dom@19.2.5(react@19.2.5):
     dependencies:
@@ -6181,14 +5973,6 @@ snapshots:
 
   signal-exit@4.1.0: {}
 
-  simple-concat@1.0.1: {}
-
-  simple-get@4.0.1:
-    dependencies:
-      decompress-response: 6.0.0
-      once: 1.4.0
-      simple-concat: 1.0.1
-
   simple-update-notifier@2.0.0:
     dependencies:
       semver: 7.7.4
@@ -6296,8 +6080,6 @@ snapshots:
 
   strip-final-newline@3.0.0: {}
 
-  strip-json-comments@2.0.1: {}
-
   sucrase@3.35.1:
     dependencies:
       '@jridgewell/gen-mapping': 0.3.13
@@ -6317,21 +6099,6 @@ snapshots:
   supports-color@7.2.0:
     dependencies:
       has-flag: 4.0.0
-
-  tar-fs@2.1.4:
-    dependencies:
-      chownr: 1.1.4
-      mkdirp-classic: 0.5.3
-      pump: 3.0.4
-      tar-stream: 2.2.0
-
-  tar-stream@2.2.0:
-    dependencies:
-      bl: 4.1.0
-      end-of-stream: 1.4.5
-      fs-constants: 1.0.0
-      inherits: 2.0.4
-      readable-stream: 3.6.2
 
   tar@7.5.13:
     dependencies:
@@ -6423,10 +6190,6 @@ snapshots:
       - supports-color
       - tsx
       - yaml
-
-  tunnel-agent@0.6.0:
-    dependencies:
-      safe-buffer: 5.2.1
 
   turbo@2.9.6:
     optionalDependencies:
@@ -6556,8 +6319,6 @@ snapshots:
       strip-ansi: 7.2.0
 
   wrappy@1.0.2: {}
-
-  ws@8.20.0: {}
 
   xmlbuilder@15.1.1: {}
 

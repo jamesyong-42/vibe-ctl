@@ -1,12 +1,12 @@
 /**
  * Internal types for @vibe-ctl/runtime.
  *
- * Public-facing plugin types live in `@vibe-ctl/extension-api`. This module
+ * Public-facing plugin types live in `@vibe-ctl/plugin-api`. This module
  * holds kernel-internal shapes used across discovery, resolution, activation
  * and the ECS world.
  */
 
-import type { Logger, PluginTier } from '@vibe-ctl/extension-api';
+import type { Logger, PluginTier } from '@vibe-ctl/plugin-api';
 
 /** Lifecycle state for a plugin entity in the kernel ECS world. */
 export type PluginState =

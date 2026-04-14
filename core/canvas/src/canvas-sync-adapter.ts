@@ -1,4 +1,4 @@
-import type { Disposable } from '@vibe-ctl/extension-api';
+import type { Disposable } from '@vibe-ctl/plugin-api';
 import type { KernelCanvasEngine } from './engine.js';
 
 /**

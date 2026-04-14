@@ -10,7 +10,7 @@
  * Off by default; only wired when `devPluginRoots` is non-empty.
  */
 
-import type { Logger } from '@vibe-ctl/extension-api';
+import type { Logger } from '@vibe-ctl/plugin-api';
 
 export interface HotReloaderOptions {
   devPluginRoots: string[];

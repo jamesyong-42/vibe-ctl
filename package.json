@@ -17,7 +17,7 @@
     "test": "vitest run",
     "clean": "turbo run clean",
     "changeset": "changeset",
-    "create-plugin": "npx create-vibe-plugin",
+    "create-plugin": "npx @vibe-ctl/create-plugin",
     "prepare": "husky"
   },
   "devDependencies": {

@@ -7,7 +7,7 @@
  * of the first-use activation triggers (spec 01 §10).
  */
 
-import type { Disposable } from '@vibe-ctl/extension-api';
+import type { Disposable } from '@vibe-ctl/plugin-api';
 
 export interface CommandDef {
   id: string;

@@ -1,4 +1,4 @@
-import type { Disposable, WidgetDef } from '@vibe-ctl/extension-api';
+import type { Disposable, WidgetDef } from '@vibe-ctl/plugin-api';
 import {
   type WidgetTypeEntry,
   type WidgetTypeId,

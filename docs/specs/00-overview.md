@@ -69,7 +69,7 @@ implements it.
 │  themes · project-manager · side-panels · command-palette     │
 │  mesh-widgets · quick-actions · ...community plugins          │
 └──────────────────────────────────────────────────────────────┘
-                         ↕ @vibe-ctl/extension-api
+                         ↕ @vibe-ctl/plugin-api
 ┌──────────────────────────────────────────────────────────────┐
 │  KERNEL  (three layers, no domain logic)                      │
 │                                                               │
@@ -174,7 +174,7 @@ Deeper rationale in `specs/03-monorepo-layout.md`.
 | File | Contents |
 |---|---|
 | [`00-overview.md`](00-overview.md) | This file. Vision, modules, architectural stance |
-| [`01-extension-system.md`](01-extension-system.md) | Plugin manifest, `Plugin` class, `PluginContext`, widgets, services, sync API |
+| [`01-plugin-system.md`](01-plugin-system.md) | Plugin manifest, `Plugin` class, `PluginContext`, widgets, services, sync API |
 | [`02-kernel-runtime.md`](02-kernel-runtime.md) | Kernel layers, three sync principles, worked walkthrough, edge-case policies |
 | [`03-monorepo-layout.md`](03-monorepo-layout.md) | File tree, packages, build pipeline, plugin catalogue |
 | [`04-registry-marketplace.md`](04-registry-marketplace.md) | Git-based registry, publishing, installation, updates |
@@ -232,7 +232,7 @@ the architectural framing (service-layer vs kernel+plugins) is superseded.
 ### Module Consumption
 - **`.pnpmfile.cjs` auto-linking.** Local module dirs are linked during dev
   if present; falls back to npm in CI. Zero config switching. (spec 03 §2)
-- **Host-provided singletons.** `@vibe-ctl/extension-api`, `react`,
+- **Host-provided singletons.** `@vibe-ctl/plugin-api`, `react`,
   `react-dom`, `@jamesyong42/infinite-canvas`, `@jamesyong42/reactive-ecs`,
   `@vibecook/truffle` — plugins mark these `external` in their bundler.
   Kernel injects single instances. (spec 03 §4)

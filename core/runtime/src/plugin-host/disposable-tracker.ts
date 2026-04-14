@@ -11,7 +11,7 @@
  * first.
  */
 
-import type { Disposable } from '@vibe-ctl/extension-api';
+import type { Disposable } from '@vibe-ctl/plugin-api';
 
 export class DisposableTracker {
   /** Per-plugin stack of disposables, newest last. */

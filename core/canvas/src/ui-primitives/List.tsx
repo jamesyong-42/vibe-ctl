@@ -1,4 +1,4 @@
-import type { ListProps } from '@vibe-ctl/extension-api';
+import type { ListProps } from '@vibe-ctl/plugin-api';
 import type { CSSProperties, FC } from 'react';
 
 export type { ListProps };
@@ -13,7 +13,7 @@ const style: CSSProperties = {
 };
 
 /**
- * The extension-api `ListProps` is non-generic (`items: unknown[]`);
+ * The plugin-api `ListProps` is non-generic (`items: unknown[]`);
  * callers who need typed item access wrap `List` in their own generic
  * component. Runtime behaviour is a plain map over items.
  */

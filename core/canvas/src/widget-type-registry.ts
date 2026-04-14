@@ -1,4 +1,4 @@
-import type { Disposable, WidgetDef } from '@vibe-ctl/extension-api';
+import type { Disposable, WidgetDef } from '@vibe-ctl/plugin-api';
 
 /**
  * Reactive widget-type registry. Populated by plugins through

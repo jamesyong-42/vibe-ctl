@@ -6,7 +6,7 @@ plugins. First-party plugins use the same public API as third-party.
 ## Read these first
 
 1. **`docs/specs/00-overview.md`** — vision, architecture, decisions
-2. **`docs/specs/01-extension-system.md`** — plugin contract (the public API)
+2. **`docs/specs/01-plugin-system.md`** — plugin contract (the public API)
 3. **`docs/specs/02-kernel-runtime.md`** — kernel internals + sync model
 4. **`docs/specs/03-monorepo-layout.md`** — file tree, package boundaries
 5. **`docs/specs/04-registry-marketplace.md`** — distribution model
@@ -17,7 +17,7 @@ Outdated specs are in `docs/specs/outdated/`. Do not use them as source of truth
 
 | Path | Purpose |
 |---|---|
-| `core/extension-api` | Published to npm. Plugin contract (types + `Plugin` base class). |
+| `core/plugin-api` | Published to npm. Plugin contract (types + `Plugin` base class). |
 | `core/runtime` | Plugin host + sync fabric. Owns the single `NapiNode` and kernel ECS world. |
 | `core/canvas` | Canvas substrate + CRDT sync adapter + `ctx.ui` primitives. |
 | `core/shell` | Electron shell (main / preload / renderer chrome). |
@@ -25,8 +25,8 @@ Outdated specs are in `docs/specs/outdated/`. Do not use them as source of truth
 | `apps/desktop` | Electron packaging + resources. |
 | `tooling/tsconfig` | Shared tsconfig presets (published). |
 | `tooling/tsup-plugin-preset` | Shared tsup config for plugins (externals + asset copying). |
-| `tooling/create-vibe-plugin` | Plugin scaffold CLI. |
-| `tooling/plugin-registry-tools` | Registry PR CLI. |
+| `tooling/create-plugin` | Plugin scaffold CLI. |
+| `tooling/plugin-cli` | Registry PR CLI. |
 
 ## Conventions
 
@@ -40,7 +40,7 @@ Outdated specs are in `docs/specs/outdated/`. Do not use them as source of truth
   only (no `.d.ts` — plugins are consumed, not imported as types).
 - **electron-vite** for the Electron shell (HMR across main/preload/renderer).
 - **Host-provided singletons** (managed by `@vibe-ctl/tsup-plugin-preset`):
-  `@vibe-ctl/extension-api`, `react`, `react-dom`,
+  `@vibe-ctl/plugin-api`, `react`, `react-dom`,
   `@jamesyong42/infinite-canvas`, `@jamesyong42/reactive-ecs`,
   `@vibecook/truffle`. Plugins never bundle their own copies of these.
   Use `definePluginConfig()` from the preset — do not inline the external list.
@@ -143,7 +143,7 @@ to the npm registry versions.
 - Do not add `error handling` or `migration code` at plugin boundaries —
   the kernel owns lifecycle, teardown, and version checking (spec 02).
 - Do not bypass `ctx.*` to reach into runtime internals. If the `ctx` API
-  is missing something, add it to `core/extension-api` first (with a
+  is missing something, add it to `core/plugin-api` first (with a
   spec change), then expose it in `core/runtime/context-builder.ts`.
-- Do not publish `core/*` packages to npm except `@vibe-ctl/extension-api`
+- Do not publish `core/*` packages to npm except `@vibe-ctl/plugin-api`
   and `@vibe-ctl/tsconfig`. Everything else is `"private": true`.

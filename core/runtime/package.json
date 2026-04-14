@@ -19,7 +19,7 @@
     "clean": "rm -rf dist .turbo"
   },
   "dependencies": {
-    "@vibe-ctl/extension-api": "workspace:*",
+    "@vibe-ctl/plugin-api": "workspace:*",
     "@jamesyong42/reactive-ecs": "^0.1.1",
     "@jamesyong42/infinite-canvas": "^0.1.0",
     "@vibecook/truffle": "^0.4.2",

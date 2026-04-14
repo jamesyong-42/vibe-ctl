@@ -1,4 +1,4 @@
-import type { WidgetProps } from '@vibe-ctl/extension-api';
+import type { WidgetProps } from '@vibe-ctl/plugin-api';
 
 /**
  * Widget: dynamic island status (diagnostic mirror of the NotchHelper

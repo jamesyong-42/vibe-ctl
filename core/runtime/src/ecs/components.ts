@@ -12,7 +12,7 @@
  */
 
 import { defineComponent } from '@jamesyong42/reactive-ecs';
-import type { PluginTier } from '@vibe-ctl/extension-api';
+import type { PluginTier } from '@vibe-ctl/plugin-api';
 import type { PluginSource, PluginState } from '../types.js';
 
 type ManifestData = {

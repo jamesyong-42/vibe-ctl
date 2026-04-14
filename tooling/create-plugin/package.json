@@ -1,0 +1,32 @@
+{
+  "name": "@vibe-ctl/create-plugin",
+  "version": "0.1.0",
+  "license": "MIT",
+  "description": "Scaffold a new vibe-ctl plugin.",
+  "type": "module",
+  "bin": {
+    "create-plugin": "./bin/index.mjs"
+  },
+  "main": "./dist/index.js",
+  "files": ["dist", "bin"],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist .turbo"
+  },
+  "dependencies": {
+    "kleur": "^4.1.5",
+    "prompts": "^2.4.2"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/prompts": "^2.4.9",
+    "@vibe-ctl/tsconfig": "workspace:*",
+    "tsup": "^8.3.0",
+    "typescript": "^5.7.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

@@ -13,7 +13,7 @@
   "dependencies": {
     "@vibe-ctl/runtime": "workspace:*",
     "@vibe-ctl/canvas": "workspace:*",
-    "@vibe-ctl/extension-api": "workspace:*"
+    "@vibe-ctl/plugin-api": "workspace:*"
   },
   "peerDependencies": {
     "electron": "^41.2.0",

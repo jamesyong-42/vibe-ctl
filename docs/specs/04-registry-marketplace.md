@@ -3,7 +3,7 @@
 > The distribution model for third-party plugins. How developers publish,
 > how users discover and install, how updates flow.
 
-**Depends on:** `01-extension-system.md`, `03-monorepo-layout.md`
+**Depends on:** `01-plugin-system.md`, `03-monorepo-layout.md`
 
 ---
 
@@ -45,7 +45,7 @@ vibe-ctl/plugins/
 ├── scripts/
 │   ├── validate.ts                     # Runs in CI on PRs
 │   ├── fetch-manifests.ts              # Fetches each plugin's manifest from GH release
-│   └── publish.ts                      # Used by vibe-ctl-plugin-registry-tools CLI
+│   └── publish.ts                      # Used by @vibe-ctl/plugin-cli CLI
 └── .github/
     └── workflows/
         ├── validate-pr.yml             # CI on PRs
@@ -119,7 +119,7 @@ vibe-ctl/plugins/
 ### Step 1: Create the plugin
 
 ```bash
-npx create-vibe-plugin my-awesome-plugin
+npx @vibe-ctl/create-plugin my-awesome-plugin
 cd my-awesome-plugin
 # Edit src/, plugin.json, README.md
 pnpm build
@@ -155,7 +155,7 @@ validates this.
 Option A -- CLI (recommended):
 
 ```bash
-npx vibe-ctl-plugin-registry-tools submit
+npx @vibe-ctl/plugin-cli submit
 # Interactive: prompts for repo, category, etc.
 # Creates a fork, branch, commits plugins.json change, opens PR.
 ```
@@ -501,25 +501,25 @@ which to install. Perfect for:
 
 ---
 
-## 8. `plugin-registry-tools` CLI
+## 8. `plugin-cli` CLI
 
-Published separately as `vibe-ctl-plugin-registry-tools` (or similar).
+Published separately as `@vibe-ctl/plugin-cli` (or similar).
 Helps plugin authors manage their registry entries.
 
 ```bash
 # Submit a new plugin
-vibe-ctl-plugin-registry submit
+vibe-ctl-plugin submit
 # Prompts interactively, opens PR
 
 # Validate your plugin.json against the schema
-vibe-ctl-plugin-registry validate ./plugin.json
+vibe-ctl-plugin validate ./plugin.json
 
 # Check if your latest release is properly set up
-vibe-ctl-plugin-registry check <repo>
+vibe-ctl-plugin check <repo>
 # Verifies: tag matches version, plugin.json + index.js in assets, manifest valid
 
 # Pre-release (not submitted to registry, users install via BRAT-style URL)
-vibe-ctl-plugin-registry prerelease
+vibe-ctl-plugin prerelease
 ```
 
 ---
@@ -612,7 +612,7 @@ Obsidian did this exact arc. Took ~6 months to reach meaningful diversity.
   suggested. Author updates via PR.
 - **Workspace bundles ("install these 5 at once") deferred.** Post-launch
   UX polish. Not blocking v1.
-- **`create-vibe-plugin` CLI is the primary scaffold.** A public
+- **`@vibe-ctl/create-plugin` CLI is the primary scaffold.** A public
   `vibe-ctl/plugin-template` repo exists as a forkable reference for
   authors who prefer that starting point, but docs point to the CLI
   first.

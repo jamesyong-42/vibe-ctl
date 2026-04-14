@@ -13,7 +13,7 @@
  * Follows the bootstrap sequence of spec 02 §10.
  */
 
-import type { Logger } from '@vibe-ctl/extension-api';
+import type { Logger } from '@vibe-ctl/plugin-api';
 import type { KernelWorld } from './ecs/world.js';
 import type {
   DiscoveryResult,

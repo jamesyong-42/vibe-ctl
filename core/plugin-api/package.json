@@ -1,0 +1,45 @@
+{
+  "name": "@vibe-ctl/plugin-api",
+  "version": "1.0.0-alpha.0",
+  "license": "MIT",
+  "description": "Plugin contract for vibe-ctl.",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist .turbo"
+  },
+  "dependencies": {
+    "zod": "^3.23.0",
+    "semver": "^7.6.0"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "@vibecook/truffle": "^0.4.2"
+  },
+  "peerDependenciesMeta": {
+    "react": { "optional": true },
+    "@vibecook/truffle": { "optional": true }
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "@types/semver": "^7.5.0",
+    "@vibe-ctl/tsconfig": "workspace:*",
+    "tsup": "^8.3.0",
+    "typescript": "^5.7.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

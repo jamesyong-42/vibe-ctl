@@ -1,4 +1,4 @@
-import { Plugin } from '@vibe-ctl/extension-api';
+import { Plugin } from '@vibe-ctl/plugin-api';
 import type { ClaudeCodeMainApi } from './main';
 import { ProjectListWidget } from './widgets/ProjectListWidget';
 

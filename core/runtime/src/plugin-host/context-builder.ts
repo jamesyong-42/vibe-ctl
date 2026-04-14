@@ -9,7 +9,7 @@
  * impersonate another).
  */
 
-import type { Logger, PluginContext, PluginTier } from '@vibe-ctl/extension-api';
+import type { Logger, PluginContext, PluginTier } from '@vibe-ctl/plugin-api';
 import type { CommandRegistry } from '../command-registry.js';
 import type { PermissionManager } from '../permission-manager.js';
 import type { ServiceRegistry } from '../service-registry.js';

@@ -20,7 +20,7 @@
     "clean": "rm -rf dist .turbo"
   },
   "dependencies": {
-    "@vibe-ctl/extension-api": "workspace:*"
+    "@vibe-ctl/plugin-api": "workspace:*"
   },
   "peerDependencies": {
     "@jamesyong42/infinite-canvas": "^0.1.0",

@@ -1,4 +1,4 @@
-import type { PanelProps } from '@vibe-ctl/extension-api';
+import type { PanelProps } from '@vibe-ctl/plugin-api';
 import type { CSSProperties, FC } from 'react';
 
 export type { PanelProps };

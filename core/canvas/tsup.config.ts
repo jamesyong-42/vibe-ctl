@@ -8,7 +8,7 @@ export default defineConfig({
   sourcemap: true,
   dts: true,
   external: [
-    '@vibe-ctl/extension-api',
+    '@vibe-ctl/plugin-api',
     '@jamesyong42/infinite-canvas',
     '@jamesyong42/reactive-ecs',
     '@vibecook/truffle',

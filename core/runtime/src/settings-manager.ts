@@ -9,7 +9,7 @@
  * automatically; this manager enforces that on writes as a defence in depth.
  */
 
-import type { Disposable } from '@vibe-ctl/extension-api';
+import type { Disposable } from '@vibe-ctl/plugin-api';
 import type { KernelDocs } from './sync/kernel-docs.js';
 
 export interface SettingsManagerOptions {

@@ -22,7 +22,7 @@
   },
   "permissions": ["mesh:proxy"],
   "hostProvided": [
-    "@vibe-ctl/extension-api",
+    "@vibe-ctl/plugin-api",
     "react",
     "react-dom",
     "@jamesyong42/infinite-canvas",

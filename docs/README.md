@@ -10,7 +10,7 @@ Five documents define the current architecture. Read in order.
 | File | Contents |
 |---|---|
 | [00-overview.md](specs/00-overview.md) | Vision, module inventory, tech stack, architecture diagram |
-| [01-extension-system.md](specs/01-extension-system.md) | Plugin manifest, `Plugin` class, `PluginContext`, widget system, services, permissions |
+| [01-plugin-system.md](specs/01-plugin-system.md) | Plugin manifest, `Plugin` class, `PluginContext`, widget system, services, permissions |
 | [02-kernel-runtime.md](specs/02-kernel-runtime.md) | Kernel implementation: three layers, three sync principles, lifecycle, teardown |
 | [03-monorepo-layout.md](specs/03-monorepo-layout.md) | File tree, build pipeline, first-party plugin catalogue |
 | [04-registry-marketplace.md](specs/04-registry-marketplace.md) | Git-based registry, publishing, installation, updates, trust model |
@@ -27,7 +27,7 @@ third-party. No "core features" bypass the plugin system.
 │  claude-code · terminal · notifications · themes      │
 │  dynamic-island · side-panels · mesh-widgets · ...    │
 └──────────────────────────────────────────────────────┘
-                      ↕ @vibe-ctl/extension-api
+                      ↕ @vibe-ctl/plugin-api
 ┌──────────────────────────────────────────────────────┐
 │  Kernel — three layers                                │
 │  Plugin Host │ Sync Fabric │ Platform                 │

@@ -6,7 +6,7 @@ allowed-tools: Read, Write, Edit, Bash(ls *), Bash(mkdir *)
 
 Scaffold a new first-party plugin at `plugins/$1/`.
 
-Read `docs/specs/01-extension-system.md` §2, §13 and
+Read `docs/specs/01-plugin-system.md` §2, §13 and
 `docs/specs/03-monorepo-layout.md` §5, §6 first to confirm current conventions.
 
 Before scaffolding:

@@ -4,7 +4,7 @@
 > Tight version built around three sync principles and one concrete
 > walkthrough.
 
-**Depends on:** `01-extension-system.md`
+**Depends on:** `01-plugin-system.md`
 
 ---
 

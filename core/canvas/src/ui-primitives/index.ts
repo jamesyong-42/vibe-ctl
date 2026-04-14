@@ -1,4 +1,4 @@
-import type { UI } from '@vibe-ctl/extension-api';
+import type { UI } from '@vibe-ctl/plugin-api';
 import { Badge } from './Badge.js';
 import { Button } from './Button.js';
 import { Icon } from './Icon.js';
@@ -28,7 +28,7 @@ export {
 };
 
 // Re-export component prop types (canonically declared in
-// @vibe-ctl/extension-api) for convenient import from @vibe-ctl/canvas.
+// @vibe-ctl/plugin-api) for convenient import from @vibe-ctl/canvas.
 export type {
   BadgeProps,
   ButtonProps,
@@ -43,14 +43,14 @@ export type {
   SpinnerProps,
   TooltipProps,
   UI,
-} from '@vibe-ctl/extension-api';
+} from '@vibe-ctl/plugin-api';
 
 /**
  * The runtime implementation of `ctx.ui`. The kernel assigns this to
  * every plugin's `PluginContext` when constructing `ctx`. Plugins read
  * it via `useUI()` inside widget components.
  *
- * Typed against `UI` from `@vibe-ctl/extension-api` so the kernel can
+ * Typed against `UI` from `@vibe-ctl/plugin-api` so the kernel can
  * pass this straight into the plugin context with no widening.
  */
 export const ui: UI = {

@@ -27,7 +27,7 @@ import { Runtime, type RuntimeOptions } from '@vibe-ctl/runtime';
 
 The runtime is consumed by `@vibe-ctl/shell` and, in tests, directly. It
 is never imported by plugins — plugins talk to the runtime through
-`ctx.*` façades defined in `@vibe-ctl/extension-api`.
+`ctx.*` façades defined in `@vibe-ctl/plugin-api`.
 
 ## Scripts
 

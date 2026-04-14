@@ -1,4 +1,4 @@
-import type { ButtonProps } from '@vibe-ctl/extension-api';
+import type { ButtonProps } from '@vibe-ctl/plugin-api';
 import type { CSSProperties, FC } from 'react';
 
 export type { ButtonProps };

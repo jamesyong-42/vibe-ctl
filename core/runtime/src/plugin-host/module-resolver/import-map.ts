@@ -2,7 +2,7 @@
  * Host-provided module resolution. Spec 03 §4.
  *
  * Plugins mark these packages `external` in their bundler:
- *   @vibe-ctl/extension-api, react, react-dom,
+ *   @vibe-ctl/plugin-api, react, react-dom,
  *   @jamesyong42/infinite-canvas, @jamesyong42/reactive-ecs,
  *   @vibecook/truffle
  *
@@ -13,7 +13,7 @@
 
 /** The canonical list of host-provided packages. */
 export const HOST_PROVIDED_PACKAGES = Object.freeze([
-  '@vibe-ctl/extension-api',
+  '@vibe-ctl/plugin-api',
   'react',
   'react-dom',
   '@jamesyong42/infinite-canvas',

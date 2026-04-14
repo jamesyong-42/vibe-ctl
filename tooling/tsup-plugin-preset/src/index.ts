@@ -8,7 +8,7 @@ import type { Options } from 'tsup';
  * These are injected by the kernel at runtime — plugins never bundle them.
  */
 export const pluginExternals = [
-  '@vibe-ctl/extension-api',
+  '@vibe-ctl/plugin-api',
   '@jamesyong42/infinite-canvas',
   '@jamesyong42/reactive-ecs',
   '@vibecook/truffle',

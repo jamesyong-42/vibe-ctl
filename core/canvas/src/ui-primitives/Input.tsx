@@ -1,4 +1,4 @@
-import type { InputProps } from '@vibe-ctl/extension-api';
+import type { InputProps } from '@vibe-ctl/plugin-api';
 import type { CSSProperties, FC } from 'react';
 
 export type { InputProps };

@@ -13,7 +13,7 @@ Responsibilities:
    `../../docs/specs/02-kernel-runtime.md` §4.2.
 3. **UI primitives** — runtime implementations of the
    `ctx.ui.*` React components declared in
-   `@vibe-ctl/extension-api`.
+   `@vibe-ctl/plugin-api`.
 4. **Placement slots** — React components that mount plugin-contributed
    widgets in each built-in placement (canvas, side panel, status bar,
    command palette, notification surface).

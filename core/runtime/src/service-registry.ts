@@ -19,7 +19,7 @@
  * event.
  */
 
-import type { Disposable, PluginTier } from '@vibe-ctl/extension-api';
+import type { Disposable, PluginTier } from '@vibe-ctl/plugin-api';
 
 export interface ProvideOpts {
   warmup?: Promise<void>;

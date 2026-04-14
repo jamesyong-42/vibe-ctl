@@ -2,11 +2,15 @@
   "name": "@vibe-ctl/tsconfig",
   "version": "1.0.0",
   "license": "MIT",
+  "description": "Shared TypeScript config presets for vibe-ctl packages and plugins.",
   "files": [
     "base.json",
     "library.json",
     "plugin.json",
     "electron-main.json",
     "electron-renderer.json"
-  ]
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
 }

@@ -1,4 +1,4 @@
-import type { TooltipProps } from '@vibe-ctl/extension-api';
+import type { TooltipProps } from '@vibe-ctl/plugin-api';
 import type { CSSProperties, FC } from 'react';
 
 export type { TooltipProps };

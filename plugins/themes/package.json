@@ -10,7 +10,7 @@
     "clean": "rm -rf dist .turbo"
   },
   "peerDependencies": {
-    "@vibe-ctl/extension-api": "workspace:*",
+    "@vibe-ctl/plugin-api": "workspace:*",
     "@jamesyong42/infinite-canvas": "^0.1.0",
     "@jamesyong42/reactive-ecs": "^0.1.1",
     "react": "^19.0.0",
@@ -18,7 +18,7 @@
   },
   "devDependencies": {
     "@types/react": "^19.0.0",
-    "@vibe-ctl/extension-api": "workspace:*",
+    "@vibe-ctl/plugin-api": "workspace:*",
     "@vibe-ctl/tsconfig": "workspace:*",
     "@vibe-ctl/tsup-plugin-preset": "workspace:*",
     "tsup": "^8.3.0",

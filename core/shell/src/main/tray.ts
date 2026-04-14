@@ -3,7 +3,7 @@
  *
  * Stub: first-party plugins (notifications, dynamic-island, quick-actions)
  * contribute actual menu entries via the tray contribution point once the
- * extension API surface is wired. For now, we render a static skeleton.
+ * plugin API surface is wired. For now, we render a static skeleton.
  */
 
 import { BrowserWindow, Menu, Tray, app, nativeImage } from 'electron';

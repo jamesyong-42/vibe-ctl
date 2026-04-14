@@ -1,4 +1,4 @@
-import type { WidgetProps } from '@vibe-ctl/extension-api';
+import type { WidgetProps } from '@vibe-ctl/plugin-api';
 
 /**
  * Widget: port proxy controls. Lets the user expose a local port via

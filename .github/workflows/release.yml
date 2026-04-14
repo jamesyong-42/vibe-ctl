@@ -40,4 +40,7 @@ jobs:
           publish: pnpm changeset publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          # Enables npm provenance via GitHub OIDC (needs id-token: write above).
+          # Every published tarball gets a sigstore attestation linking it to
+          # this workflow run + commit. Visible as "Provenance" on npmjs.com.
+          NPM_CONFIG_PROVENANCE: true

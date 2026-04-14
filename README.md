@@ -40,7 +40,7 @@ No "core features" that bypass the plugin system.
 │  claude-code · terminal · notifications · themes     │
 │  dynamic-island · project-manager · mesh-widgets · … │
 └──────────────────────────────────────────────────────┘
-                      ↕ @vibe-ctl/extension-api
+                      ↕ @vibe-ctl/plugin-api
 ┌──────────────────────────────────────────────────────┐
 │  Kernel — three layers                               │
 │  Plugin Host │ Sync Fabric │ Platform                │
@@ -93,7 +93,7 @@ Pre-commit hooks run Biome on staged files; pre-push runs `pnpm typecheck`.
 ```
 vibe-ctl/
 ├── core/                   # The kernel (4 packages)
-│   ├── extension-api/      # Published. Plugin contract (types + Plugin class).
+│   ├── plugin-api/      # Published. Plugin contract (types + Plugin class).
 │   ├── runtime/            # Plugin host + sync fabric.
 │   ├── canvas/             # Canvas substrate + CRDT sync adapter + UI primitives.
 │   └── shell/              # Electron shell (main / preload / renderer).
@@ -114,8 +114,8 @@ vibe-ctl/
 │
 ├── tooling/
 │   ├── tsconfig/           # Shared tsconfig presets (published)
-│   ├── create-vibe-plugin/ # CLI scaffold (published)
-│   └── plugin-registry-tools/ # Registry PR CLI (published)
+│   ├── @vibe-ctl/create-plugin/ # CLI scaffold (published)
+│   └── plugin-cli/ # Registry PR CLI (published)
 │
 └── docs/
     ├── README.md           # Docs index
@@ -129,7 +129,7 @@ vibe-ctl/
 | Doc | Contents |
 |---|---|
 | [docs/specs/00-overview.md](docs/specs/00-overview.md) | Vision, modules, tech stack |
-| [docs/specs/01-extension-system.md](docs/specs/01-extension-system.md) | Plugin API (manifest + class + context) |
+| [docs/specs/01-plugin-system.md](docs/specs/01-plugin-system.md) | Plugin API (manifest + class + context) |
 | [docs/specs/02-kernel-runtime.md](docs/specs/02-kernel-runtime.md) | Kernel internals + sync model |
 | [docs/specs/03-monorepo-layout.md](docs/specs/03-monorepo-layout.md) | Build pipeline, package catalogue |
 | [docs/specs/04-registry-marketplace.md](docs/specs/04-registry-marketplace.md) | Distribution + trust model |

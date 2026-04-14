@@ -3,7 +3,7 @@
 > File tree, package boundaries, build pipeline. Aligned with the three
 > kernel layers from spec 02 and the plugin contract from spec 01.
 
-**Depends on:** `00-overview.md`, `01-extension-system.md`, `02-kernel-runtime.md`
+**Depends on:** `00-overview.md`, `01-plugin-system.md`, `02-kernel-runtime.md`
 
 ---
 
@@ -22,7 +22,7 @@ vibe-ctl/
 ├── specs/                              # These spec documents
 │
 ├── core/                               # The kernel (private packages)
-│   ├── extension-api/                  # Published to npm
+│   ├── plugin-api/                  # Published to npm
 │   ├── runtime/                        # Plugin host + sync fabric
 │   ├── canvas/                         # Canvas substrate + sync adapter
 │   └── shell/                          # Electron shell + UI chrome
@@ -45,8 +45,8 @@ vibe-ctl/
 ├── tooling/
 │   ├── tsconfig/                       # Shared tsconfig presets
 │   ├── eslint-config/                  # Or biome config
-│   ├── create-vibe-plugin/             # npx create-vibe-plugin
-│   └── plugin-registry-tools/
+│   ├── @vibe-ctl/create-plugin/             # npx @vibe-ctl/create-plugin
+│   └── plugin-cli/
 │
 └── e2e/                                # End-to-end tests
 ```
@@ -116,7 +116,7 @@ module.exports = { hooks: { readPackage } };
     "typecheck": "turbo run typecheck",
     "lint": "turbo run lint",
     "test": "turbo run test",
-    "create-plugin": "npx create-vibe-plugin"
+    "create-plugin": "npx @vibe-ctl/create-plugin"
   },
   "pnpm": {
     "overrides": {
@@ -156,13 +156,13 @@ module.exports = { hooks: { readPackage } };
 
 ## 3. Core Packages
 
-### `core/extension-api/` -- `@vibe-ctl/extension-api` (PUBLISHED)
+### `core/plugin-api/` -- `@vibe-ctl/plugin-api` (PUBLISHED)
 
 The plugin author's contract. Everything in spec 01. Published to npm so
 third-party plugin authors `npm install` it.
 
 ```
-core/extension-api/
+core/plugin-api/
 ├── package.json
 ├── tsup.config.ts
 └── src/
@@ -233,7 +233,7 @@ core/runtime/
 ```
 
 **Dependencies:**
-- `@vibe-ctl/extension-api` (workspace)
+- `@vibe-ctl/plugin-api` (workspace)
 - `@jamesyong42/reactive-ecs` (ECS for kernel world)
 - `@vibecook/truffle` (mesh + CrdtDoc + SyncedStore)
 - `zod`, `semver`, `chokidar`
@@ -270,7 +270,7 @@ core/canvas/
 - `@jamesyong42/infinite-canvas` (external; provides ECS + renderer)
 - `@jamesyong42/reactive-ecs` (shared runtime with the canvas)
 - `@vibecook/truffle` (for CrdtDoc types)
-- `@vibe-ctl/extension-api` (workspace)
+- `@vibe-ctl/plugin-api` (workspace)
 
 ### `core/shell/` -- `@vibe-ctl/shell` (PRIVATE)
 
@@ -315,7 +315,7 @@ mark them `external` in their bundler config (see §5).
 
 | Package | Role |
 |---|---|
-| `@vibe-ctl/extension-api` | The plugin contract itself |
+| `@vibe-ctl/plugin-api` | The plugin contract itself |
 | `react`, `react-dom` | UI primitives consistent across plugins |
 | `@jamesyong42/infinite-canvas` | Canvas engine (shared ECS world) |
 | `@jamesyong42/reactive-ecs` | ECS library (shared runtime) |
@@ -369,7 +369,7 @@ plugins/claude-code/
     "@vibecook/spaghetti-sdk": "^0.5.1"
   },
   "peerDependencies": {
-    "@vibe-ctl/extension-api": "^1.0.0",
+    "@vibe-ctl/plugin-api": "^1.0.0",
     "react": "^19.0.0",
     "@vibecook/truffle": "^0.4.2",
     "@jamesyong42/reactive-ecs": "^0.1.0"
@@ -394,7 +394,7 @@ export default defineConfig({
   sourcemap: true,
   dts: false,
   external: [
-    '@vibe-ctl/extension-api',
+    '@vibe-ctl/plugin-api',
     'react',
     'react-dom',
     '@jamesyong42/infinite-canvas',
@@ -499,13 +499,13 @@ pnpm build
 turbo run build (respects dep graph)
     ↓
 ┌────────────────────────────────────────────────────┐
-│ core/extension-api  (no deps)                       │
+│ core/plugin-api  (no deps)                       │
 │     ↓                                                │
 │ core/runtime  +  core/canvas                         │
 │     ↓                                                │
 │ core/shell                                           │
 │     ↓                                                │
-│ plugins/* (parallel; all depend on extension-api)   │
+│ plugins/* (parallel; all depend on plugin-api)   │
 └────────────────────────────────────────────────────┘
     ↓
 turbo run bundle-plugins
@@ -535,16 +535,16 @@ tooling/tsconfig/
 └── electron-renderer.json
 ```
 
-Published to npm alongside `create-vibe-plugin` so third-party plugin
+Published to npm alongside `@vibe-ctl/create-plugin` so third-party plugin
 authors extend the same presets.
 
-### `tooling/create-vibe-plugin/`
+### `tooling/create-plugin/`
 
-Published as `create-vibe-plugin`. Scaffolds a new plugin with
+Published as `@vibe-ctl/create-plugin`. Scaffolds a new plugin with
 manifest, bundler config, tsconfig, and an empty `Plugin` subclass:
 
 ```bash
-npx create-vibe-plugin my-plugin
+npx @vibe-ctl/create-plugin my-plugin
 cd my-plugin
 pnpm install
 pnpm dev
@@ -553,9 +553,9 @@ pnpm dev
 Scaffolds both a single-entry and split-plugin skeleton based on a
 prompt at scaffold time.
 
-### `tooling/plugin-registry-tools/`
+### `tooling/plugin-cli/`
 
-Published as `vibe-ctl-plugin-registry-tools`. CLI that helps
+Published as `@vibe-ctl/plugin-cli`. CLI that helps
 third-party authors submit to the registry (see spec 04).
 
 ---
@@ -577,7 +577,7 @@ third-party authors submit to the registry (see spec 04).
 - Nothing else
 
 Writing agent-specific code in `core/` → move to a plugin. Writing
-shared infra inside a plugin → lift into `core/extension-api`.
+shared infra inside a plugin → lift into `core/plugin-api`.
 
 ---
 
@@ -595,7 +595,7 @@ shared infra inside a plugin → lift into `core/extension-api`.
   `apps/desktop/resources/plugins/`). Cacheable, inspectable, debuggable.
   electron-builder's `extraResources` glob is opaque when something's
   missing.
-- **`@vibe-ctl/extension-api` exports UI primitive types only; components
+- **`@vibe-ctl/plugin-api` exports UI primitive types only; components
   provided at runtime via `ctx.ui`.** Keeps the API package small (no
   React dep for authors using only types). Host versions components
   without breaking plugins.

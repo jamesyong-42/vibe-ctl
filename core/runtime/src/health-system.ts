@@ -14,7 +14,7 @@
  * silent cascade with user notification).
  */
 
-import type { Logger } from '@vibe-ctl/extension-api';
+import type { Logger } from '@vibe-ctl/plugin-api';
 import type { KernelWorld } from './ecs/world.js';
 
 export interface HealthSystemOptions {

@@ -17,7 +17,7 @@ Focus areas:
    one version-beacons slice. Are they all referenced in
    `core/runtime/src/sync/kernel-docs.ts`?
 4. **Plugin API surface** — spec 01 §5 lists every `ctx.*` member. Does
-   `core/extension-api/src/context.ts` export them all? Does the runtime
+   `core/plugin-api/src/context.ts` export them all? Does the runtime
    wire each one in `context-builder.ts`?
 
 Report findings as a bulleted list grouped by area. Do NOT make changes;

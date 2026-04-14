@@ -10,7 +10,7 @@
  * type at build time.
  */
 
-import type { Logger } from '@vibe-ctl/extension-api';
+import type { Logger } from '@vibe-ctl/plugin-api';
 import type { NapiNode } from '@vibecook/truffle';
 
 export interface MeshNodeOptions {

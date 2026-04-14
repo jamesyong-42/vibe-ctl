@@ -19,7 +19,7 @@
  *   - T3: install-time warning; prompt first-use always.
  */
 
-import type { PluginTier } from '@vibe-ctl/extension-api';
+import type { PluginTier } from '@vibe-ctl/plugin-api';
 import type { KernelDocs } from './sync/kernel-docs.js';
 
 export interface PermissionManagerOptions {

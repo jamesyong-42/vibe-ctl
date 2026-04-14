@@ -1,4 +1,4 @@
-import type { SpinnerProps } from '@vibe-ctl/extension-api';
+import type { SpinnerProps } from '@vibe-ctl/plugin-api';
 import type { CSSProperties, FC } from 'react';
 
 export type { SpinnerProps };

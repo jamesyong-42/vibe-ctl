@@ -1,4 +1,4 @@
-import { Plugin } from '@vibe-ctl/extension-api';
+import { Plugin } from '@vibe-ctl/plugin-api';
 import { LeftPanelHostWidget } from './widgets/LeftPanelHostWidget';
 import { RightPanelHostWidget } from './widgets/RightPanelHostWidget';
 
