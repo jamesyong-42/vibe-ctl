@@ -9,9 +9,13 @@
 import { contextBridge } from 'electron';
 
 // The typed host surface. Grows as kernel IPC channels are defined.
+//
+// Intentionally NOT exposed: process.versions (leaks Node/V8/Electron
+// minor versions to the renderer, useful for fingerprinting exploits).
+// Plugins that need version info request it via an IPC call which the
+// host can audit and gate.
 const vibeCtl = {
   platform: process.platform,
-  versions: process.versions,
   // TODO: expose IPC-backed host APIs here
   //   - runtime.queryPlugins()
   //   - runtime.enablePlugin(id) / disablePlugin(id)
