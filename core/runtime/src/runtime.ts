@@ -46,9 +46,15 @@ export class Runtime {
    * Scan plugin dirs (built-in, user, dev) and parse manifests into ECS
    * entities. Does NOT activate. Corresponds to step 6 of the bootstrap
    * sequence in spec 02 §10.
+   *
+   * Scaffold stub: returns an empty result with a warning log. Real
+   * implementation lives in `DiscoverySystem` (spec 02 §7). Kept as a
+   * viable no-op so the shell's dev loop can run end-to-end while the
+   * plugin host is being built out.
    */
   async discover(): Promise<DiscoveryResult> {
-    throw new Error('not implemented: Runtime.discover');
+    this.#logger.warn('[runtime] discover(): stub — returning empty result');
+    return { discovered: [], errors: [] };
   }
 
   /**
@@ -56,9 +62,12 @@ export class Runtime {
    * an activation order or a list of unresolved reasons (cycles, missing
    * non-optional deps, incompatible semver). Handled in the
    * `DependencyResolutionSystem`.
+   *
+   * Scaffold stub — see `discover()`.
    */
   async resolve(): Promise<ResolutionResult> {
-    throw new Error('not implemented: Runtime.resolve');
+    this.#logger.warn('[runtime] resolve(): stub — returning empty result');
+    return { activationOrder: [], unresolved: [] };
   }
 
   /**
@@ -70,20 +79,25 @@ export class Runtime {
    *   3. Create the kernel ECS world and register kernel systems.
    *   4. Discover + resolve plugins.
    *   5. Activate eager plugins in topological order.
+   *
+   * Scaffold stub — marks started so `stop()` pairs cleanly.
    */
   async start(): Promise<void> {
     if (this.#started) return;
-    throw new Error('not implemented: Runtime.start');
+    this.#logger.warn('[runtime] start(): stub — no-op, marking started');
+    this.#started = true;
   }
 
   /**
    * Reverse-topological teardown. Fires AbortSignals, runs each plugin's
    * onDeactivate (5s timeout), invalidates provided services, disposes
    * tracked disposables, closes sync docs, stops the NapiNode.
+   *
+   * Scaffold stub.
    */
   async stop(): Promise<void> {
     if (!this.#started) return;
-    throw new Error('not implemented: Runtime.stop');
+    this.#started = false;
   }
 
   // ─── Plugin control (user-initiated or programmatic) ────────────────
