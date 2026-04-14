@@ -10,6 +10,9 @@
     "package": "electron-builder --config electron-builder.yml",
     "typecheck": "tsc --noEmit"
   },
+  "dependencies": {
+    "electron-updater": "^6.8.3"
+  },
   "devDependencies": {
     "@vibe-ctl/shell": "workspace:*",
     "@vibe-ctl/tsconfig": "workspace:*",
