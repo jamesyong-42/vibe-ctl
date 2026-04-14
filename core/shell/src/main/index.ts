@@ -24,6 +24,11 @@ import { setupSecurity } from './security.js';
 import { type TrayHandle, createTray } from './tray.js';
 import { type WindowManager, createWindowManager } from './windows.js';
 
+// Override Electron's default app name (derived from the shell package's
+// `@vibe-ctl/shell`) so `userData`, the menu bar label, and the tray
+// tooltip all use a clean `vibe-ctl`. Must precede any `app.getPath()`.
+app.setName('vibe-ctl');
+
 // Enforce process sandboxing for every renderer and utilityProcess
 // regardless of per-window webPreferences. Must run before app-ready.
 app.enableSandbox();

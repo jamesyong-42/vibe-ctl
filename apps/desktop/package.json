@@ -6,7 +6,6 @@
   "main": "../../core/shell/out/main/index.js",
   "scripts": {
     "build": "echo 'Desktop build relies on @vibe-ctl/shell build' && exit 0",
-    "dev": "pnpm --filter @vibe-ctl/shell dev",
     "package": "electron-builder --config electron-builder.yml",
     "typecheck": "tsc --noEmit"
   },
