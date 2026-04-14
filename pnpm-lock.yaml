@@ -10,6 +10,8 @@ overrides:
   three: 0.183.2
   '@react-three/fiber': 9.5.0
 
+pnpmfileChecksum: sha256-Jjrj7+nkFxTW+KKtG3Dg37JdWwQU4BF0RGzF7t91s0s=
+
 importers:
 
   .:
