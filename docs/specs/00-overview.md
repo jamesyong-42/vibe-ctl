@@ -230,8 +230,9 @@ the architectural framing (service-layer vs kernel+plugins) is superseded.
   button. (spec 02 §9)
 
 ### Module Consumption
-- **`.pnpmfile.cjs` auto-linking.** Local module dirs are linked during dev
-  if present; falls back to npm in CI. Zero config switching. (spec 03 §2)
+- **`.pnpmfile.cjs` opt-in linking.** Set `VIBE_LINK_LOCAL=1` to link
+  sibling module checkouts during dev; default install + CI resolve
+  from npm so the committed lockfile stays portable. (spec 03 §2)
 - **Host-provided singletons.** `@vibe-ctl/plugin-api`, `react`,
   `react-dom`, `@jamesyong42/infinite-canvas`, `@jamesyong42/reactive-ecs`,
   `@vibecook/truffle` — plugins mark these `external` in their bundler.

@@ -15,7 +15,7 @@ vibe-ctl/
 ├── pnpm-workspace.yaml
 ├── turbo.json
 ├── tsconfig.base.json
-├── .pnpmfile.cjs                       # Auto-link local modules in dev
+├── .pnpmfile.cjs                       # Opt-in local linking (VIBE_LINK_LOCAL=1)
 ├── .node-version                       # 24
 ├── CLAUDE.md
 ├── README.md
@@ -44,9 +44,9 @@ vibe-ctl/
 │
 ├── tooling/
 │   ├── tsconfig/                       # Shared tsconfig presets
-│   ├── eslint-config/                  # Or biome config
-│   ├── @vibe-ctl/create-plugin/             # npx @vibe-ctl/create-plugin
-│   └── plugin-cli/
+│   ├── tsup-plugin-preset/             # Shared tsup preset for plugins
+│   ├── create-plugin/                  # @vibe-ctl/create-plugin (scaffolder)
+│   └── plugin-cli/                     # @vibe-ctl/plugin-cli (dev CLI)
 │
 └── e2e/                                # End-to-end tests
 ```
@@ -72,7 +72,9 @@ packages:
 
 External modules (truffle, spaghetti-sdk, avocado-sdk, infinite-canvas,
 reactive-ecs) are consumed as normal dependencies. `.pnpmfile.cjs`
-auto-links to local paths during development; falls back to npm in CI.
+provides **opt-in** local linking: set `VIBE_LINK_LOCAL=1` before
+`pnpm install` to link to sibling checkouts; default install and CI
+resolve from npm so the committed lockfile stays portable.
 
 ### `.pnpmfile.cjs`
 
@@ -89,11 +91,12 @@ const LOCAL_MODULES = {
 };
 
 function readPackage(pkg) {
+  if (!process.env.VIBE_LINK_LOCAL) return pkg;
   for (const [name, localPath] of Object.entries(LOCAL_MODULES)) {
     const absPath = path.resolve(__dirname, localPath);
-    if (pkg.dependencies?.[name] && fs.existsSync(absPath)) {
-      pkg.dependencies[name] = 'link:' + localPath;
-    }
+    if (!fs.existsSync(absPath)) continue;
+    if (pkg.dependencies?.[name])    pkg.dependencies[name]    = `link:${absPath}`;
+    if (pkg.devDependencies?.[name]) pkg.devDependencies[name] = `link:${absPath}`;
   }
   return pkg;
 }

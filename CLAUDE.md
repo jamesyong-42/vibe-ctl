@@ -95,11 +95,13 @@ VIBE_CTL_DEV_PLUGINS=~/my-plugin pnpm dev
 # Kernel loads it as T3 (community tier) with hot-reload.
 ```
 
-## Source modules (auto-linked by `.pnpmfile.cjs` when paths exist)
+## Source modules (opt-in linking via `.pnpmfile.cjs`)
 
-If these local directories exist on disk, pnpm links to them directly for
-instant iteration. If they don't exist (CI, fresh clone), pnpm falls back
-to the npm registry versions.
+Set `VIBE_LINK_LOCAL=1` before `pnpm install` and pnpm links to these
+local paths for instant iteration. Without the env var (default, CI,
+fresh clone), pnpm resolves from the npm registry — keeps the committed
+lockfile portable. Do NOT commit a lockfile generated with
+`VIBE_LINK_LOCAL=1` — it contains absolute paths that break CI.
 
 | Package | Local path |
 |---|---|
