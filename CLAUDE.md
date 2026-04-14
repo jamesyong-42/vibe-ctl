@@ -24,6 +24,7 @@ Outdated specs are in `docs/specs/outdated/`. Do not use them as source of truth
 | `plugins/*` | First-party plugins (T1), bundled into the app. |
 | `apps/desktop` | Electron packaging + resources. |
 | `tooling/tsconfig` | Shared tsconfig presets (published). |
+| `tooling/tsup-plugin-preset` | Shared tsup config for plugins (externals + asset copying). |
 | `tooling/create-vibe-plugin` | Plugin scaffold CLI. |
 | `tooling/plugin-registry-tools` | Registry PR CLI. |
 
@@ -34,14 +35,15 @@ Outdated specs are in `docs/specs/outdated/`. Do not use them as source of truth
 - **TypeScript 5.7+** strict mode. `verbatimModuleSyntax` is on — always
   use `import type` for type-only imports and `.js` extensions in relative
   imports.
-- **Biome** for lint + format. Runs automatically on pre-commit.
+- **Biome** for lint + format + import sorting. Runs automatically on pre-commit.
 - **tsup** for library builds (emits ESM + `.d.ts`). Plugins bundle ESM
   only (no `.d.ts` — plugins are consumed, not imported as types).
 - **electron-vite** for the Electron shell (HMR across main/preload/renderer).
-- **Host-provided singletons** (marked `external` in every plugin's
-  `tsup.config.ts`): `@vibe-ctl/extension-api`, `react`, `react-dom`,
+- **Host-provided singletons** (managed by `@vibe-ctl/tsup-plugin-preset`):
+  `@vibe-ctl/extension-api`, `react`, `react-dom`,
   `@jamesyong42/infinite-canvas`, `@jamesyong42/reactive-ecs`,
   `@vibecook/truffle`. Plugins never bundle their own copies of these.
+  Use `definePluginConfig()` from the preset — do not inline the external list.
 
 ## Scripts
 
@@ -53,7 +55,9 @@ pnpm lint         # Biome check (read-only)
 pnpm lint:fix     # Biome check --write (auto-fix)
 pnpm format       # Biome format --write
 pnpm typecheck    # tsc --noEmit across all packages
-pnpm test         # turbo run test
+pnpm test         # vitest run (workspace-wide)
+pnpm clean        # turbo run clean (all packages)
+pnpm changeset    # create a changeset for versioning
 pnpm create-plugin <name>   # scaffold a new first-party plugin
 ```
 
@@ -116,11 +120,21 @@ to the npm registry versions.
 
 ## Testing
 
-- No test framework wired yet. When we add one, it'll be Vitest (native
-  ESM, fast, works across workspace). Until then, stubs return typed
-  `throw new Error('not implemented')` — that's expected.
+- **Vitest** is wired as the test framework. Test files go in
+  `src/**/*.test.ts` within each package. Run with `pnpm test`.
 - The quality bar is `pnpm typecheck && pnpm lint && pnpm build` passing,
   not test coverage.
+
+## CI/CD
+
+- **GitHub Actions** runs on every push to `main` and every PR:
+  `pnpm install --frozen-lockfile`, `pnpm lint`, `pnpm typecheck`,
+  `pnpm build`, `pnpm test`.
+- **Changesets** handles release versioning. Run `pnpm changeset` to
+  describe version bumps before merging. The release workflow opens a
+  "Version Packages" PR and publishes to npm on merge.
+- **Renovate** keeps dependencies up to date with grouped PRs and
+  automerge for safe updates.
 
 ## What NOT to do
 

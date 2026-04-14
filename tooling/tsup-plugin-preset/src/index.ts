@@ -40,11 +40,7 @@ function copyPluginAssets(): void {
  * Host-provided externals and asset copying are handled automatically.
  */
 export function definePluginConfig(overrides: Partial<Options> = {}) {
-  const {
-    external: extraExternal = [],
-    onSuccess: userOnSuccess,
-    ...rest
-  } = overrides;
+  const { external: extraExternal = [], onSuccess: userOnSuccess, ...rest } = overrides;
 
   const mergedExternal = [
     ...pluginExternals,
