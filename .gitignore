@@ -1,0 +1,33 @@
+# Build artifacts
+node_modules/
+dist/
+out/
+.turbo/
+release/
+
+# Bundled plugins (copied at build time from plugins/*/dist into apps/desktop)
+apps/desktop/resources/plugins/
+!apps/desktop/resources/plugins/.gitkeep
+
+# Logs & OS
+*.log
+.DS_Store
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Editor / IDE
+.idea/
+.vscode/
+
+# Claude Code — user-local (keep settings.json committed, ignore the rest)
+.claude/settings.local.json
+.claude/chat
+.claude/projects/
+.claude/todos/
+
+# Memory system (per-user, under ~/.claude/projects/*/memory/ normally, but
+# just in case someone's system writes into the repo)
+.claude/memory/

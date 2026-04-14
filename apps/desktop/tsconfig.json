@@ -1,0 +1,7 @@
+{
+  "extends": "@vibe-ctl/tsconfig/base.json",
+  "compilerOptions": {
+    "noEmit": true
+  },
+  "include": ["src/**/*"]
+}

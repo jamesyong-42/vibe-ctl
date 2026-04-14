@@ -1,0 +1,10 @@
+{
+  "extends": "@vibe-ctl/tsconfig/electron-renderer.json",
+  "compilerOptions": {
+    "composite": true,
+    "rootDir": "src/renderer",
+    "outDir": "out/.types/renderer",
+    "tsBuildInfoFile": "out/.types/renderer.tsbuildinfo"
+  },
+  "include": ["src/renderer/**/*"]
+}

@@ -1,0 +1,4 @@
+{
+  "extends": "@vibe-ctl/tsconfig/plugin.json",
+  "include": ["src/**/*"]
+}

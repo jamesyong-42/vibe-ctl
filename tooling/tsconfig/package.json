@@ -1,0 +1,12 @@
+{
+  "name": "@vibe-ctl/tsconfig",
+  "version": "1.0.0",
+  "license": "MIT",
+  "files": [
+    "base.json",
+    "library.json",
+    "plugin.json",
+    "electron-main.json",
+    "electron-renderer.json"
+  ]
+}

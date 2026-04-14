@@ -1,0 +1,34 @@
+{
+  "$schema": "https://vibe-ctl.dev/schemas/plugin/v1.json",
+  "id": "@vibe-ctl/plugin-quick-actions",
+  "name": "Quick Actions",
+  "version": "0.1.0",
+  "apiVersion": "^1.0.0",
+  "description": "Common action widgets: start new session, open terminal, run command. Thin shortcuts that call into other plugins' services.",
+  "author": { "name": "vibe-ctl" },
+  "license": "MIT",
+  "icon": "./assets/icon.svg",
+  "executionContext": "renderer",
+  "entry": "./dist/index.js",
+  "eagerActivation": false,
+  "engines": { "vibe-ctl": "^1.0.0" },
+  "provides": {},
+  "dependencies": {},
+  "optionalDependencies": {
+    "claude-code": "^1.0.0",
+    "terminal": "^1.0.0"
+  },
+  "waitForReady": [],
+  "sync": {
+    "settings": true,
+    "data": []
+  },
+  "permissions": [],
+  "hostProvided": [
+    "@vibe-ctl/extension-api",
+    "react",
+    "react-dom",
+    "@jamesyong42/infinite-canvas",
+    "@jamesyong42/reactive-ecs"
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "name": "@vibe-ctl/plugin-claude-code",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsup && cp plugin.json dist/ && cp -r assets dist/",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist .turbo"
+  },
+  "dependencies": {
+    "@vibecook/spaghetti-sdk": "^0.5.1"
+  },
+  "peerDependencies": {
+    "@vibe-ctl/extension-api": "workspace:*",
+    "@jamesyong42/infinite-canvas": "^0.1.0",
+    "@jamesyong42/reactive-ecs": "^0.1.1",
+    "@vibecook/truffle": "^0.4.2",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "@vibe-ctl/extension-api": "workspace:*",
+    "@vibe-ctl/tsconfig": "workspace:*",
+    "tsup": "^8.3.0",
+    "typescript": "^5.7.0"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "extends": "@vibe-ctl/tsconfig/electron-main.json",
+  "compilerOptions": {
+    "composite": true,
+    "rootDir": "src",
+    "outDir": "out/.types/main",
+    "tsBuildInfoFile": "out/.types/main.tsbuildinfo"
+  },
+  "include": ["src/main/**/*", "src/preload/**/*"]
+}

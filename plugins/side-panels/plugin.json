@@ -1,0 +1,33 @@
+{
+  "$schema": "https://vibe-ctl.dev/schemas/plugin/v1.json",
+  "id": "@vibe-ctl/plugin-side-panels",
+  "name": "Side Panels",
+  "version": "0.1.0",
+  "apiVersion": "^1.0.0",
+  "description": "Left/right side panel host. Owns panel layout, tabs, and resizing; hosts widgets placed on `side-panel:left` / `side-panel:right`.",
+  "author": { "name": "vibe-ctl" },
+  "license": "MIT",
+  "icon": "./assets/icon.svg",
+  "executionContext": "renderer",
+  "entry": "./dist/index.js",
+  "eagerActivation": true,
+  "engines": { "vibe-ctl": "^1.0.0" },
+  "provides": {},
+  "dependencies": {},
+  "optionalDependencies": {
+    "projects": "^1.0.0"
+  },
+  "waitForReady": [],
+  "sync": {
+    "settings": true,
+    "data": []
+  },
+  "permissions": [],
+  "hostProvided": [
+    "@vibe-ctl/extension-api",
+    "react",
+    "react-dom",
+    "@jamesyong42/infinite-canvas",
+    "@jamesyong42/reactive-ecs"
+  ]
+}

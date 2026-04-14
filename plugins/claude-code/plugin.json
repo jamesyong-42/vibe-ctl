@@ -1,0 +1,32 @@
+{
+  "$schema": "https://vibe-ctl.dev/schemas/plugin/v1.json",
+  "id": "@vibe-ctl/plugin-claude-code",
+  "name": "Claude Code",
+  "version": "0.1.0",
+  "apiVersion": "^1.0.0",
+  "description": "Claude Code session management: discovers Spaghetti-SDK sessions, exposes transcripts, and bridges hook events.",
+  "author": { "name": "vibe-ctl" },
+  "license": "MIT",
+  "icon": "./assets/icon.svg",
+  "executionContext": "split",
+  "entry": { "main": "./dist/main.js", "renderer": "./dist/renderer.js" },
+  "eagerActivation": true,
+  "engines": { "vibe-ctl": "^1.0.0" },
+  "provides": { "claude-code": "1.0.0" },
+  "dependencies": {},
+  "optionalDependencies": {},
+  "waitForReady": [],
+  "sync": {
+    "settings": true,
+    "data": [{ "name": "session-index", "type": "store", "scope": "per-device" }]
+  },
+  "permissions": ["claude-code:read-transcripts", "claude-code:approve", "filesystem.state"],
+  "hostProvided": [
+    "@vibe-ctl/extension-api",
+    "react",
+    "react-dom",
+    "@jamesyong42/infinite-canvas",
+    "@jamesyong42/reactive-ecs",
+    "@vibecook/truffle"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "name": "@vibe-ctl/desktop",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "../../core/shell/out/main/index.js",
+  "scripts": {
+    "build": "echo 'Desktop build relies on @vibe-ctl/shell build' && exit 0",
+    "dev": "pnpm --filter @vibe-ctl/shell dev",
+    "package": "electron-builder --config electron-builder.yml",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@vibe-ctl/shell": "workspace:*",
+    "@vibe-ctl/tsconfig": "workspace:*",
+    "electron": "^41.2.0",
+    "electron-builder": "^26.8.1",
+    "typescript": "^5.7.0"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "$schema": "https://vibe-ctl.dev/schemas/plugin/v1.json",
+  "id": "@vibe-ctl/plugin-mesh-widgets",
+  "name": "Mesh Widgets",
+  "version": "0.1.0",
+  "apiVersion": "^1.0.0",
+  "description": "UI widgets for the kernel mesh: device-status list, shared-services list, and port-proxy controls.",
+  "author": { "name": "vibe-ctl" },
+  "license": "MIT",
+  "icon": "./assets/icon.svg",
+  "executionContext": "renderer",
+  "entry": "./dist/index.js",
+  "eagerActivation": false,
+  "engines": { "vibe-ctl": "^1.0.0" },
+  "provides": {},
+  "dependencies": {},
+  "optionalDependencies": {},
+  "waitForReady": [],
+  "sync": {
+    "settings": true,
+    "data": []
+  },
+  "permissions": ["mesh:proxy"],
+  "hostProvided": [
+    "@vibe-ctl/extension-api",
+    "react",
+    "react-dom",
+    "@jamesyong42/infinite-canvas",
+    "@jamesyong42/reactive-ecs"
+  ]
+}

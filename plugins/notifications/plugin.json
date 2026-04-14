@@ -1,0 +1,34 @@
+{
+  "$schema": "https://vibe-ctl.dev/schemas/plugin/v1.json",
+  "id": "@vibe-ctl/plugin-notifications",
+  "name": "Notifications",
+  "version": "0.1.0",
+  "apiVersion": "^1.0.0",
+  "description": "Approval flow and OS notifications. Surfaces Claude Code approvals and other agent prompts via native notifications and in-app surfaces.",
+  "author": { "name": "vibe-ctl" },
+  "license": "MIT",
+  "icon": "./assets/icon.svg",
+  "executionContext": "split",
+  "entry": { "main": "./dist/main.js", "renderer": "./dist/renderer.js" },
+  "eagerActivation": true,
+  "engines": { "vibe-ctl": "^1.0.0" },
+  "provides": { "notifications": "1.0.0" },
+  "dependencies": {},
+  "optionalDependencies": {
+    "claude-code": "^1.0.0"
+  },
+  "waitForReady": [],
+  "sync": {
+    "settings": true,
+    "data": []
+  },
+  "permissions": ["notifications", "claude-code:approve"],
+  "hostProvided": [
+    "@vibe-ctl/extension-api",
+    "react",
+    "react-dom",
+    "@jamesyong42/infinite-canvas",
+    "@jamesyong42/reactive-ecs",
+    "@vibecook/truffle"
+  ]
+}

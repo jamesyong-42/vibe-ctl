@@ -1,0 +1,10 @@
+{
+  "extends": "@vibe-ctl/tsconfig/library.json",
+  "compilerOptions": {
+    "lib": ["ES2022", "ESNext.Disposable", "DOM", "DOM.Iterable"],
+    "jsx": "react-jsx",
+    "rootDir": "src",
+    "outDir": "dist"
+  },
+  "include": ["src/**/*"]
+}

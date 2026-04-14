@@ -1,0 +1,31 @@
+{
+  "$schema": "https://vibe-ctl.dev/schemas/plugin/v1.json",
+  "id": "@vibe-ctl/plugin-themes",
+  "name": "Themes",
+  "version": "0.1.0",
+  "apiVersion": "^1.0.0",
+  "description": "Theme system and default light/dark themes. Provides the `themes` service and a theme-picker widget.",
+  "author": { "name": "vibe-ctl" },
+  "license": "MIT",
+  "icon": "./assets/icon.svg",
+  "executionContext": "renderer",
+  "entry": "./dist/index.js",
+  "eagerActivation": true,
+  "engines": { "vibe-ctl": "^1.0.0" },
+  "provides": { "themes": "1.0.0" },
+  "dependencies": {},
+  "optionalDependencies": {},
+  "waitForReady": [],
+  "sync": {
+    "settings": true,
+    "data": []
+  },
+  "permissions": [],
+  "hostProvided": [
+    "@vibe-ctl/extension-api",
+    "react",
+    "react-dom",
+    "@jamesyong42/infinite-canvas",
+    "@jamesyong42/reactive-ecs"
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**", "out/**"]
+    },
+    "dev": {
+      "dependsOn": ["^build"],
+      "cache": false,
+      "persistent": true
+    },
+    "typecheck": {
+      "dependsOn": ["^build"]
+    },
+    "lint": {},
+    "test": {
+      "dependsOn": ["^build"]
+    },
+    "bundle-plugins": {
+      "dependsOn": ["build"],
+      "outputs": ["../../apps/desktop/resources/plugins/**"]
+    },
+    "package": {
+      "dependsOn": ["bundle-plugins", "^build"],
+      "outputs": ["release/**"]
+    }
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "name": "@vibe-ctl/shell",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./out/main/index.js",
+  "scripts": {
+    "build": "electron-vite build",
+    "dev": "electron-vite dev",
+    "typecheck": "tsc --build",
+    "clean": "rm -rf out dist .turbo"
+  },
+  "dependencies": {
+    "@vibe-ctl/runtime": "workspace:*",
+    "@vibe-ctl/canvas": "workspace:*",
+    "@vibe-ctl/extension-api": "workspace:*"
+  },
+  "peerDependencies": {
+    "electron": "^41.2.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vibe-ctl/tsconfig": "workspace:*",
+    "@vitejs/plugin-react": "^4.3.0",
+    "electron": "^41.2.0",
+    "electron-vite": "^5.0.0",
+    "typescript": "^5.7.0",
+    "vite": "^7.0.0"
+  }
+}
