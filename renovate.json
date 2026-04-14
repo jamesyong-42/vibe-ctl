@@ -1,0 +1,31 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended", ":semanticCommits"],
+  "packageRules": [
+    {
+      "groupName": "type definitions",
+      "matchPackagePatterns": ["^@types/"],
+      "automerge": true
+    },
+    {
+      "groupName": "devDependencies (patch)",
+      "matchDepTypes": ["devDependencies"],
+      "matchUpdateTypes": ["patch"],
+      "automerge": true
+    },
+    {
+      "groupName": "biome",
+      "matchPackagePatterns": ["^@biomejs/"],
+      "automerge": true
+    },
+    {
+      "groupName": "turbo",
+      "matchPackageNames": ["turbo"],
+      "automerge": true
+    }
+  ],
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["before 3am on Monday"]
+  }
+}
