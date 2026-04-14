@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "tsup && cp plugin.json dist/ && cp -r assets dist/",
+    "build": "tsup",
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist .turbo"
@@ -20,6 +20,7 @@
     "@types/react": "^19.0.0",
     "@vibe-ctl/extension-api": "workspace:*",
     "@vibe-ctl/tsconfig": "workspace:*",
+    "@vibe-ctl/tsup-plugin-preset": "workspace:*",
     "tsup": "^8.3.0",
     "typescript": "^5.7.0"
   }

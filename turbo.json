@@ -3,6 +3,14 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
+      "inputs": [
+        "src/**",
+        "tsconfig.json",
+        "tsconfig.*.json",
+        "tsup.config.ts",
+        "electron-vite.config.ts",
+        "package.json"
+      ],
       "outputs": ["dist/**", "out/**"]
     },
     "dev": {
@@ -11,11 +19,16 @@
       "persistent": true
     },
     "typecheck": {
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build"],
+      "inputs": ["src/**", "tsconfig.json", "tsconfig.*.json", "package.json"]
     },
     "lint": {},
     "test": {
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build"],
+      "inputs": ["src/**", "tsconfig.json", "package.json"]
+    },
+    "clean": {
+      "cache": false
     },
     "bundle-plugins": {
       "dependsOn": ["build"],

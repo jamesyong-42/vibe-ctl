@@ -1,10 +1,9 @@
 import type { ScaffoldContext } from '../scaffold.js';
 
 /**
- * tsup config for a plugin. Matches spec 03 §5:
- *   - host-provided modules marked external
- *   - ESM only
- *   - es2022 target (shell's Chromium + Node 24 both support it)
+ * tsup config for a plugin. Uses the shared plugin preset from
+ * @vibe-ctl/tsup-plugin-preset which handles externals, target, and
+ * post-build asset copying automatically.
  */
 export function tsupConfigTemplate(ctx: ScaffoldContext): string {
   const entry =
@@ -12,23 +11,10 @@ export function tsupConfigTemplate(ctx: ScaffoldContext): string {
       ? `{ main: 'src/main.ts', renderer: 'src/renderer.ts' }`
       : `['src/index.ts']`;
 
-  return `import { defineConfig } from 'tsup';
+  return `import { definePluginConfig } from '@vibe-ctl/tsup-plugin-preset';
 
-export default defineConfig({
+export default definePluginConfig({
   entry: ${entry},
-  format: ['esm'],
-  target: 'es2022',
-  clean: true,
-  sourcemap: true,
-  dts: false,
-  external: [
-    '@vibe-ctl/extension-api',
-    'react',
-    'react-dom',
-    '@jamesyong42/infinite-canvas',
-    '@jamesyong42/reactive-ecs',
-    '@vibecook/truffle',
-  ],
 });
 `;
 }
