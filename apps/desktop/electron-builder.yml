@@ -3,6 +3,22 @@ productName: vibe-ctl
 directories:
   output: release
   buildResources: resources
+
+asar: true
+
+# Bundle the built shell plus its workspace dependencies' node_modules.
+# The top-level exclusion removes dev deps; per-package node_modules that
+# contain real runtime dependencies (e.g. electron-updater) are included
+# by the workspace-walk electron-builder performs against
+# `core/shell/package.json` and `apps/desktop/package.json`.
+files:
+  - '!**/node_modules/**/{CHANGELOG.md,README.md,README,readme.md,readme}'
+  - '!**/node_modules/**/{test,__tests__,tests,powered-test,example,examples}'
+  - '!**/node_modules/**/*.d.ts'
+  - '!**/node_modules/**/.bin'
+  - '!**/{.DS_Store,.git,.github,.vscode,.idea,.turbo}'
+  - '../../core/shell/out/**'
+
 extraResources:
   - from: resources/plugins
     to: plugins
@@ -10,18 +26,48 @@ extraResources:
   - from: resources/icons
     to: icons
     filter: ['**/*']
-files:
-  - '!**/node_modules/**'
-  - '../../core/shell/out/**'
+
+# Electron Fuses flipped at package time. Once flipped, code signing
+# seals them; the OS's own signature check detects tampering. See
+# https://www.electronjs.org/docs/latest/tutorial/fuses
+electronFuses:
+  runAsNode: false
+  enableCookieEncryption: true
+  enableNodeOptionsEnvironmentVariable: false
+  enableNodeCliInspectArguments: false
+  enableEmbeddedAsarIntegrityValidation: true
+  onlyLoadAppFromAsar: true
+  loadBrowserProcessSpecificV8Snapshot: false
+  grantFileProtocolExtraPrivileges: false
+
 mac:
   category: public.app-category.developer-tools
+  hardenedRuntime: true
+  gatekeeperAssess: false
+  entitlements: build/entitlements.mac.plist
+  entitlementsInherit: build/entitlements.mac.plist
+  # Notarization reads APPLE_ID, APPLE_APP_SPECIFIC_PASSWORD, APPLE_TEAM_ID
+  # from env. Keep `false` in local builds; CI flips via env vars.
+  notarize: false
   target:
-    - dmg
-    - zip
+    - target: dmg
+      arch: [arm64, x64]
+    - target: zip
+      arch: [arm64, x64]
+
 win:
   target:
-    - nsis
+    - target: nsis
+      arch: [x64, arm64]
+
 linux:
   target:
     - AppImage
     - deb
+  category: Development
+
+publish:
+  provider: github
+  owner: jamesyong-42
+  repo: vibe-ctl
+  releaseType: release

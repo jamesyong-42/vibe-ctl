@@ -11,7 +11,8 @@
 
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { BrowserWindow, shell } from 'electron';
+import { BrowserWindow } from 'electron';
+import { guardNavigation } from './navigation.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -22,6 +23,16 @@ const PRELOAD_PATH = join(__dirname, '../preload/index.js');
 /** Dev server URL (set by electron-vite) or file:// URL to the built HTML. */
 const RENDERER_URL = process.env.ELECTRON_RENDERER_URL;
 const RENDERER_FILE = join(__dirname, '../renderer/index.html');
+
+/** webPreferences baseline shared by every window we create. */
+const SECURE_WEB_PREFERENCES = {
+  preload: PRELOAD_PATH,
+  sandbox: true,
+  contextIsolation: true,
+  nodeIntegration: false,
+  webviewTag: false,
+  spellcheck: false,
+} as const;
 
 export interface WindowManager {
   createMainWindow(): BrowserWindow;
@@ -57,23 +68,13 @@ export function createWindowManager(): WindowManager {
       minHeight: 600,
       show: false,
       titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'default',
-      webPreferences: {
-        preload: PRELOAD_PATH,
-        sandbox: true,
-        contextIsolation: true,
-        nodeIntegration: false,
-      },
+      webPreferences: { ...SECURE_WEB_PREFERENCES },
     });
 
+    guardNavigation(mainWindow);
     mainWindow.once('ready-to-show', () => mainWindow?.show());
     mainWindow.on('closed', () => {
       mainWindow = null;
-    });
-
-    // Open external links in the OS browser, never a new BrowserWindow.
-    mainWindow.webContents.setWindowOpenHandler(({ url }) => {
-      void shell.openExternal(url);
-      return { action: 'deny' };
     });
 
     loadRenderer(mainWindow);
@@ -86,13 +87,9 @@ export function createWindowManager(): WindowManager {
       height: 400,
       frame: false,
       show: false,
-      webPreferences: {
-        preload: PRELOAD_PATH,
-        sandbox: true,
-        contextIsolation: true,
-        nodeIntegration: false,
-      },
+      webPreferences: { ...SECURE_WEB_PREFERENCES },
     });
+    guardNavigation(win);
     win.once('ready-to-show', () => win.show());
     loadRenderer(win, `/widget/${encodeURIComponent(widgetId)}`);
     return win;

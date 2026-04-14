@@ -20,17 +20,38 @@ import { BrowserWindow, app } from 'electron';
 import { initAutoUpdater } from './auto-updater.js';
 import { createAppMenu } from './menu.js';
 import { registerProtocols } from './protocol.js';
+import { setupSecurity } from './security.js';
 import { type TrayHandle, createTray } from './tray.js';
 import { type WindowManager, createWindowManager } from './windows.js';
+
+// Enforce process sandboxing for every renderer and utilityProcess
+// regardless of per-window webPreferences. Must run before app-ready.
+app.enableSandbox();
 
 let runtime: Runtime | null = null;
 let windows: WindowManager | null = null;
 let tray: TrayHandle | null = null;
 
+// Single-instance lock: if another instance is already running, surface
+// its window and quit this process. Must be claimed synchronously before
+// any windows are created.
+const gotLock = app.requestSingleInstanceLock();
+if (!gotLock) {
+  app.quit();
+}
+
+app.on('second-instance', () => {
+  const existing = windows?.getMainWindow();
+  if (!existing) return;
+  if (existing.isMinimized()) existing.restore();
+  existing.focus();
+});
+
 async function boot(): Promise<void> {
   await app.whenReady();
 
   // --- Step 2: platform layer --------------------------------------------
+  setupSecurity();
   registerProtocols();
   createAppMenu();
 
@@ -94,8 +115,10 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
 });
 
-boot().catch((err) => {
-  // eslint-disable-next-line no-console
-  console.error('[vibe-ctl] boot failed', err);
-  app.exit(1);
-});
+if (gotLock) {
+  boot().catch((err) => {
+    // eslint-disable-next-line no-console
+    console.error('[vibe-ctl] boot failed', err);
+    app.exit(1);
+  });
+}
