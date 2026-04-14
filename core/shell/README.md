@@ -13,9 +13,9 @@ Owns the **platform layer** (spec 02 §2) and the host UI chrome:
 Does NOT own domain logic. Domain features (agents, terminals,
 notifications, etc.) are plugins loaded by `@vibe-ctl/runtime`.
 
-See [`specs/02-kernel-runtime.md`](../../specs/02-kernel-runtime.md) §2
+See [`../../docs/specs/02-kernel-runtime.md`](../../../../docs/specs/02-kernel-runtime.md) §2
 (Platform Layer) and §10 (Bootstrap Sequence) and
-[`specs/03-monorepo-layout.md`](../../specs/03-monorepo-layout.md) §3 +
+[`../../docs/specs/03-monorepo-layout.md`](../../../../docs/specs/03-monorepo-layout.md) §3 +
 §7 for package boundaries.
 
 ## Boot flow

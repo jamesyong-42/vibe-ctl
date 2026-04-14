@@ -15,8 +15,8 @@ Owns:
   components so UI queries re-fire on sync deltas.
 - Command registry, settings, permissions, health monitoring.
 
-See [`specs/02-kernel-runtime.md`](../../specs/02-kernel-runtime.md) for
-the authoritative design and [`specs/03-monorepo-layout.md`](../../specs/03-monorepo-layout.md)
+See [`../../docs/specs/02-kernel-runtime.md`](../../../../docs/specs/02-kernel-runtime.md) for
+the authoritative design and [`../../docs/specs/03-monorepo-layout.md`](../../../../docs/specs/03-monorepo-layout.md)
 for package boundaries.
 
 ## Public surface

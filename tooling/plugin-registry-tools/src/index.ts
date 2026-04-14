@@ -58,7 +58,7 @@ ${kleur.bold('Options')}
   -h, --help                  Show this help (pass to any subcommand for per-command help)
 
 ${kleur.bold('Docs')}
-  specs/04-registry-marketplace.md in the vibe-ctl repo.
+  ../../docs/specs/04-registry-marketplace.md in the vibe-ctl repo.
 `);
 }
 

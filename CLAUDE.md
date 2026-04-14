@@ -5,13 +5,13 @@ plugins. First-party plugins use the same public API as third-party.
 
 ## Read these first
 
-1. **`specs/00-overview.md`** — vision, architecture, decisions
-2. **`specs/01-extension-system.md`** — plugin contract (the public API)
-3. **`specs/02-kernel-runtime.md`** — kernel internals + sync model
-4. **`specs/03-monorepo-layout.md`** — file tree, package boundaries
-5. **`specs/04-registry-marketplace.md`** — distribution model
+1. **`docs/specs/00-overview.md`** — vision, architecture, decisions
+2. **`docs/specs/01-extension-system.md`** — plugin contract (the public API)
+3. **`docs/specs/02-kernel-runtime.md`** — kernel internals + sync model
+4. **`docs/specs/03-monorepo-layout.md`** — file tree, package boundaries
+5. **`docs/specs/04-registry-marketplace.md`** — distribution model
 
-Outdated specs are in `specs/outdated/`. Do not use them as source of truth.
+Outdated specs are in `docs/specs/outdated/`. Do not use them as source of truth.
 
 ## Packages
 

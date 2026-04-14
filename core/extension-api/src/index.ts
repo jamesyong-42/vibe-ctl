@@ -2,7 +2,7 @@
  * @vibe-ctl/extension-api
  *
  * The public plugin contract for vibe-ctl. Authoritative spec lives in
- * `specs/01-extension-system.md`. Everything in this file is part of
+ * `../../docs/specs/01-extension-system.md`. Everything in this file is part of
  * the stable API; breaking changes require a major version bump.
  */
 

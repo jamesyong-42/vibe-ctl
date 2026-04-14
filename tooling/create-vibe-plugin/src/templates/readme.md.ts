@@ -33,6 +33,6 @@ VIBE_CTL_DEV_PLUGINS=$(pwd) pnpm --filter @vibe-ctl/desktop dev
    npx vibe-ctl-plugin-registry-tools submit
    \`\`\`
 
-See \`vibe-ctl/specs/04-registry-marketplace.md\` for the full flow.
+See \`vibe-ctl/../../../../docs/specs/04-registry-marketplace.md\` for the full flow.
 `;
 }

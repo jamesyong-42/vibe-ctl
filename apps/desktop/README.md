@@ -37,5 +37,5 @@ apps/desktop/
 └── release/                   # electron-builder output (gitignored)
 ```
 
-See [`specs/03-monorepo-layout.md`](../../specs/03-monorepo-layout.md) §7
+See [`../../docs/specs/03-monorepo-layout.md`](../../../../docs/specs/03-monorepo-layout.md) §7
 for the desktop-app boundary and the plugin-bundling task.

@@ -20,9 +20,9 @@ pnpm add @vibe-ctl/extension-api
 
 The authoritative contract lives in `specs/`:
 
-- [`specs/00-overview.md`](../../specs/00-overview.md) — vision and architecture
-- [`specs/01-extension-system.md`](../../specs/01-extension-system.md) — plugin contract (this package)
-- [`specs/02-kernel-runtime.md`](../../specs/02-kernel-runtime.md) — sync model the runtime implements
+- [`../../docs/specs/00-overview.md`](../../../../docs/specs/00-overview.md) — vision and architecture
+- [`../../docs/specs/01-extension-system.md`](../../../../docs/specs/01-extension-system.md) — plugin contract (this package)
+- [`../../docs/specs/02-kernel-runtime.md`](../../../../docs/specs/02-kernel-runtime.md) — sync model the runtime implements
 
 ## Implementation note
 

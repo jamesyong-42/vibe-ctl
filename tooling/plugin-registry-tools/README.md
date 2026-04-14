@@ -21,7 +21,7 @@ npx vibe-ctl-plugin-registry-tools <command>
 
 Every command accepts `--help`.
 
-See `specs/04-registry-marketplace.md` for the full publishing flow this CLI automates.
+See `../../docs/specs/04-registry-marketplace.md` for the full publishing flow this CLI automates.
 
 ## Status
 

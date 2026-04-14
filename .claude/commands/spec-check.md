@@ -3,8 +3,8 @@ description: Cross-check the current scaffold against the specs. Report drift.
 allowed-tools: Read, Grep, Glob, Bash(ls *), Bash(find *)
 ---
 
-Cross-reference the spec set (`specs/00-overview.md` through
-`specs/04-registry-marketplace.md`) against what's actually in the repo.
+Cross-reference the spec set (`docs/specs/00-overview.md` through
+`docs/specs/04-registry-marketplace.md`) against what's actually in the repo.
 
 Focus areas:
 

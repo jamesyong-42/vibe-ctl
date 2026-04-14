@@ -10,7 +10,7 @@ Responsibilities:
 2. **Canvas-sync adapter** (`CanvasSyncAdapter`) — bridges the
    infinite-canvas ECS world to the kernel-owned `kernel/canvas-layout`
    truffle `CrdtDoc` (Loro map). See
-   `specs/02-kernel-runtime.md` §4.2.
+   `../../docs/specs/02-kernel-runtime.md` §4.2.
 3. **UI primitives** — runtime implementations of the
    `ctx.ui.*` React components declared in
    `@vibe-ctl/extension-api`.
