@@ -27,5 +27,13 @@
   "lockFileMaintenance": {
     "enabled": true,
     "schedule": ["before 3am on Monday"]
-  }
+  },
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "labels": ["security"],
+    "addLabels": ["security"],
+    "schedule": ["at any time"],
+    "prPriority": 10
+  },
+  "osvVulnerabilityAlerts": true
 }
