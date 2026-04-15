@@ -77,19 +77,7 @@ importers:
       '@vibecook/truffle':
         specifier: ^0.4.2
         version: 0.4.3
-      react:
-        specifier: 19.2.5
-        version: 19.2.5
-      react-dom:
-        specifier: 19.2.5
-        version: 19.2.5(react@19.2.5)
     devDependencies:
-      '@types/react':
-        specifier: ^19.0.0
-        version: 19.2.14
-      '@types/react-dom':
-        specifier: ^19.0.0
-        version: 19.2.3(@types/react@19.2.14)
       '@vibe-ctl/tsconfig':
         specifier: workspace:*
         version: link:../../tooling/tsconfig
@@ -191,6 +179,9 @@ importers:
       '@vibe-ctl/runtime':
         specifier: workspace:*
         version: link:../runtime
+      '@vibe-ctl/ui':
+        specifier: workspace:*
+        version: link:../ui
       electron-updater:
         specifier: ^6.8.3
         version: 6.8.3
@@ -246,6 +237,37 @@ importers:
       vite:
         specifier: ^7.0.0
         version: 7.3.2(@types/node@24.12.2)(jiti@2.6.1)(lightningcss@1.32.0)(yaml@2.8.3)
+
+  core/ui:
+    dependencies:
+      '@vibe-ctl/plugin-api':
+        specifier: workspace:*
+        version: link:../plugin-api
+      react:
+        specifier: 19.2.5
+        version: 19.2.5
+      react-dom:
+        specifier: 19.2.5
+        version: 19.2.5(react@19.2.5)
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.2.14
+      '@types/react-dom':
+        specifier: ^19.0.0
+        version: 19.2.3(@types/react@19.2.14)
+      '@vibe-ctl/canvas':
+        specifier: workspace:*
+        version: link:../canvas
+      '@vibe-ctl/tsconfig':
+        specifier: workspace:*
+        version: link:../../tooling/tsconfig
+      tsup:
+        specifier: ^8.3.0
+        version: 8.5.1(jiti@2.6.1)(postcss@8.5.9)(typescript@5.9.3)(yaml@2.8.3)
+      typescript:
+        specifier: ^5.7.0
+        version: 5.9.3
 
   plugins/claude-code:
     dependencies:

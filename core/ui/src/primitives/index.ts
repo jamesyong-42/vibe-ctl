@@ -28,7 +28,7 @@ export {
 };
 
 // Re-export component prop types (canonically declared in
-// @vibe-ctl/plugin-api) for convenient import from @vibe-ctl/canvas.
+// @vibe-ctl/plugin-api) for convenient import from @vibe-ctl/ui.
 export type {
   BadgeProps,
   ButtonProps,

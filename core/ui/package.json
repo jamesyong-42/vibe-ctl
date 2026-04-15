@@ -1,5 +1,5 @@
 {
-  "name": "@vibe-ctl/canvas",
+  "name": "@vibe-ctl/ui",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -23,11 +23,14 @@
     "@vibe-ctl/plugin-api": "workspace:*"
   },
   "peerDependencies": {
-    "@jamesyong42/infinite-canvas": "^1.0.0",
-    "@jamesyong42/reactive-ecs": "^0.1.1",
-    "@vibecook/truffle": "^0.4.2"
+    "@vibe-ctl/canvas": "workspace:*",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vibe-ctl/canvas": "workspace:*",
     "@vibe-ctl/tsconfig": "workspace:*",
     "tsup": "^8.3.0",
     "typescript": "^5.7.0"

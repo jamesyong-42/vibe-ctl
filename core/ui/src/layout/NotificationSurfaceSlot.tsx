@@ -1,7 +1,7 @@
+import type { KernelCanvasEngine } from '@vibe-ctl/canvas';
 import type { CSSProperties, FC } from 'react';
-import type { KernelCanvasEngine } from '../engine.js';
 
-export interface NotificationSurfacePlacementProps {
+export interface NotificationSurfaceSlotProps {
   engine: KernelCanvasEngine;
 }
 
@@ -17,15 +17,15 @@ const rootStyle: CSSProperties = {
 };
 
 /**
- * Notification-surface placement slot. Mounts widgets with placement
+ * Notification-surface slot. Mounts widgets with placement
  * `notification-surface`. Typically used by a notification plugin to
- * stack toasts; the plugin owns the notification data model and
- * each toast is a widget instance.
+ * stack toasts; the plugin owns the notification data model and each
+ * toast is a widget instance.
  */
-export const NotificationSurfacePlacement: FC<NotificationSurfacePlacementProps> = (_props) => {
+export const NotificationSurfaceSlot: FC<NotificationSurfaceSlotProps> = (_props) => {
   // TODO: Render one widget per active notification. The notifications
   //       plugin maintains the list in its own SyncedStore (or local
   //       state) and spawns/removes widget instances through
   //       `ctx.canvas.addWidget(...)`.
-  return <div data-vibe-notification-surface-placement style={rootStyle} />;
+  return <div data-vibe-notification-surface-slot style={rootStyle} />;
 };

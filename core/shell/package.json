@@ -16,6 +16,7 @@
     "@react-three/fiber": "^9.5.0",
     "@vibe-ctl/runtime": "workspace:*",
     "@vibe-ctl/canvas": "workspace:*",
+    "@vibe-ctl/ui": "workspace:*",
     "@vibe-ctl/plugin-api": "workspace:*",
     "electron-updater": "^6.8.3",
     "three": "^0.183.2",

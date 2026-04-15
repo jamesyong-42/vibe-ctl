@@ -14,7 +14,5 @@ export default defineConfig((options) => ({
     '@jamesyong42/infinite-canvas',
     '@jamesyong42/reactive-ecs',
     '@vibecook/truffle',
-    'react',
-    'react-dom',
   ],
 }));
