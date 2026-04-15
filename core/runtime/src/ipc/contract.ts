@@ -6,11 +6,13 @@
  * `'vibe-ctl:host'` `ipcMain.handle` channel with payload
  * `{ method, args }` (see spec 05 §6.1).
  *
- * The shape here is intentionally minimal — commit 4 wires
- * `HostRequest<M>` / `HostResponse<M>` to the Zod schemas in
- * `./schemas/` via `z.infer`, making the schemas the source of truth.
- * Until then, both sides resolve to `unknown` so importers fail loudly.
+ * `HostRequest<M>` and `HostResponse<M>` are inferred from the Zod
+ * schemas in `./schemas/index.ts`, making the schemas the single source
+ * of truth for wire shapes.
  */
+
+import type { z } from 'zod';
+import type { hostSchemas } from './schemas/index.js';
 
 export type HostMethod =
   | 'plugins.list'
@@ -30,11 +32,9 @@ export type HostMethod =
   | 'system.openExternal'
   | 'system.ping';
 
-// Replaced in commit 4 with `z.infer<(typeof hostSchemas)[M]['request']>`.
-export type HostRequest<M extends HostMethod> = M extends HostMethod ? unknown : never;
+export type HostRequest<M extends HostMethod> = z.infer<(typeof hostSchemas)[M]['request']>;
 
-// Replaced in commit 4 with `z.infer<(typeof hostSchemas)[M]['response']>`.
-export type HostResponse<M extends HostMethod> = M extends HostMethod ? unknown : never;
+export type HostResponse<M extends HostMethod> = z.infer<(typeof hostSchemas)[M]['response']>;
 
 /** Fixed channel name for the host dispatcher (spec 05 §6.1). */
 export const HOST_CHANNEL = 'vibe-ctl:host' as const;
