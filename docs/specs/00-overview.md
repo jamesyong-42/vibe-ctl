@@ -178,6 +178,7 @@ Deeper rationale in `specs/03-monorepo-layout.md`.
 | [`02-kernel-runtime.md`](02-kernel-runtime.md) | Kernel layers, three sync principles, worked walkthrough, edge-case policies |
 | [`03-monorepo-layout.md`](03-monorepo-layout.md) | File tree, packages, build pipeline, plugin catalogue |
 | [`04-registry-marketplace.md`](04-registry-marketplace.md) | Git-based registry, publishing, installation, updates |
+| [`05-electron-app-architecture.md`](05-electron-app-architecture.md) | Platform-layer deep-dive: processes, windows, preload, IPC, protocols, security, renderer composition, packaging |
 
 Previous domain specs (agent-management, terminal, mesh-network, notifications,
 mobile, implementation-plan) are archived in `specs/outdated/`. Their content
