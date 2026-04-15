@@ -22,11 +22,17 @@
 
   --canvas-bg: #fafafa;
   --canvas-dot: rgba(0, 0, 0, 0.16);
+  --text: #18181b;
+  --button-bg: #ffffff;
+  --button-fg: #71717a;
 }
 
 html.dark {
   --canvas-bg: #171717;
   --canvas-dot: rgba(255, 255, 255, 0.08);
+  --text: #e4e4e7;
+  --button-bg: #262626;
+  --button-fg: #a1a1aa;
 }
 
 html,

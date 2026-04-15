@@ -27,6 +27,7 @@ import {
 } from '@jamesyong42/infinite-canvas';
 import { useEffect, useMemo, useState } from 'react';
 import { InventoryBanner } from './onboarding/InventoryBanner.js';
+import { NavigationBreadcrumbs } from './panels/NavigationBreadcrumbs.js';
 import { VersionGate } from './version-gate/VersionGate.js';
 import { DebugCard } from './widgets/DebugCard.js';
 import { DebugContainer, DebugContainerArchetype } from './widgets/DebugContainer.js';
@@ -168,12 +169,27 @@ export function App(): React.JSX.Element {
 
   return (
     <VersionGate>
-      <div className="relative h-screen w-screen overflow-hidden">
-        <InfiniteCanvas engine={engine} grid={gridConfig} className="absolute inset-0" />
+      <div
+        style={{
+          position: 'relative',
+          height: '100vh',
+          width: '100vw',
+          overflow: 'hidden',
+        }}
+      >
+        <InfiniteCanvas
+          engine={engine}
+          grid={gridConfig}
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}
+        />
 
         {/* Invisible drag strip sharing canvas bg. Traffic lights overlay
             from the native window frame into its left edge. */}
         <div className="app-drag absolute top-0 left-0 right-0 h-[52px] z-40" />
+
+        {/* Back button + breadcrumb pill in the top-left drag strip,
+            positioned after the native traffic lights (Freeform-style). */}
+        <NavigationBreadcrumbs engine={engine} />
 
         <FloatingButton
           onClick={() => setDark((d) => !d)}
