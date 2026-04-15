@@ -8,7 +8,9 @@
     "library.json",
     "plugin.json",
     "electron-main.json",
-    "electron-renderer.json"
+    "electron-renderer.json",
+    "electron-utility.json",
+    "electron-preload.json"
   ],
   "publishConfig": {
     "access": "public"

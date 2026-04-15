@@ -1,0 +1,12 @@
+{
+  "extends": "./base.json",
+  "compilerOptions": {
+    "target": "ES2023",
+    "module": "commonjs",
+    "moduleResolution": "Node",
+    "lib": ["ES2023", "DOM"],
+    "types": ["node"],
+    "verbatimModuleSyntax": false,
+    "noEmit": true
+  }
+}
