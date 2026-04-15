@@ -14,3 +14,5 @@ export type {
   ResolutionResult,
   CanvasEngineHandle,
 } from './types.js';
+
+export * from './ipc/index.js';
