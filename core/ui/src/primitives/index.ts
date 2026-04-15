@@ -27,6 +27,10 @@ export {
   Tooltip,
 };
 
+// Shell-level primitives (not part of the ctx.ui runtime bundle —
+// plugins don't consume these, only host shells do).
+export { FloatingButton, type FloatingButtonProps } from './FloatingButton.js';
+
 // Re-export component prop types (canonically declared in
 // @vibe-ctl/plugin-api) for convenient import from @vibe-ctl/ui.
 export type {

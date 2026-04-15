@@ -10,6 +10,9 @@
 // ─── ctx.ui primitives ──────────────────────────────────────────────
 export * from './primitives/index.js';
 
+// ─── Icon catalog ───────────────────────────────────────────────────
+export * from './icons/index.js';
+
 // ─── Layout slots (placement mount points) ──────────────────────────
 export * from './layout/index.js';
 

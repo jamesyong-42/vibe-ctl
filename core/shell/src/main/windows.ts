@@ -16,7 +16,7 @@ import { guardNavigation } from './navigation.js';
 
 /**
  * Background color used while the BrowserWindow paints before the renderer
- * takes over. Matches `--canvas-bg` in `renderer/index.css` so there's no
+ * takes over. Matches `--canvas-bg` in `renderer/styles/index.css` so there's no
  * visible seam at the rounded window corners (Freeform-style aesthetic).
  */
 const CANVAS_BG_DARK = '#171717';

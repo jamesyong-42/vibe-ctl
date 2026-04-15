@@ -1,13 +1,15 @@
 /* Tailwind v4, monorepo setup:
    `source(none)` disables implicit scanning; every workspace location that
-   renders UI into the shell is listed explicitly below so first-party
-   plugin utilities make it into the built CSS. Paths are relative to
-   this file (`core/shell/src/renderer/index.css`). */
+   contributes utilities to the shell is listed explicitly below. Paths
+   are relative to this file (`core/shell/src/renderer/styles/index.css`).
+   Layers are all reachable via the `../` prefix — one extra hop compared
+   to the old location directly under `renderer/`. */
 @import "tailwindcss" source(none);
-@source "./index.html";
-@source "./**/*.{ts,tsx}";
-@source "../../../canvas/src/**/*.{ts,tsx}";
-@source "../../../../plugins/**/*.{ts,tsx}";
+@source "../index.html";
+@source "../**/*.{ts,tsx}";
+@source "../../../../ui/src/**/*.{ts,tsx}";
+@source "../../../../canvas/src/**/*.{ts,tsx}";
+@source "../../../../../plugins/**/*.{ts,tsx}";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
