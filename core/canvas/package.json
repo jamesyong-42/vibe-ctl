@@ -23,7 +23,7 @@
     "@vibe-ctl/plugin-api": "workspace:*"
   },
   "peerDependencies": {
-    "@jamesyong42/infinite-canvas": "^0.1.0",
+    "@jamesyong42/infinite-canvas": "^1.0.0",
     "@jamesyong42/reactive-ecs": "^0.1.1",
     "@vibecook/truffle": "^0.4.2",
     "react": "^19.0.0",

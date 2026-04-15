@@ -1,6 +1,17 @@
-/* Minimal renderer reset. Tailwind/theme tokens are contributed by the
-   `@vibe-ctl/plugin-themes` plugin once the theming contribution point
-   lands; this file only covers the naked shell. */
+/* Tailwind v4, monorepo setup:
+   `source(none)` disables implicit scanning; every workspace location that
+   renders UI into the shell is listed explicitly below so first-party
+   plugin utilities make it into the built CSS. Paths are relative to
+   this file (`core/shell/src/renderer/index.css`). */
+@import "tailwindcss" source(none);
+@source "./index.html";
+@source "./**/*.{ts,tsx}";
+@source "../../../canvas/src/**/*.{ts,tsx}";
+@source "../../../../plugins/**/*.{ts,tsx}";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ── Design tokens ─────────────────────────────────────────── */
 
 :root {
   color-scheme: dark light;
@@ -8,6 +19,14 @@
     "Helvetica Neue", sans-serif;
   font-size: 14px;
   line-height: 1.5;
+
+  --canvas-bg: #fafafa;
+  --canvas-dot: rgba(0, 0, 0, 0.16);
+}
+
+html.dark {
+  --canvas-bg: #171717;
+  --canvas-dot: rgba(255, 255, 255, 0.08);
 }
 
 html,
@@ -16,10 +35,23 @@ body,
   height: 100%;
   margin: 0;
   padding: 0;
+  overscroll-behavior: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 body {
-  background: #0b0b0e;
-  color: #e7e7ea;
+  background: var(--canvas-bg);
   overflow: hidden;
+}
+
+/* Freeform-style invisible drag bar. Same bg as canvas. The whole top
+   strip is an Electron drag region so users can grab anywhere; floating
+   buttons sit on top and opt out via `.no-drag`. */
+.app-drag {
+  -webkit-app-region: drag;
+}
+.no-drag {
+  -webkit-app-region: no-drag;
 }

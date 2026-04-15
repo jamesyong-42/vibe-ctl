@@ -11,14 +11,30 @@
 
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { BrowserWindow } from 'electron';
+import { BrowserWindow, screen } from 'electron';
 import { guardNavigation } from './navigation.js';
+
+/**
+ * Background color used while the BrowserWindow paints before the renderer
+ * takes over. Matches `--canvas-bg` in `renderer/index.css` so there's no
+ * visible seam at the rounded window corners (Freeform-style aesthetic).
+ */
+const CANVAS_BG_DARK = '#171717';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-/** Resolve the electron-vite-emitted preload script. */
-const PRELOAD_PATH = join(__dirname, '../preload/index.js');
+/** Resolve the esbuild-emitted CJS preload script.
+ *
+ *  Electron's sandboxed preload loader can only execute CommonJS. But with
+ *  `"type": "module"` in package.json (needed so main can import ESM-only
+ *  workspace deps), electron-vite v5 forces the preload it builds to ESM
+ *  `.mjs` and silently ignores format overrides. So we bypass it: a
+ *  sibling `scripts/build-preload.mjs` invokes esbuild directly to emit
+ *  CJS `out/preload-cjs/index.js`, which this path loads. The
+ *  electron-vite-emitted `out/preload/index.mjs` is an unused artifact —
+ *  kept only so electron-vite's watcher stays happy. */
+const PRELOAD_PATH = join(__dirname, '../preload-cjs/index.js');
 
 /** Dev server URL (set by electron-vite) or file:// URL to the built HTML. */
 const RENDERER_URL = process.env.ELECTRON_RENDERER_URL;
@@ -61,18 +77,35 @@ export function createWindowManager(): WindowManager {
       return mainWindow;
     }
 
+    // Open at the full work area (primary display minus menu bar and dock),
+    // same footprint Apple Freeform uses on launch.
+    const { workArea } = screen.getPrimaryDisplay();
+
     mainWindow = new BrowserWindow({
-      width: 1440,
-      height: 900,
-      minWidth: 800,
-      minHeight: 600,
+      x: workArea.x,
+      y: workArea.y,
+      width: workArea.width,
+      height: workArea.height,
+      minWidth: 1100,
+      minHeight: 720,
       show: false,
+      backgroundColor: CANVAS_BG_DARK,
       titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'default',
+      // Align the three traffic lights with the top row of our floating
+      // 40x40 buttons (top:16, button center y = 36). macOS dot height is
+      // ~12px, so y = 30 centers them on the same axis.
+      trafficLightPosition: process.platform === 'darwin' ? { x: 18, y: 22 } : undefined,
       webPreferences: { ...SECURE_WEB_PREFERENCES },
     });
 
     guardNavigation(mainWindow);
-    mainWindow.once('ready-to-show', () => mainWindow?.show());
+    mainWindow.once('ready-to-show', () => {
+      mainWindow?.show();
+      // Open DevTools automatically in dev so we can see runtime errors.
+      if (process.env.ELECTRON_RENDERER_URL) {
+        mainWindow?.webContents.openDevTools({ mode: 'detach' });
+      }
+    });
     mainWindow.on('closed', () => {
       mainWindow = null;
     });

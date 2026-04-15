@@ -2,10 +2,13 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta
-      http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: host: plugin:; font-src 'self' data:; connect-src 'self'; media-src 'self' blob: host: plugin:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';"
-    />
+    <!--
+      CSP is applied via HTTP header from the main process
+      (core/shell/src/main/security.ts). It's NOT declared here because:
+        1. `frame-ancestors` is ignored when delivered via <meta>, and
+        2. In dev we need to allow Vite's inline HMR preamble, which a
+           compile-time <meta> can't conditionally relax.
+    -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>vibe-ctl</title>
   </head>

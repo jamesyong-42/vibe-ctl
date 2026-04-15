@@ -22,23 +22,46 @@ import { type Session, session } from 'electron';
  */
 const ALLOWED_PERMISSIONS = new Set<string>(['clipboard-sanitized-write', 'notifications']);
 
-const CSP_DIRECTIVES: Record<string, string> = {
-  'default-src': "'self'",
-  'script-src': "'self'",
-  'style-src': "'self' 'unsafe-inline'",
-  'img-src': "'self' data: blob: host: plugin:",
-  'font-src': "'self' data:",
-  'connect-src': "'self'",
-  'media-src': "'self' blob: host: plugin:",
-  'worker-src': "'self' blob:",
-  'object-src': "'none'",
-  'base-uri': "'self'",
-  'form-action': "'self'",
-  'frame-ancestors': "'none'",
-};
-
+/**
+ * Build the CSP for the current process mode.
+ *
+ * Production: strict — no inline scripts, no eval, no external origins.
+ *
+ * Dev: carve out the three things Vite's HMR runtime needs and nothing
+ *   else:
+ *     - `'unsafe-inline'` on `script-src` so Vite's preamble injection
+ *       (`<script>` nodes rewritten by @vitejs/plugin-react) can execute
+ *     - `'unsafe-eval'` on `script-src` so Vite's client can eval HMR
+ *       payloads
+ *     - the dev server origin on `script-src` and `connect-src` so the
+ *       renderer can fetch modules and open the HMR WebSocket
+ *
+ * `ELECTRON_RENDERER_URL` is set by electron-vite in dev and absent in
+ * packaged builds, so it's a reliable mode switch.
+ */
 function buildCsp(): string {
-  return Object.entries(CSP_DIRECTIVES)
+  const devUrl = process.env.ELECTRON_RENDERER_URL;
+  const wsUrl = devUrl?.replace(/^http/, 'ws');
+
+  const scriptSrc = devUrl ? `'self' 'unsafe-inline' 'unsafe-eval' ${devUrl}` : "'self'";
+  const connectSrc = devUrl ? `'self' ${devUrl} ${wsUrl}` : "'self'";
+
+  const directives: Record<string, string> = {
+    'default-src': "'self'",
+    'script-src': scriptSrc,
+    'style-src': "'self' 'unsafe-inline'",
+    'img-src': "'self' data: blob: host: plugin:",
+    'font-src': "'self' data:",
+    'connect-src': connectSrc,
+    'media-src': "'self' blob: host: plugin:",
+    'worker-src': "'self' blob:",
+    'object-src': "'none'",
+    'base-uri': "'self'",
+    'form-action': "'self'",
+    'frame-ancestors': "'none'",
+  };
+
+  return Object.entries(directives)
     .map(([k, v]) => `${k} ${v}`)
     .join('; ');
 }

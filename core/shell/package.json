@@ -5,16 +5,21 @@
   "type": "module",
   "main": "./out/main/index.js",
   "scripts": {
-    "build": "electron-vite build",
-    "dev": "electron-vite dev",
+    "build": "electron-vite build && node scripts/build-preload.mjs",
+    "dev": "node scripts/build-preload.mjs && electron-vite dev",
     "typecheck": "tsc --build",
     "clean": "rm -rf out dist .turbo"
   },
   "dependencies": {
+    "@jamesyong42/infinite-canvas": "^1.0.0",
+    "@jamesyong42/reactive-ecs": "^0.1.1",
+    "@react-three/fiber": "^9.5.0",
     "@vibe-ctl/runtime": "workspace:*",
     "@vibe-ctl/canvas": "workspace:*",
     "@vibe-ctl/plugin-api": "workspace:*",
-    "electron-updater": "^6.8.3"
+    "electron-updater": "^6.8.3",
+    "three": "^0.183.2",
+    "zod": "^4.3.6"
   },
   "peerDependencies": {
     "electron": "^41.2.0",
@@ -22,13 +27,17 @@
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
+    "@tailwindcss/vite": "^4.2.2",
     "@types/node": "^24.0.0",
+    "esbuild": "^0.25.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "@types/three": "^0.183.0",
     "@vibe-ctl/tsconfig": "workspace:*",
     "@vitejs/plugin-react": "^4.3.0",
     "electron": "^41.2.0",
     "electron-vite": "^5.0.0",
+    "tailwindcss": "^4.2.2",
     "typescript": "^5.7.0",
     "vite": "^7.0.0"
   }
