@@ -9,6 +9,9 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./kernel-utility": {
+      "import": "./dist/kernel-utility.js"
     }
   },
   "files": ["dist"],
