@@ -23,6 +23,8 @@
     "@jamesyong42/reactive-ecs": "^0.1.1",
     "@jamesyong42/infinite-canvas": "^1.0.0",
     "@vibecook/truffle": "^0.4.2",
+    "comlink": "^4.4.2",
+    "pino": "^9.5.0",
     "zod": "^3.23.0",
     "semver": "^7.6.0",
     "chokidar": "^4.0.0"
