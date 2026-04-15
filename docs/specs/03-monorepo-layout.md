@@ -22,10 +22,11 @@ vibe-ctl/
 ├── specs/                              # These spec documents
 │
 ├── core/                               # The kernel (private packages)
-│   ├── plugin-api/                  # Published to npm
+│   ├── plugin-api/                     # Published to npm
 │   ├── runtime/                        # Plugin host + sync fabric
-│   ├── canvas/                         # Canvas substrate + sync adapter
-│   └── shell/                          # Electron shell + UI chrome
+│   ├── canvas/                         # Canvas engine wrapper + CRDT adapter (no UI)
+│   ├── ui/                             # Portable React design system (ctx.ui.*)
+│   └── shell/                          # Electron shell (renderer + main + preload)
 │
 ├── plugins/                            # First-party plugins (T1)
 │   ├── claude-code/
@@ -244,70 +245,197 @@ core/runtime/
 ### `core/canvas/` -- `@vibe-ctl/canvas` (PRIVATE)
 
 Thin wrapper around `@jamesyong42/infinite-canvas` that adds
-kernel-specific concerns: the canvas-sync adapter and UI primitives
-plugins render into.
+kernel-specific concerns: the engine, the canvas-sync adapter, and the
+widget-type registry. Zero UI components — this package does NOT render.
 
 ```
 core/canvas/
 ├── package.json
 └── src/
-    ├── index.ts                        # Re-exports infinite-canvas + bridges
+    ├── index.ts                        # Re-exports the three exports below
     ├── engine.ts                       # Kernel-aware engine wrapper
     ├── widget-type-registry.ts         # Reactive; mirrors to kernel ECS
-    ├── canvas-sync-adapter.ts          # The canvas ECS ↔ Loro bridge (spec 02 §4.2)
-    ├── ui-primitives/                  # ctx.ui implementations
-    │   ├── Panel.tsx
-    │   ├── List.tsx
-    │   ├── Button.tsx
-    │   ├── Input.tsx
-    │   ├── Modal.tsx
-    │   └── ...
-    └── placements/                     # Widget placement slots
-        ├── CanvasPlacement.tsx
-        ├── SidePanelPlacement.tsx
-        ├── StatusBarPlacement.tsx
-        └── CommandPalettePlacement.tsx
+    └── canvas-sync-adapter.ts          # The canvas ECS ↔ Loro bridge (spec 02 §4.2)
 ```
 
 **Dependencies:**
-- `@jamesyong42/infinite-canvas` (external; provides ECS + renderer)
-- `@jamesyong42/reactive-ecs` (shared runtime with the canvas)
-- `@vibecook/truffle` (for CrdtDoc types)
+- `@jamesyong42/infinite-canvas` (peer — engine + ECS)
+- `@jamesyong42/reactive-ecs` (peer — ECS runtime)
+- `@vibecook/truffle` (peer — CrdtDoc types)
 - `@vibe-ctl/plugin-api` (workspace)
+
+No React peer dep. The package is renderer-agnostic — runs in an
+electron renderer, a web renderer, node tests, whatever the host is.
+
+### `core/ui/` -- `@vibe-ctl/ui` (PRIVATE)
+
+The portable design system: `ctx.ui.*` primitives, icons, layout slots,
+missing-plugin placeholder. Pure React — no Electron, no canvas engine,
+no truffle. Consumed by any renderer (desktop shell today, web shell
+tomorrow, storybook/tests at any point).
+
+```
+core/ui/
+├── package.json
+└── src/
+    ├── index.ts                        # Public re-exports
+    ├── primitives/                     # ctx.ui implementations
+    │   ├── Badge.tsx
+    │   ├── Button.tsx
+    │   ├── FloatingButton.tsx          # Round FAB primitive used by every shell
+    │   ├── Icon.tsx
+    │   ├── Input.tsx
+    │   ├── List.tsx
+    │   ├── ListItem.tsx
+    │   ├── Modal.tsx
+    │   ├── Panel.tsx
+    │   ├── Select.tsx
+    │   ├── Separator.tsx
+    │   ├── Spinner.tsx
+    │   ├── Tooltip.tsx
+    │   └── index.ts                    # Exports + the `ui: UI` bundle
+    ├── icons/                          # One-per-file SVG icon catalog
+    │   ├── BackIcon.tsx
+    │   ├── ChevronIcon.tsx
+    │   ├── InspectorIcon.tsx
+    │   ├── MoonIcon.tsx
+    │   ├── SettingsIcon.tsx
+    │   └── SunIcon.tsx
+    ├── layout/                         # Slot components (where widgets mount)
+    │   ├── SidePanelSlot.tsx
+    │   ├── StatusBarSlot.tsx
+    │   ├── CommandPaletteSlot.tsx
+    │   └── NotificationSurfaceSlot.tsx
+    └── placeholders/
+        └── MissingPluginPlaceholder.tsx
+```
+
+**Dependencies:**
+- `react`, `react-dom` (peer)
+- `@vibe-ctl/plugin-api` (workspace — for `UI` / prop types)
+
+The canvas-mount placement (which needs an engine instance) is NOT here
+— it lives in `core/shell/src/renderer/screens/main/workspace/` because
+it couples to the engine construction site.
 
 ### `core/shell/` -- `@vibe-ctl/shell` (PRIVATE)
 
-Electron shell. Boots the runtime, owns windows, mounts the canvas.
+Electron shell. Main + preload processes, plus a screens-first renderer
+that composes `@vibe-ctl/ui` primitives + `@vibe-ctl/canvas` engine into
+the desktop app's user-facing screens. Electron-only; a future
+`core/web-shell/` would mirror this layout for a browser build.
 
 ```
 core/shell/
 ├── package.json
-├── src/
-│   ├── main/
-│   │   ├── index.ts                    # App bootstrap
-│   │   ├── windows.ts
-│   │   ├── tray.ts
-│   │   ├── menu.ts
-│   │   ├── protocol.ts                 # host:// + plugin:// handlers
-│   │   ├── auto-updater.ts
-│   │   └── utility-process-host.ts     # For split plugins
-│   │
-│   ├── preload/
-│   │   └── index.ts                    # contextBridge exposures
-│   │
-│   └── renderer/
-│       ├── index.html
-│       ├── main.tsx                    # React root
-│       ├── App.tsx                     # Shell chrome
-│       ├── version-gate/               # Blocking "update required" UI
-│       ├── onboarding/                 # Plugin inventory diff banner
-│       └── boot.ts                     # Runtime init in renderer
+├── electron.vite.config.ts
+├── scripts/
+│   └── build-preload.mjs               # CJS preload companion (see memory)
+└── src/
+    ├── main/                           # Electron main process
+    │   ├── index.ts
+    │   ├── windows.ts
+    │   ├── tray.ts
+    │   ├── menu.ts
+    │   ├── protocol.ts
+    │   ├── security.ts
+    │   ├── navigation.ts
+    │   ├── auto-updater.ts
+    │   └── utility-process-host.ts
+    │
+    ├── preload/
+    │   └── index.ts
+    │
+    └── renderer/
+        ├── index.html
+        ├── entry.client.tsx            # Mount React: side-effects → providers → <Root/>
+        │
+        ├── app/                        # Cross-screen composition + bootstrap
+        │   ├── root.tsx                # Renders active screen
+        │   ├── boot.ts                 # Orchestrates startup tasks
+        │   ├── providers.tsx           # Stacks global providers
+        │   ├── screen-router.tsx       # State machine between screens
+        │   ├── useScreenState.ts
+        │   └── theme/
+        │       ├── ThemeProvider.tsx
+        │       └── useTheme.ts
+        │
+        ├── chrome/                     # Window-level Electron primitives
+        │   └── DragRegion.tsx          # -webkit-app-region strip
+        │
+        ├── screens/                    # PRIMARY organizational axis
+        │   ├── loading/                # Plugin loading + update checks
+        │   │   ├── LoadingScreen.tsx
+        │   │   ├── ProgressBar.tsx
+        │   │   ├── TaskList.tsx
+        │   │   └── useBootTasks.ts
+        │   ├── onboarding/             # First-use welcome flow
+        │   │   ├── OnboardingScreen.tsx
+        │   │   ├── useOnboardingProgress.ts
+        │   │   └── steps/
+        │   ├── version-gate/           # Blocking "update required" screen
+        │   │   └── VersionGateScreen.tsx
+        │   └── main/                   # The canvas experience — 3 layers + overlays
+        │       ├── MainScreen.tsx
+        │       ├── workspace/          # LAYER 1 — infinite canvas substrate
+        │       │   ├── WorkspaceLayer.tsx
+        │       │   ├── EngineProvider.tsx
+        │       │   ├── useEngine.ts
+        │       │   └── useWorkspaceShortcuts.ts
+        │       ├── hud/                # LAYER 2 — heads-up display (floating UI + dock)
+        │       │   ├── HudLayer.tsx
+        │       │   ├── navigation/
+        │       │   │   ├── NavigationBar.tsx
+        │       │   │   ├── BackButton.tsx
+        │       │   │   ├── Breadcrumbs.tsx
+        │       │   │   └── useNavigationCrumbs.ts
+        │       │   ├── theme-toggle/
+        │       │   │   └── ThemeToggleButton.tsx
+        │       │   ├── settings/
+        │       │   │   ├── SettingsButton.tsx
+        │       │   │   └── SettingsPanel.tsx
+        │       │   ├── inspector/
+        │       │   │   ├── InspectorButton.tsx
+        │       │   │   └── InspectorPanel.tsx
+        │       │   └── dock/           # Figma toolbar / macOS dock — launches overlays
+        │       │       ├── Dock.tsx
+        │       │       ├── DockItem.tsx
+        │       │       └── useDock.ts
+        │       ├── dynamic-island/     # LAYER 3 — macOS notch widget
+        │       │   ├── DynamicIslandLayer.tsx
+        │       │   └── useDynamicIsland.ts
+        │       └── overlays/           # Full-screen overlays triggered from dock
+        │           ├── OverlayHost.tsx
+        │           ├── registry.ts
+        │           └── agents-monitor/
+        │               └── AgentsMonitorOverlay.tsx
+        │
+        └── styles/
+            └── index.css               # Tailwind v4 entry + design tokens
 ```
 
 **Dependencies:**
 - `@vibe-ctl/runtime` (workspace)
 - `@vibe-ctl/canvas` (workspace)
-- `electron`
+- `@vibe-ctl/ui` (workspace)
+- `@vibe-ctl/plugin-api` (workspace)
+- `electron`, `electron-updater`
+
+### Renderer file-naming conventions
+
+| Role | Suffix | Example |
+|---|---|---|
+| Screen entry | `*Screen.tsx` | `LoadingScreen.tsx`, `MainScreen.tsx` |
+| Layer entry | `*Layer.tsx` | `WorkspaceLayer.tsx`, `HudLayer.tsx` |
+| Overlay entry | `*Overlay.tsx` | `AgentsMonitorOverlay.tsx` |
+| Host / frame | `*Host.tsx` | `OverlayHost.tsx` |
+| UI region | `*Bar.tsx`, `*Panel.tsx`, `*Button.tsx` | `NavigationBar.tsx` |
+| Hook | `use<Name>.ts` | `useEngine.ts`, `useDock.ts` |
+| Provider | `*Provider.tsx` | `EngineProvider.tsx` |
+
+Folders are kebab-case, singular (`workspace/`, `theme-toggle/`,
+`version-gate/`). Files are PascalCase `.tsx` for components,
+camelCase `.ts` for hooks / pure modules.
 
 ---
 
@@ -323,6 +451,12 @@ mark them `external` in their bundler config (see §5).
 | `@jamesyong42/infinite-canvas` | Canvas engine (shared ECS world) |
 | `@jamesyong42/reactive-ecs` | ECS library (shared runtime) |
 | `@vibecook/truffle` | `CrdtDoc` / `SyncedStore` types (instances come from host) |
+
+The host bundles `@vibe-ctl/ui` and exposes its primitives to every plugin
+through `ctx.ui` at runtime. Plugins do NOT import `@vibe-ctl/ui` directly
+— that path stays internal to whichever shell is hosting them, so the
+same plugin renders identically in the desktop shell, a future web
+shell, or a test harness.
 
 Plugins that bundle their own copy of these fail validation at load
 time (see spec 02 §8).
@@ -502,13 +636,13 @@ pnpm build
 turbo run build (respects dep graph)
     ↓
 ┌────────────────────────────────────────────────────┐
-│ core/plugin-api  (no deps)                       │
+│ core/plugin-api  (no deps)                          │
 │     ↓                                                │
-│ core/runtime  +  core/canvas                         │
+│ core/runtime  +  core/canvas  +  core/ui             │
 │     ↓                                                │
 │ core/shell                                           │
 │     ↓                                                │
-│ plugins/* (parallel; all depend on plugin-api)   │
+│ plugins/* (parallel; all depend on plugin-api)      │
 └────────────────────────────────────────────────────┘
     ↓
 turbo run bundle-plugins
@@ -566,9 +700,12 @@ third-party authors submit to the registry (see spec 04).
 ## 11. Placement Guidelines
 
 **Kernel (`core/*`):**
-- The five verbs (load/run/render/schedule/interact) plus sync fabric
-- Generic UI primitives (`ctx.ui.*`)
-- No domain logic
+- `plugin-api`: the contract — types only, no impl
+- `runtime`: plugin host + sync fabric (truffle, ECS world)
+- `canvas`: engine wrapper + CRDT adapter + widget-type registry
+- `ui`: portable React primitives + icons + layout slots + placeholders
+- `shell`: Electron-only — main/preload/renderer composition
+- No domain logic anywhere in `core/`
 
 **Plugin (`plugins/*`):**
 - All domain logic (agents, terminals, notifications, dynamic island)
@@ -579,8 +716,17 @@ third-party authors submit to the registry (see spec 04).
 - Electron packaging + resources
 - Nothing else
 
-Writing agent-specific code in `core/` → move to a plugin. Writing
-shared infra inside a plugin → lift into `core/plugin-api`.
+**The shape test:**
+- Component depends only on React → `core/ui`
+- Component depends on canvas engine → `core/shell` (or future web-shell)
+- Component is Electron-specific (uses `-webkit-app-region`, IPC, etc.)
+  → `core/shell/src/renderer/chrome/`
+- Component touches a domain (agents, terminals, settings semantics) →
+  a plugin
+
+Writing agent-specific code in `core/` → move to a plugin. Writing a
+React component in `core/canvas` → move to `core/ui` or to the shell.
+Writing shared infra inside a plugin → lift into `core/plugin-api`.
 
 ---
 
@@ -602,3 +748,28 @@ shared infra inside a plugin → lift into `core/plugin-api`.
   provided at runtime via `ctx.ui`.** Keeps the API package small (no
   React dep for authors using only types). Host versions components
   without breaking plugins.
+- **`core/canvas` is renderer-agnostic.** Engine wrapper, CRDT adapter,
+  widget-type registry. No React peer dep. Runs in any host (electron
+  shell, future web shell, node tests). UI primitives that previously
+  shipped here moved to `core/ui` for portability.
+- **`core/ui` is the portable design system.** Pure React. No Electron,
+  no canvas, no truffle. Houses the `ctx.ui.*` primitives, icon
+  catalog, layout slots, and `MissingPluginPlaceholder`. Consumed by
+  whatever shell is hosting (desktop today, web tomorrow). Plugins
+  reach these via `ctx.ui` at runtime — never imported directly.
+- **Electron-specific renderer code lives under `core/shell/src/renderer/chrome/`.**
+  Anything that uses `-webkit-app-region`, IPC, native window APIs, or
+  Electron-specific behaviors stays out of `core/ui`. Future web shell
+  has its own equivalent of `chrome/` (or none) without polluting the
+  shared design system.
+- **Renderer is screens-first.** Top axis = screen state machine
+  (`loading` → `onboarding` → `version-gate` → `main`). Inside `main`,
+  three layers stacked by z-index (`workspace`, `hud`, `dynamic-island`)
+  plus full-screen `overlays` triggered from the dock. Cross-screen
+  concerns (theme, engine providers) live in `app/`. Mirrors how users
+  experience the app instead of forcing every component into one flat
+  features bucket.
+- **Widgets are plugin territory.** No `widgets/` folder anywhere in
+  `core/`. The shell renders an empty workspace until plugins activate
+  and contribute. Debug/dev widgets ship as a first-party plugin, not
+  embedded in the shell source.
