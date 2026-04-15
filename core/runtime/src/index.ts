@@ -16,3 +16,4 @@ export type {
 } from './types.js';
 
 export * from './ipc/index.js';
+export * from './logging/index.js';
