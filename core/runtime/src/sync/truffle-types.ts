@@ -134,21 +134,11 @@ export interface TruffleNapiNode {
 
 export interface TruffleModule {
   NapiNode: new () => TruffleNapiNode;
-  createMeshNode: (options: {
-    appId: string;
-    deviceName?: string;
-    deviceId?: string;
-    sidecarPath?: string;
-    stateDir?: string;
-    authKey?: string;
-    ephemeral?: boolean;
-    wsPort?: number;
-    autoAuth?: boolean;
-    openUrl?: (url: string) => void;
-    onAuthRequired?: (url: string) => void;
-    onPeerChange?: (event: TrufflePeerEvent) => void;
-  }) => Promise<TruffleNapiNode>;
-  resolveSidecarPath: () => string;
+  NapiCrdtDoc: unknown;
+  NapiSyncedStore: unknown;
+  NapiFileTransfer: unknown;
+  NapiProxy: unknown;
+  NapiOfferResponder: unknown;
 }
 
 /**
@@ -158,7 +148,7 @@ export interface TruffleModule {
  */
 export async function loadTruffle(): Promise<TruffleModule | null> {
   try {
-    const mod = (await import('@vibecook/truffle')) as TruffleModule;
+    const mod = (await import('@vibecook/truffle')) as unknown as TruffleModule;
     // Sanity-check that the NapiNode class is actually present.
     if (typeof mod.NapiNode !== 'function') return null;
     return mod;
