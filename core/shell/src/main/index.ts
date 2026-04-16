@@ -20,6 +20,8 @@
 import { resolve } from 'node:path';
 import { Runtime, createScopedLogger } from '@vibe-ctl/runtime';
 import { app } from 'electron';
+// Side-effect: registerSchemesAsPrivileged MUST run before app.whenReady().
+import './protocols/register.js';
 import { registerDeepLinks } from './app/deep-links.js';
 import { runFuseCheck } from './app/fuse-check.js';
 import { registerLifecycleHooks } from './app/lifecycle.js';
@@ -28,7 +30,7 @@ import { initAutoUpdater } from './auto-updater.js';
 import { createBroker, registerHostDispatcher, sendHandshake } from './ipc/index.js';
 import { type KernelSupervisor, startKernelSupervisor } from './kernel/index.js';
 import { createAppMenu } from './menu.js';
-import { registerProtocols } from './protocol.js';
+import { registerHostProtocol, registerPluginProtocol } from './protocols/index.js';
 import { setupSessionSecurity } from './security/index.js';
 import { createTray } from './tray.js';
 import { type WindowManager, createWindowManager } from './windows/index.js';
@@ -55,7 +57,8 @@ async function boot(): Promise<void> {
   // --- Step 2: platform layer --------------------------------------------
   runFuseCheck();
   setupSessionSecurity();
-  registerProtocols();
+  registerHostProtocol();
+  registerPluginProtocol();
   createAppMenu();
   registerDeepLinks({});
   registerHostDispatcher();
