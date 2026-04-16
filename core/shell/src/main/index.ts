@@ -1,28 +1,35 @@
 /**
- * Electron main-process entry for `@vibe-ctl/shell`.
+ * Electron main-process composition root for `@vibe-ctl/shell`.
  *
- * Implements the bootstrap sequence of spec 02 §10:
+ * Implements the bootstrap sequence of spec 02 §10 and the tri-process
+ * topology of spec 05 §2. Stays thin by design — every concern (single
+ * instance, lifecycle, fuse check, deep links, windows, kernel spawn,
+ * IPC) lives in its own module.
  *
- *   1. Electron main starts (this file)
- *   2. Platform layer ready (windows, tray, menu handles prepared)
- *   3. Runtime.start(): sync fabric → version gate → discover → resolve
- *      → activate eager plugins (the Runtime walks steps 3–8 internally)
- *   4. Create the main window; renderer boots and mounts canvas placements
- *   5. On `before-quit` or `window-all-closed` (non-mac): Runtime.stop()
- *
- * Kept deliberately stub-shaped — real Runtime wiring is out of scope
- * for the scaffold. Sketch only.
+ * Sketch:
+ *   1. app.setName + app.enableSandbox (must precede app-ready).
+ *   2. Acquire single-instance lock; quit early if a peer holds it.
+ *   3. whenReady() → platform layer (security, protocols, menu).
+ *   4. Construct + start the Runtime (stub until Phase 1 commit 10).
+ *   5. Create the main window + tray + auto-updater wiring.
+ *   6. Register app lifecycle hooks (activate / before-quit / all-closed).
  */
 
 import { resolve } from 'node:path';
-import { Runtime } from '@vibe-ctl/runtime';
-import { BrowserWindow, app } from 'electron';
+import { Runtime, createScopedLogger } from '@vibe-ctl/runtime';
+import { app } from 'electron';
+import { registerDeepLinks } from './app/deep-links.js';
+import { runFuseCheck } from './app/fuse-check.js';
+import { registerLifecycleHooks } from './app/lifecycle.js';
+import { acquireSingleInstanceLock } from './app/single-instance.js';
 import { initAutoUpdater } from './auto-updater.js';
 import { createAppMenu } from './menu.js';
 import { registerProtocols } from './protocol.js';
 import { setupSecurity } from './security.js';
-import { type TrayHandle, createTray } from './tray.js';
+import { createTray } from './tray.js';
 import { type WindowManager, createWindowManager } from './windows.js';
+
+const log = createScopedLogger('shell:main');
 
 // Override Electron's default app name (derived from the shell package's
 // `@vibe-ctl/shell`) so `userData`, the menu bar label, and the tray
@@ -33,38 +40,27 @@ app.setName('vibe-ctl');
 // regardless of per-window webPreferences. Must run before app-ready.
 app.enableSandbox();
 
-let runtime: Runtime | null = null;
-let windows: WindowManager | null = null;
-let tray: TrayHandle | null = null;
+// Late-bound refs used by lifecycle + single-instance handlers that are
+// registered before the objects they refer to exist.
+const windowsRef: {
+  current: WindowManager | null;
+} = { current: null };
+const runtimeRef: { current: Runtime | null } = { current: null };
 
-// Single-instance lock: if another instance is already running, surface
-// its window and quit this process. Must be claimed synchronously before
-// any windows are created.
-const gotLock = app.requestSingleInstanceLock();
-if (!gotLock) {
-  app.quit();
-}
-
-app.on('second-instance', () => {
-  const existing = windows?.getMainWindow();
-  if (!existing) return;
-  if (existing.isMinimized()) existing.restore();
-  existing.focus();
-});
+const gotLock = acquireSingleInstanceLock(windowsRef);
 
 async function boot(): Promise<void> {
   await app.whenReady();
 
   // --- Step 2: platform layer --------------------------------------------
+  runFuseCheck();
   setupSecurity();
   registerProtocols();
   createAppMenu();
+  registerDeepLinks({});
 
   // --- Step 3: construct + start the runtime -----------------------------
-  // The Runtime owns the sync fabric, version gate, discovery, resolution,
-  // and plugin activation (spec 02 §10 steps 3–8). The shell only provides
-  // platform-layer wiring.
-  runtime = new Runtime({
+  const runtime = new Runtime({
     // Scan the packaged resources dir first, then the user-data dir.
     builtInPluginRoots: [resolve(process.resourcesPath ?? '', 'plugins')],
     pluginDirs: [resolve(app.getPath('userData'), 'plugins')],
@@ -72,58 +68,35 @@ async function boot(): Promise<void> {
     // Canvas engine handle is wired from the renderer; main-process runtime
     // gets a placeholder until the canvas adapter protocol is fleshed out.
     canvasEngine: null,
-    logger: console,
+    logger: createScopedLogger('runtime'),
     kernelVersion: app.getVersion(),
     userDataDir: app.getPath('userData'),
     // TODO: stable device identity. Placeholder: hostname + pid.
     deviceId: `${process.env.HOSTNAME ?? 'unknown'}-${process.pid}`,
     deviceName: process.env.HOSTNAME ?? 'unknown',
   });
+  runtimeRef.current = runtime;
 
-  // TODO: version gate lives inside Runtime.start() per spec 02 §10 step 4.
-  // If it reports "behind", the shell should render <VersionGate /> in the
-  // main window and NOT create additional windows.
   await runtime.discover();
   await runtime.resolve();
   await runtime.start();
 
   // --- Step 4: platform UI chrome ----------------------------------------
-  windows = createWindowManager();
-  tray = createTray();
-  void tray;
+  const windows = createWindowManager();
+  windowsRef.current = windows;
+  createTray();
   windows.createMainWindow();
 
   initAutoUpdater();
-
-  // Re-open the main window on macOS dock activation.
-  app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      windows?.createMainWindow();
-    }
-  });
 }
 
-// --- Teardown -----------------------------------------------------------
-
-app.on('before-quit', async (event) => {
-  if (!runtime) return;
-  event.preventDefault();
-  try {
-    await runtime.stop();
-  } finally {
-    runtime = null;
-    app.exit(0);
-  }
-});
-
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit();
-});
+// Lifecycle hooks are registered eagerly so `before-quit` fires even if
+// boot() throws halfway through.
+registerLifecycleHooks({ runtimeRef, windowsRef });
 
 if (gotLock) {
   boot().catch((err) => {
-    // eslint-disable-next-line no-console
-    console.error('[vibe-ctl] boot failed', err);
+    log.error({ err }, 'boot failed');
     app.exit(1);
   });
 }
