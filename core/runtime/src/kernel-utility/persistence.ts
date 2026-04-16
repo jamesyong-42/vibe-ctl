@@ -1,16 +1,21 @@
 /**
  * DocPersistence — snapshot read/write for kernel docs (spec 05 §2.1).
  *
- * Lives in the kernel utility process. Persists binary snapshots to
- * `{dataDir}/truffle/{docName}.snapshot`. When truffle is wired, the
- * snapshots contain the Loro doc's deep JSON value (serialised as JSON,
- * matching the CrdtDocHandle.exportSnapshot() contract). When in fallback
- * mode, the same JSON format is used.
+ * Lives in the kernel utility process. Persists Loro-shaped binary
+ * snapshots to `{dataDir}/truffle/{docName}.loro`. The payload comes
+ * from `CrdtDocHandle.exportSnapshot()`: when truffle exposes a binary
+ * export path at NAPI level these are raw Loro bytes; today they are
+ * UTF-8 JSON bytes emitted by the adapter. Writes and reads treat the
+ * payload as opaque `Uint8Array`.
+ *
+ * Migration: prior builds wrote `.snapshot` files (JSON). On load we
+ * fall back to `.snapshot` if `.loro` is absent, import it into the
+ * doc, and write out the new `.loro` file on the next save cycle.
  *
  * Periodic saves every 30s when dirty; final save on shutdown.
  */
 
-import { mkdir, readFile, stat, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, rename, stat, unlink, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { createScopedLogger } from '../logging/index.js';
 import type { KernelDocName, KernelDocs } from '../sync/kernel-docs.js';
@@ -43,9 +48,15 @@ export class DocPersistence {
     this.#dataDir = opts.dataDir;
   }
 
-  /** Resolve the snapshot file path for a doc. */
+  /** Resolve the current (.loro) snapshot file path for a doc. */
   #snapshotPath(docName: KernelDocName): string {
     // Sanitise the doc name for the filesystem (replace / with _).
+    const safeName = docName.replace(/\//g, '_');
+    return join(this.#dataDir, 'truffle', `${safeName}.loro`);
+  }
+
+  /** Resolve the legacy (.snapshot) file path for migration. */
+  #legacySnapshotPath(docName: KernelDocName): string {
     const safeName = docName.replace(/\//g, '_');
     return join(this.#dataDir, 'truffle', `${safeName}.snapshot`);
   }
@@ -60,7 +71,14 @@ export class DocPersistence {
     log.debug({ docName, bytes: snapshot.byteLength }, 'snapshot saved');
   }
 
-  /** Load a single doc's snapshot from disk. Returns null if not found. */
+  /**
+   * Load a single doc's snapshot from disk. Returns null if not found.
+   *
+   * Migration path: if the new `.loro` file is missing but a legacy
+   * `.snapshot` file exists, rename it in place and return its contents.
+   * The next periodic save will overwrite with the current adapter's
+   * encoding (JSON today, raw Loro bytes once truffle exposes export()).
+   */
   async load(docName: KernelDocName): Promise<Uint8Array | null> {
     const path = this.#snapshotPath(docName);
     try {
@@ -68,9 +86,30 @@ export class DocPersistence {
       log.debug({ docName, bytes: buf.byteLength }, 'snapshot loaded');
       return new Uint8Array(buf);
     } catch (err) {
-      if ((err as NodeJS.ErrnoException).code === 'ENOENT') {
-        return null;
+      if ((err as NodeJS.ErrnoException).code !== 'ENOENT') throw err;
+    }
+
+    // Fall back to legacy .snapshot; migrate if present.
+    const legacyPath = this.#legacySnapshotPath(docName);
+    try {
+      const buf = await readFile(legacyPath);
+      log.info({ docName }, 'migrating legacy .snapshot to .loro');
+      await mkdir(dirname(path), { recursive: true });
+      try {
+        await rename(legacyPath, path);
+      } catch {
+        // Best-effort rename; fall back to write + unlink so the data is
+        // at least preserved under the new name.
+        await writeFile(path, buf);
+        try {
+          await unlink(legacyPath);
+        } catch {
+          /* ignore */
+        }
       }
+      return new Uint8Array(buf);
+    } catch (err) {
+      if ((err as NodeJS.ErrnoException).code === 'ENOENT') return null;
       throw err;
     }
   }

@@ -187,14 +187,18 @@ function createTruffleCrdtDoc(id: string, nativeDoc: TruffleCrdtDoc): CrdtDocHan
       }
     },
     exportSnapshot() {
-      // Export the full document state as JSON for persistence.
+      // Truffle's NapiCrdtDoc does not yet expose a binary Loro export
+      // at NAPI level. We serialise getDeepValue() as the best available
+      // shape; when a real export() arrives, swap this to raw Loro
+      // bytes. Persistence treats the return as opaque Uint8Array — the
+      // `.loro` file on disk holds whatever shape this emits.
       const deep = nativeDoc.getDeepValue();
       return new TextEncoder().encode(JSON.stringify(deep ?? {}));
     },
     importSnapshot(data) {
-      // Import is handled at doc creation time — truffle docs persist
-      // themselves internally. For the JSON-based persistence layer,
-      // re-apply the map entries.
+      // Paired with exportSnapshot above: re-apply the persisted map
+      // entries via mapInsert. When truffle exposes a binary import,
+      // swap both ends together.
       try {
         const text = new TextDecoder().decode(data);
         const obj = JSON.parse(text) as Record<string, unknown>;
