@@ -1,4 +1,4 @@
-import { type ReactNode, createContext, useMemo, useState } from 'react';
+import { createContext, type ReactNode, useMemo, useState } from 'react';
 
 export interface DockState {
   activeOverlayId: string | null;

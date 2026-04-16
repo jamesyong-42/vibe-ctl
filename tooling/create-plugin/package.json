@@ -8,7 +8,10 @@
     "create-plugin": "./bin/index.mjs"
   },
   "main": "./dist/index.js",
-  "files": ["dist", "bin"],
+  "files": [
+    "dist",
+    "bin"
+  ],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",

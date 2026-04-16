@@ -43,9 +43,7 @@ export function transferToKernel(child: UtilityProcess, port: MessagePortMain): 
  * port (to include in the handshake) and transfers the kernel-side port
  * to the kernel utility.
  */
-export function setupDocSyncPorts(opts: {
-  kernelChild: UtilityProcess;
-}): MessagePortMain {
+export function setupDocSyncPorts(opts: { kernelChild: UtilityProcess }): MessagePortMain {
   const { rendererPort, kernelPort } = mintDocSyncPair();
   transferToKernel(opts.kernelChild, kernelPort);
   return rendererPort;

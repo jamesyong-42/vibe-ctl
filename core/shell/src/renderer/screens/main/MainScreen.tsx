@@ -16,12 +16,12 @@
 
 import { type FC, useMemo } from 'react';
 import { DynamicIslandLayer } from './dynamic-island/DynamicIslandLayer.js';
-import { HudLayer } from './hud/HudLayer.js';
 import { DockProvider } from './hud/dock/DockProvider.js';
+import { HudLayer } from './hud/HudLayer.js';
 import { OverlayHost } from './overlays/OverlayHost.js';
+import { createDemoEngine } from './workspace/demoScene.js';
 import { EngineProvider } from './workspace/EngineProvider.js';
 import { WorkspaceLayer } from './workspace/WorkspaceLayer.js';
-import { createDemoEngine } from './workspace/demoScene.js';
 
 export const MainScreen: FC = () => {
   const engine = useMemo(() => createDemoEngine(), []);

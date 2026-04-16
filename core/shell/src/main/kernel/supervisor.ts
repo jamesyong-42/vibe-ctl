@@ -10,7 +10,7 @@
  * so the same class is reusable for split-plugin supervisors (Phase 6).
  */
 
-import { CrashRecovery, type KernelCtrl, createScopedLogger } from '@vibe-ctl/runtime';
+import { CrashRecovery, createScopedLogger, type KernelCtrl } from '@vibe-ctl/runtime';
 import type * as Comlink from 'comlink';
 import type { MessagePortMain, UtilityProcess } from 'electron';
 import { createCtrlClient } from './ctrl-client.js';

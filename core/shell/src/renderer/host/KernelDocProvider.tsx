@@ -11,7 +11,7 @@
  */
 
 import type { DocSyncMessage, KernelDocName } from '@vibe-ctl/runtime';
-import { type FC, type ReactNode, createContext, useContext, useEffect, useRef } from 'react';
+import { createContext, type FC, type ReactNode, useContext, useEffect, useRef } from 'react';
 import { useHostBridgeOptional } from './useHostInvoke.js';
 
 // ─── In-memory doc replica ───────────────────────────────────────────────────

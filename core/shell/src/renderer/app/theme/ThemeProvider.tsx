@@ -4,7 +4,7 @@
  * read it. Persists to localStorage and toggles `html.dark`.
  */
 
-import { type ReactNode, createContext, useCallback, useEffect, useMemo, useState } from 'react';
+import { createContext, type ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 
 export type Theme = 'light' | 'dark';
 

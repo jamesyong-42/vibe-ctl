@@ -7,7 +7,7 @@
  * render something visible while the plugin host is being wired up.
  */
 
-import { Children, type LayoutEngine, createLayoutEngine } from '@jamesyong42/infinite-canvas';
+import { Children, createLayoutEngine, type LayoutEngine } from '@jamesyong42/infinite-canvas';
 import { DebugCard } from './widgets/DebugCard.js';
 import { DebugContainer, DebugContainerArchetype } from './widgets/DebugContainer.js';
 import { DebugInteractive } from './widgets/DebugInteractive.js';

@@ -57,7 +57,7 @@
 
 import { createRequire } from 'node:module';
 import { join } from 'node:path';
-import { type Logger, type TransportTargetOptions, pino } from 'pino';
+import { type Logger, pino, type TransportTargetOptions } from 'pino';
 
 export type LogLevel = 'trace' | 'debug' | 'info' | 'warn' | 'error' | 'fatal' | 'silent';
 

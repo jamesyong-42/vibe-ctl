@@ -6,7 +6,7 @@
  * not the native menu, so this file stays small.
  */
 
-import { Menu, type MenuItemConstructorOptions, app } from 'electron';
+import { app, Menu, type MenuItemConstructorOptions } from 'electron';
 
 export function createAppMenu(): void {
   const isMac = process.platform === 'darwin';

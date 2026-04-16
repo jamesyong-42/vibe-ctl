@@ -19,10 +19,10 @@
 
 import { join, resolve } from 'node:path';
 import {
-  type EventPortMessage,
-  Runtime,
   createLogger,
   createScopedLogger,
+  type EventPortMessage,
+  Runtime,
   setRootLogger,
 } from '@vibe-ctl/runtime';
 import { app } from 'electron';
@@ -40,16 +40,16 @@ import {
   setupLogReceiver,
 } from './ipc/index.js';
 import {
-  type KernelSupervisor,
   brokerDocSyncPort,
   brokerEventPort,
+  type KernelSupervisor,
   startKernelSupervisor,
 } from './kernel/index.js';
 import { createAppMenu } from './menu.js';
 import { registerHostProtocol, registerPluginProtocol } from './protocols/index.js';
 import { setupSessionSecurity } from './security/index.js';
 import { createTray } from './tray.js';
-import { type WindowManager, createWindowManager } from './windows/index.js';
+import { createWindowManager, type WindowManager } from './windows/index.js';
 
 const log = createScopedLogger('shell:main');
 

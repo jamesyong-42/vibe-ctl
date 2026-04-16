@@ -2,9 +2,6 @@
  * Kernel ECS barrel. Re-exports world factory, components, tags, and systems.
  */
 
-export { createKernelWorld } from './world.js';
-export type { KernelWorld } from './world.js';
-
 export {
   PermissionGrant,
   PluginDeps,
@@ -22,9 +19,8 @@ export {
   ServiceEntry,
   WidgetType,
 } from './components.js';
-
-export { Disabled, Eager, Failed, NeedsUpdate } from './tags.js';
-
+export type { DocSubscription, SyncBridgeCallbacks } from './systems/sync-bridge-system.js';
+export { createSyncBridge } from './systems/sync-bridge-system.js';
 export {
   ActivationSystem,
   DeactivationSystem,
@@ -33,6 +29,6 @@ export {
   HealthMonitorSystem,
   SyncBridgeSystem,
 } from './systems.js';
-
-export { createSyncBridge } from './systems/sync-bridge-system.js';
-export type { DocSubscription, SyncBridgeCallbacks } from './systems/sync-bridge-system.js';
+export { Disabled, Eager, Failed, NeedsUpdate } from './tags.js';
+export type { KernelWorld } from './world.js';
+export { createKernelWorld } from './world.js';

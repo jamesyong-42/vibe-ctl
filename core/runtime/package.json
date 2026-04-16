@@ -15,7 +15,9 @@
       "default": "./dist/kernel-utility.js"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",

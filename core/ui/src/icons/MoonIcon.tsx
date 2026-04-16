@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { type SvgIconProps, defaultIconProps } from './types.js';
+import { defaultIconProps, type SvgIconProps } from './types.js';
 
 export const MoonIcon: FC<SvgIconProps> = ({ size = 18, ...rest }) => (
   <svg {...defaultIconProps} width={size} height={size} {...rest}>

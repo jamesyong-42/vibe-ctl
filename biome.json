@@ -1,24 +1,23 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.4.12/schema.json",
   "vcs": {
     "enabled": true,
     "clientKind": "git",
     "useIgnoreFile": true
   },
   "files": {
-    "ignore": [
-      "**/dist/**",
-      "**/out/**",
-      "**/node_modules/**",
-      "**/.turbo/**",
-      "**/release/**",
-      "apps/desktop/resources/plugins/**",
-      "specs/outdated/**"
+    "includes": [
+      "**",
+      "!**/dist",
+      "!**/out",
+      "!**/node_modules",
+      "!**/.turbo",
+      "!**/release",
+      "!**/apps/desktop/resources/plugins",
+      "!**/specs/outdated"
     ]
   },
-  "organizeImports": {
-    "enabled": true
-  },
+  "assist": { "actions": { "source": { "organizeImports": "on" } } },
   "formatter": {
     "enabled": true,
     "indentStyle": "space",
@@ -38,7 +37,9 @@
       },
       "a11y": {
         "useKeyWithClickEvents": "off",
-        "useSemanticElements": "off"
+        "useSemanticElements": "off",
+        "useAriaPropsSupportedByRole": "off",
+        "noStaticElementInteractions": "off"
       }
     }
   },
@@ -48,6 +49,11 @@
       "semicolons": "always",
       "trailingCommas": "all",
       "arrowParentheses": "always"
+    }
+  },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
     }
   },
   "json": {

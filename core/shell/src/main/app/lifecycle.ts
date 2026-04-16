@@ -11,7 +11,7 @@
 
 import type { Runtime } from '@vibe-ctl/runtime';
 import { createScopedLogger } from '@vibe-ctl/runtime';
-import { BrowserWindow, app } from 'electron';
+import { app, BrowserWindow } from 'electron';
 
 const log = createScopedLogger('shell:lifecycle');
 

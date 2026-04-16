@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { type SvgIconProps, defaultIconProps } from './types.js';
+import { defaultIconProps, type SvgIconProps } from './types.js';
 
 export interface ChevronIconProps extends SvgIconProps {
   direction?: 'left' | 'right' | 'up' | 'down';

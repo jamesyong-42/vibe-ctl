@@ -35,7 +35,7 @@ import { loadTruffle } from '../sync/truffle-types.js';
 import { VersionBeacons } from '../sync/version-beacons.js';
 import { createCtrlService } from './ctrl-service.js';
 import { DocRouter, type DocSyncPort } from './doc-router.js';
-import { type EventSink, createEventSink } from './event-sink.js';
+import { createEventSink, type EventSink } from './event-sink.js';
 import { DocPersistence } from './persistence.js';
 import { onShutdown } from './shutdown.js';
 

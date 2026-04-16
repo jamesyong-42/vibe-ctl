@@ -1,7 +1,7 @@
 import { cpSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { defineConfig } from 'tsup';
 import type { Options } from 'tsup';
+import { defineConfig } from 'tsup';
 
 /**
  * Host-provided singletons that every plugin must externalize.
