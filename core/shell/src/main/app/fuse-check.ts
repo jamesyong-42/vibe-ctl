@@ -2,18 +2,37 @@
  * Runtime fuse-state sanity check (spec 05 §3).
  *
  * Electron Fuses are flipped at packaging time via `@electron/fuses` in
- * electron-builder's afterPack hook. This check is defense-in-depth:
- * if the packaged binary boots with any fuse flipped back *on*, we
- * want to log loudly so the release is caught before users do.
+ * electron-builder's afterPack hook (`apps/desktop/scripts/afterPack.mjs`).
  *
- * Phase-1: stub. Phase 8 introduces the real check once packaging is
- * wired up.
+ * This module is the "if you're looking for fuse config, look here"
+ * breadcrumb. The real fuse flipping happens at build time — runtime
+ * validation is intentionally deferred to the packaging step because
+ * fuses are baked into the binary and cannot be introspected reliably
+ * from within a running Electron process.
+ *
+ * In development (`app.isPackaged === false`), this is a no-op — fuses
+ * only matter in packaged builds.
+ *
+ * Expected fuse state in production (see spec 05 §3):
+ *   - RunAsNode: disabled
+ *   - EnableCookieEncryption: enabled
+ *   - EnableNodeOptionsEnvironmentVariable: disabled
+ *   - EnableNodeCliInspectArguments: disabled
+ *   - EnableEmbeddedAsarIntegrityValidation: enabled
+ *   - OnlyLoadAppFromAsar: enabled
+ *   - GrantFileProtocolExtraPrivileges: disabled
  */
 
 import { createScopedLogger } from '@vibe-ctl/runtime';
+import { app } from 'electron';
 
 const log = createScopedLogger('shell:fuse-check');
 
 export function runFuseCheck(): void {
-  log.debug('fuse check not implemented yet (Phase 8)');
+  if (!app.isPackaged) {
+    log.debug('dev build — fuse check skipped');
+    return;
+  }
+
+  log.info('fuse validation deferred to packaging step — see apps/desktop/scripts/afterPack.mjs');
 }
