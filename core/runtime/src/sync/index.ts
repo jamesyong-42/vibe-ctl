@@ -23,7 +23,10 @@ export type {
   PluginInventorySlice,
 } from './kernel-docs.js';
 
-export { runVersionGate, publishVersionBeacon } from './version-gate.js';
+export { VersionBeacons } from './version-beacons.js';
+export type { VersionBeacon } from './version-beacons.js';
+
+export { checkVersionGate, publishVersionBeacon } from './version-gate.js';
 export type { VersionGateOptions, VersionGateResult } from './version-gate.js';
 
 export {
