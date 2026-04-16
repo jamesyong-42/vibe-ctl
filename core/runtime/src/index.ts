@@ -22,3 +22,6 @@ export * from './registries/index.js';
 
 export { CrashRecovery } from './plugin-host/crash-recovery.js';
 export type { CrashRecoveryOptions } from './plugin-host/crash-recovery.js';
+
+export { KERNEL_DOC_NAMES } from './sync/kernel-docs.js';
+export type { KernelDocName } from './sync/kernel-docs.js';

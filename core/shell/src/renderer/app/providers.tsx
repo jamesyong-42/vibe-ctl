@@ -19,13 +19,15 @@
  */
 
 import type { FC, ReactNode } from 'react';
-import { EventStreamProvider, HostBridgeProvider } from '../host/index.js';
+import { EventStreamProvider, HostBridgeProvider, KernelDocProvider } from '../host/index.js';
 import { ThemeProvider } from './theme/ThemeProvider.js';
 
 export const AppProviders: FC<{ children: ReactNode }> = ({ children }) => (
   <HostBridgeProvider>
     <EventStreamProvider>
-      <ThemeProvider>{children}</ThemeProvider>
+      <KernelDocProvider>
+        <ThemeProvider>{children}</ThemeProvider>
+      </KernelDocProvider>
     </EventStreamProvider>
   </HostBridgeProvider>
 );
