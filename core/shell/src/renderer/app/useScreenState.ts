@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useHostBridgeOptional } from '../host/index.js';
 
 export type ScreenState =
+  | { kind: 'boot' }
   | { kind: 'loading' }
   | { kind: 'onboarding' }
   | { kind: 'version-gate'; currentVersion: string; requiredVersion: string }
@@ -17,20 +19,32 @@ export interface ScreenController {
 const HAS_ONBOARDED_KEY = 'vibe-ctl.onboarded';
 
 /**
- * Drives the screen state machine. Starts in `loading`; once boot
- * tasks complete, `decideAfterBoot` transitions to `onboarding`
- * (first run) or `main`. `triggerVersionGate` is called imperatively
- * by the runtime if the kernel version check fails mid-session.
+ * Drives the screen state machine (spec 05 §9.2).
  *
- * Local state today — subscribes to IPC signals from the main process
- * once runtime wiring lands.
+ * Starts in `boot`. Flips to `loading` when `HostBridgeProvider` reports
+ * the handshake has completed (i.e. the bridge is non-null). `loading`
+ * then hands off to `onboarding` or `main` via `decideAfterBoot`.
+ * `triggerVersionGate` is called imperatively by the runtime if the
+ * kernel version check fails mid-session.
+ *
+ * Note: in the current `AppProviders` layout this hook runs inside the
+ * HostBridgeProvider, so `useHostBridgeOptional()` returns non-null on
+ * first render of the router — which means the effective initial state
+ * is `loading`. The `boot` branch is kept in the state machine for
+ * symmetry with spec 05 §9.2 and so future layouts that render the
+ * router above the bridge still have a legal state to sit in.
  */
 export function useScreenState(): ScreenController {
-  const [state, setState] = useState<ScreenState>({ kind: 'loading' });
+  const bridge = useHostBridgeOptional();
+  const [state, setState] = useState<ScreenState>(() =>
+    bridge ? { kind: 'loading' } : { kind: 'boot' },
+  );
 
-  // TODO(runtime-ipc): subscribe to main-process lifecycle events:
-  //   - 'boot-complete' → decideAfterBoot(controller)
-  //   - 'version-gate'  → controller.triggerVersionGate(...)
+  useEffect(() => {
+    if (bridge && state.kind === 'boot') {
+      setState({ kind: 'loading' });
+    }
+  }, [bridge, state.kind]);
 
   return {
     state,

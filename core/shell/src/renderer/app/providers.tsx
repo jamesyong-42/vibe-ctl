@@ -18,14 +18,16 @@
 
 import type { FC, ReactNode } from 'react';
 import { EventStreamProvider, HostBridgeProvider } from '../host/index.js';
+import { BootScreen } from '../screens/boot/BootScreen.js';
 import { ThemeProvider } from './theme/ThemeProvider.js';
 
 /**
- * `HostBridgeProvider` renders the `fallback` while the preload
- * handshake is in flight — commit 9 wires `<BootScreen>` in here.
+ * `HostBridgeProvider` renders `<BootScreen />` while the preload
+ * handshake is in flight; once it resolves, children mount and the
+ * screen router takes over at `loading` per spec 05 §9.2.
  */
 export const AppProviders: FC<{ children: ReactNode }> = ({ children }) => (
-  <HostBridgeProvider>
+  <HostBridgeProvider fallback={<BootScreen />}>
     <EventStreamProvider>
       <ThemeProvider>{children}</ThemeProvider>
     </EventStreamProvider>

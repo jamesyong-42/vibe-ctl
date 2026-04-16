@@ -9,6 +9,7 @@
  */
 
 import type { FC } from 'react';
+import { BootScreen } from '../screens/boot/BootScreen.js';
 import { LoadingScreen } from '../screens/loading/LoadingScreen.js';
 import { MainScreen } from '../screens/main/MainScreen.js';
 import { OnboardingScreen } from '../screens/onboarding/OnboardingScreen.js';
@@ -20,6 +21,8 @@ export const ScreenRouter: FC = () => {
   const { state } = controller;
 
   switch (state.kind) {
+    case 'boot':
+      return <BootScreen />;
     case 'loading':
       return <LoadingScreen onReady={() => decideAfterBoot(controller)} />;
     case 'onboarding':
