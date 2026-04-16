@@ -21,24 +21,19 @@ const HAS_ONBOARDED_KEY = 'vibe-ctl.onboarded';
 /**
  * Drives the screen state machine (spec 05 §9.2).
  *
- * Starts in `boot`. Flips to `loading` when `HostBridgeProvider` reports
- * the handshake has completed (i.e. the bridge is non-null). `loading`
- * then hands off to `onboarding` or `main` via `decideAfterBoot`.
- * `triggerVersionGate` is called imperatively by the runtime if the
- * kernel version check fails mid-session.
+ * Starts in `boot` — the HostBridgeProvider always renders children,
+ * so the router mounts immediately and shows `<BootScreen />` while the
+ * preload handshake is in flight. Once the bridge becomes non-null the
+ * state flips to `loading`, which hands off to `onboarding` or `main`
+ * via `decideAfterBoot`. `triggerVersionGate` is called imperatively by
+ * the runtime if the kernel version check fails mid-session.
  *
- * Note: in the current `AppProviders` layout this hook runs inside the
- * HostBridgeProvider, so `useHostBridgeOptional()` returns non-null on
- * first render of the router — which means the effective initial state
- * is `loading`. The `boot` branch is kept in the state machine for
- * symmetry with spec 05 §9.2 and so future layouts that render the
- * router above the bridge still have a legal state to sit in.
+ * This makes the state machine the single deterministic source of what
+ * screen is on display — the provider manages IPC state only.
  */
 export function useScreenState(): ScreenController {
   const bridge = useHostBridgeOptional();
-  const [state, setState] = useState<ScreenState>(() =>
-    bridge ? { kind: 'loading' } : { kind: 'boot' },
-  );
+  const [state, setState] = useState<ScreenState>({ kind: 'boot' });
 
   useEffect(() => {
     if (bridge && state.kind === 'boot') {

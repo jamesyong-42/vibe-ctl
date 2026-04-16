@@ -21,7 +21,7 @@ import {
   useRef,
 } from 'react';
 import { useSyncExternalStore } from 'react';
-import { useHostBridge } from './useHostInvoke.js';
+import { useHostBridgeOptional } from './useHostInvoke.js';
 
 type EventMap = { [K in keyof VibeEvents]?: VibeEvents[K] };
 
@@ -53,12 +53,13 @@ function createEventStore(): EventStore {
 const EventStoreContext = createContext<EventStore | null>(null);
 
 export const EventStreamProvider: FC<{ children: ReactNode }> = ({ children }) => {
-  const bridge = useHostBridge();
+  const bridge = useHostBridgeOptional();
   const storeRef = useRef<EventStore | null>(null);
   if (!storeRef.current) storeRef.current = createEventStore();
   const store = storeRef.current;
 
   useEffect(() => {
+    if (!bridge) return;
     const port = bridge.eventPort;
     const onMessage = (ev: MessageEvent): void => {
       const data = ev.data as {
@@ -73,7 +74,7 @@ export const EventStreamProvider: FC<{ children: ReactNode }> = ({ children }) =
     return () => {
       port.removeEventListener('message', onMessage);
     };
-  }, [bridge.eventPort, store]);
+  }, [bridge, store]);
 
   const value = useMemo(() => store, [store]);
   return <EventStoreContext.Provider value={value}>{children}</EventStoreContext.Provider>;

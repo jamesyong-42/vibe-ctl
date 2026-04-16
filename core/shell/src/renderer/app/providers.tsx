@@ -6,28 +6,24 @@
  * bounded. Per spec 05 §9.1 the composition order is:
  *
  *   1. LogProvider            (Phase 2 — not yet)
- *   2. HostBridgeProvider     (awaits preload handshake)
- *   3. EventStreamProvider    (subscribes to eventPort)
+ *   2. HostBridgeProvider     (exposes bridge context; always renders children)
+ *   3. EventStreamProvider    (subscribes to eventPort — skipped during boot)
  *   4. ThemeProvider
  *   5. I18nProvider           (deferred — single locale v1)
  *   6. ScreenStateProvider    (lives inside <ScreenRouter>)
  *
- * `HostBridgeProvider` renders a `fallback` while the handshake is in
- * flight; the screen router's BootScreen takes over on ready.
+ * `HostBridgeProvider` never renders a fallback — the screen state
+ * machine in `useScreenState` owns the `'boot'` state and the
+ * `ScreenRouter` renders `<BootScreen />` while the handshake is
+ * in flight.
  */
 
 import type { FC, ReactNode } from 'react';
 import { EventStreamProvider, HostBridgeProvider } from '../host/index.js';
-import { BootScreen } from '../screens/boot/BootScreen.js';
 import { ThemeProvider } from './theme/ThemeProvider.js';
 
-/**
- * `HostBridgeProvider` renders `<BootScreen />` while the preload
- * handshake is in flight; once it resolves, children mount and the
- * screen router takes over at `loading` per spec 05 §9.2.
- */
 export const AppProviders: FC<{ children: ReactNode }> = ({ children }) => (
-  <HostBridgeProvider fallback={<BootScreen />}>
+  <HostBridgeProvider>
     <EventStreamProvider>
       <ThemeProvider>{children}</ThemeProvider>
     </EventStreamProvider>

@@ -2,14 +2,15 @@
  * HostBridgeProvider — renderer-side boot synchronisation (spec 05 §5, §9.1).
  *
  * On mount, subscribes to `window.__vibeCtl.onHostHandshake(…)` and
- * stashes the payload + ports. Children block on `ready` until the
- * handshake lands, which guarantees no React tree ever observes a
- * half-initialised bridge.
+ * stashes the payload + ports. Always renders children — the provider
+ * manages state only and does not participate in UI rendering. The
+ * screen-router decides what to show based on bridge readiness (the
+ * `'boot'` screen state maps to the handshake-pending phase).
  *
  * Placing this provider outermost (just inside `<LogProvider>` when
  * that lands in Phase 2) means the theme / i18n / screen-state
- * providers below can freely call `useHostInvoke()` without guarding
- * for `undefined`.
+ * providers below can freely call `useHostBridgeOptional()` to check
+ * readiness without guarding for mount order.
  */
 
 import type { HandshakePayload, HostMethod, HostRequest, HostResponse } from '@vibe-ctl/runtime';
@@ -51,14 +52,13 @@ declare global {
 
 /**
  * Null while handshake is pending. Consumers should go through the
- * `useHostBridge()` hook which narrows on ready.
+ * `useHostBridge()` hook (throws if null) or `useHostBridgeOptional()`
+ * (returns nullable) depending on whether the caller is inside or
+ * outside the ready gate.
  */
 export const HostBridgeContext = createContext<HostBridge | null>(null);
 
-export const HostBridgeProvider: FC<{ children: ReactNode; fallback?: ReactNode }> = ({
-  children,
-  fallback = null,
-}) => {
+export const HostBridgeProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const [bridge, setBridge] = useState<HostBridge | null>(null);
 
   useEffect(() => {
@@ -80,6 +80,5 @@ export const HostBridgeProvider: FC<{ children: ReactNode; fallback?: ReactNode 
     return dispose;
   }, []);
 
-  if (!bridge) return <>{fallback}</>;
   return <HostBridgeContext.Provider value={bridge}>{children}</HostBridgeContext.Provider>;
 };
