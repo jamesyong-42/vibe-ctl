@@ -83,8 +83,15 @@ function forwardKernelLine(line: string, streamFallback: LevelName): void {
       const msg = typeof parsed.msg === 'string' ? parsed.msg : '';
       const originalScope = typeof parsed.scope === 'string' ? parsed.scope : undefined;
       // Strip noisy/duplicated fields; keep application context.
-      // biome-ignore lint/correctness/noUnusedVariables: destructure-to-drop
-      const { level, time, pid, hostname, msg: _msg, scope: _scope, ...rest } = parsed;
+      const {
+        level: _level,
+        time: _time,
+        pid: _pid,
+        hostname: _hostname,
+        msg: _msg,
+        scope: _scope,
+        ...rest
+      } = parsed;
       kernelLog[levelName]({ ...rest, originalScope }, msg);
       return;
     } catch {
