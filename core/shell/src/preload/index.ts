@@ -1,35 +1,18 @@
 /**
- * Preload script.
+ * Preload composition root.
  *
- * Runs in an isolated context with Node access. We only expose a narrow,
- * typed surface to the renderer via `contextBridge`. Keeping the surface
- * small is the sandbox escape hatch — never expose `ipcRenderer` directly.
+ * Runs in an isolated world under `sandbox: true`; compiled to CJS by
+ * `scripts/build-preload.mjs`. The entire surface exposed to the
+ * renderer lives in `./bridge.ts`.
  */
 
 import { contextBridge } from 'electron';
+import { type VibeCtlBridge, buildBridge } from './bridge.js';
 
-// The typed host surface. Grows as kernel IPC channels are defined.
-//
-// Intentionally NOT exposed: process.versions (leaks Node/V8/Electron
-// minor versions to the renderer, useful for fingerprinting exploits).
-// Plugins that need version info request it via an IPC call which the
-// host can audit and gate.
-const vibeCtl = {
-  platform: process.platform,
-  // TODO: expose IPC-backed host APIs here
-  //   - runtime.queryPlugins()
-  //   - runtime.enablePlugin(id) / disablePlugin(id)
-  //   - canvas.registerWidgetType / unregisterWidgetType
-  //   - permissions.requestGrant / revokeGrant
-  //   - windows.detachWidget(widgetId)
-} as const;
-
-export type VibeCtlPreload = typeof vibeCtl;
-
-contextBridge.exposeInMainWorld('__vibeCtl', vibeCtl);
+contextBridge.exposeInMainWorld('__vibeCtl', buildBridge());
 
 declare global {
   interface Window {
-    __vibeCtl: VibeCtlPreload;
+    __vibeCtl: VibeCtlBridge;
   }
 }
