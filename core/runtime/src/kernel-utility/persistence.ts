@@ -1,12 +1,16 @@
 /**
  * DocPersistence — snapshot read/write for kernel docs (spec 05 §2.1).
  *
- * Lives in the kernel utility process. Persists Loro binary snapshots to
- * `{dataDir}/truffle/{docName}.snapshot`. Periodic saves every 30s when
- * dirty; final save on shutdown.
+ * Lives in the kernel utility process. Persists binary snapshots to
+ * `{dataDir}/truffle/{docName}.snapshot`. When truffle is wired, the
+ * snapshots contain the Loro doc's deep JSON value (serialised as JSON,
+ * matching the CrdtDocHandle.exportSnapshot() contract). When in fallback
+ * mode, the same JSON format is used.
+ *
+ * Periodic saves every 30s when dirty; final save on shutdown.
  */
 
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, stat, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { createScopedLogger } from '../logging/index.js';
 import type { KernelDocName, KernelDocs } from '../sync/kernel-docs.js';
@@ -21,9 +25,18 @@ export interface DocPersistenceOptions {
   dataDir: string;
 }
 
+/** Snapshot metadata returned for debug UI. */
+export interface SnapshotInfo {
+  docName: KernelDocName;
+  path: string;
+  bytes: number;
+  lastSavedAt: number | null;
+}
+
 export class DocPersistence {
   readonly #dataDir: string;
   readonly #dirty = new Set<KernelDocName>();
+  readonly #lastSavedAt = new Map<KernelDocName, number>();
   #timer: ReturnType<typeof setInterval> | null = null;
 
   constructor(opts: DocPersistenceOptions) {
@@ -43,6 +56,7 @@ export class DocPersistence {
     await mkdir(dirname(path), { recursive: true });
     await writeFile(path, snapshot);
     this.#dirty.delete(docName);
+    this.#lastSavedAt.set(docName, Date.now());
     log.debug({ docName, bytes: snapshot.byteLength }, 'snapshot saved');
   }
 
@@ -114,5 +128,32 @@ export class DocPersistence {
       clearInterval(this.#timer);
       this.#timer = null;
     }
+  }
+
+  /** Get snapshot info for all docs (for debug UI). */
+  async getSnapshotInfo(): Promise<SnapshotInfo[]> {
+    const infos: SnapshotInfo[] = [];
+    for (const name of KERNEL_DOC_NAMES) {
+      const path = this.#snapshotPath(name);
+      let bytes = 0;
+      try {
+        const s = await stat(path);
+        bytes = s.size;
+      } catch {
+        // File doesn't exist yet
+      }
+      infos.push({
+        docName: name,
+        path,
+        bytes,
+        lastSavedAt: this.#lastSavedAt.get(name) ?? null,
+      });
+    }
+    return infos;
+  }
+
+  /** Get the last save timestamp for a given doc. */
+  getLastSavedAt(docName: KernelDocName): number | null {
+    return this.#lastSavedAt.get(docName) ?? null;
   }
 }
