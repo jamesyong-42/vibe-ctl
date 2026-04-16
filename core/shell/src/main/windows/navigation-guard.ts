@@ -1,11 +1,12 @@
 /**
- * Per-window navigation guards.
+ * Per-window navigation guards (spec 05 §8.3).
  *
  * Applied to every BrowserWindow we create. Prevents the renderer from
  * being coerced into loading attacker-controlled content:
  *
  *   - `will-navigate` — block any top-level navigation to an origin
- *     that isn't our dev server or packaged file://.
+ *     that isn't our dev server, `host:`, `plugin:`, or the packaged
+ *     `file:` HTML entry.
  *   - `will-attach-webview` — deny <webview> entirely; plugins should
  *     use our managed BrowserWindow detach flow, not raw webviews.
  *   - `setWindowOpenHandler` — defer external URLs to the OS browser,

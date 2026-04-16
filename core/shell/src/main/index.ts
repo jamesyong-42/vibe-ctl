@@ -28,7 +28,7 @@ import { createAppMenu } from './menu.js';
 import { registerProtocols } from './protocol.js';
 import { setupSecurity } from './security.js';
 import { createTray } from './tray.js';
-import { type WindowManager, createWindowManager } from './windows.js';
+import { type WindowManager, createWindowManager } from './windows/index.js';
 
 const log = createScopedLogger('shell:main');
 
