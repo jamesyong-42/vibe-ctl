@@ -7,7 +7,7 @@
  */
 
 export { MeshNode } from './mesh-node.js';
-export type { MeshNodeOptions, Peer, PeerChangeEvent, TruffleNode } from './mesh-node.js';
+export type { MeshNodeOptions, Peer, PeerChangeEvent } from './mesh-node.js';
 
 export { DocAuthority } from './doc-authority.js';
 export type { DocAuthorityOptions, RendererPort } from './doc-authority.js';
@@ -28,6 +28,17 @@ export type { VersionBeacon } from './version-beacons.js';
 
 export { checkVersionGate, publishVersionBeacon } from './version-gate.js';
 export type { VersionGateOptions, VersionGateResult } from './version-gate.js';
+
+export { loadTruffle } from './truffle-types.js';
+export type {
+  TruffleCrdtDoc,
+  TruffleSyncedStore,
+  TruffleNapiNode,
+  TruffleModule,
+  TrufflePeer,
+  TrufflePeerEvent,
+  TruffleHealthInfo,
+} from './truffle-types.js';
 
 export {
   OfflineMode,

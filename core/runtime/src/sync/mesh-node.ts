@@ -10,12 +10,23 @@
  * constructs it on start, joins the tailnet, and exposes it to sibling
  * kernel modules (KernelDocs, DocAuthority, plugin MeshAPI facade). Nothing
  * else should reach for truffle's C bindings directly.
+ *
+ * When truffle is available, all methods delegate to the real NapiNode.
+ * When truffle is absent (CI, tests), a no-op fallback keeps the app
+ * functional in offline mode.
  */
 
 import type { Disposable, Logger } from '@vibe-ctl/plugin-api';
+import type {
+  TruffleCrdtDoc,
+  TruffleHealthInfo,
+  TruffleNapiNode,
+  TrufflePeer,
+  TrufflePeerEvent,
+  TruffleSyncedStore,
+} from './truffle-types.js';
 
-// ─── Truffle type stubs ──────────────────────────────────────────────────────
-// TODO: replace with @vibecook/truffle imports when available
+// ─── Public types ───────────────────────────────────────────────────────────
 
 /** Lightweight peer descriptor. Matches `ipc/kernel-ctrl.ts` Peer. */
 export interface Peer {
@@ -25,21 +36,7 @@ export interface Peer {
 
 export type PeerChangeEvent = { type: 'joined' | 'left'; peer: Peer };
 
-/** Minimal surface we need from truffle's NapiNode. */
-export interface TruffleNode {
-  start(): Promise<void>;
-  stop(): Promise<void>;
-  peers(): Peer[];
-  onPeerChange(cb: (event: PeerChangeEvent) => void): Disposable;
-  broadcast(namespace: string, data: Uint8Array): void;
-  send(peerId: string, namespace: string, data: Uint8Array): void;
-  subscribe(
-    namespace: string,
-    handler: (msg: { peerId: string; namespace: string; data: Uint8Array }) => void,
-  ): Disposable;
-}
-
-// ─── Construction options ────────────────────────────────────────────────────
+// ─── Construction options ───────────────────────────────────────────────────
 
 export interface MeshNodeOptions {
   deviceId: string;
@@ -52,15 +49,15 @@ export interface MeshNodeOptions {
    * directly. When absent, mesh operations are no-ops (offline / truffle not
    * available).
    */
-  truffleNode?: TruffleNode;
+  truffleNode?: TruffleNapiNode;
 }
 
-// ─── MeshNode ────────────────────────────────────────────────────────────────
+// ─── MeshNode ───────────────────────────────────────────────────────────────
 
 export class MeshNode {
   readonly #opts: MeshNodeOptions;
   readonly #log: Logger;
-  readonly #node: TruffleNode | null;
+  readonly #node: TruffleNapiNode | null;
   #started = false;
 
   constructor(opts: MeshNodeOptions) {
@@ -69,7 +66,7 @@ export class MeshNode {
     this.#node = opts.truffleNode ?? null;
   }
 
-  // ─── Lifecycle ─────────────────────────────────────────────────────────
+  // ─── Lifecycle ──────────────────────────────────────────────────────────
 
   /** Starts the NapiNode, joins the tailnet. Idempotent. */
   async start(): Promise<void> {
@@ -79,7 +76,8 @@ export class MeshNode {
       this.#started = true;
       return;
     }
-    await this.#node.start();
+    // NapiNode.start() is called externally before passing to MeshNode, or
+    // the node is already started via createMeshNode(). Mark as started.
     this.#log.info(
       { deviceId: this.#opts.deviceId, deviceName: this.#opts.deviceName },
       'mesh started',
@@ -100,27 +98,50 @@ export class MeshNode {
     this.#started = false;
   }
 
-  // ─── Peer queries ──────────────────────────────────────────────────────
+  // ─── Peer queries ─────────────────────────────────────────────────────
 
-  getPeers(): Peer[] {
-    return this.#node?.peers() ?? [];
+  async getPeers(): Promise<Peer[]> {
+    if (!this.#node) return [];
+    const peers = await this.#node.getPeers();
+    return peers.map((p: TrufflePeer) => ({ id: p.deviceId, deviceName: p.deviceName }));
   }
 
+  /**
+   * Subscribe to peer change events from the real NapiNode.
+   * Maps truffle's `NapiPeerEvent` to our simplified `PeerChangeEvent`.
+   */
   onPeerChange(cb: (event: PeerChangeEvent) => void): Disposable {
     if (!this.#node) {
       return { [Symbol.dispose]() {} };
     }
-    return this.#node.onPeerChange(cb);
+    this.#node.onPeerChange((event: TrufflePeerEvent) => {
+      if (event.eventType === 'joined' && event.peer) {
+        cb({
+          type: 'joined',
+          peer: { id: event.peer.deviceId, deviceName: event.peer.deviceName },
+        });
+      } else if (event.eventType === 'left') {
+        cb({
+          type: 'left',
+          peer: { id: event.peerId, deviceName: '' },
+        });
+      }
+    });
+    // NapiNode.onPeerChange doesn't return a disposable — it's a permanent
+    // subscription for the lifetime of the node. Return a no-op disposable.
+    return { [Symbol.dispose]() {} };
   }
 
-  // ─── Messaging ─────────────────────────────────────────────────────────
+  // ─── Messaging ────────────────────────────────────────────────────────
 
   broadcast(namespace: string, data: Uint8Array): void {
-    this.#node?.broadcast(namespace, data);
+    if (!this.#node) return;
+    void this.#node.broadcast(namespace, Buffer.from(data));
   }
 
   send(peerId: string, namespace: string, data: Uint8Array): void {
-    this.#node?.send(peerId, namespace, data);
+    if (!this.#node) return;
+    void this.#node.send(peerId, namespace, Buffer.from(data));
   }
 
   subscribe(
@@ -130,10 +151,47 @@ export class MeshNode {
     if (!this.#node) {
       return { [Symbol.dispose]() {} };
     }
-    return this.#node.subscribe(namespace, handler);
+    this.#node.onMessage(namespace, (msg) => {
+      handler({
+        peerId: msg.from,
+        namespace: msg.namespace,
+        data: msg.payload instanceof Uint8Array ? msg.payload : new Uint8Array(0),
+      });
+    });
+    return { [Symbol.dispose]() {} };
   }
 
-  // ─── Introspection ─────────────────────────────────────────────────────
+  // ─── CRDT doc / SyncedStore access ────────────────────────────────────
+
+  /**
+   * Open a CrdtDoc via the underlying NapiNode. Returns null if the node
+   * is not available.
+   */
+  getCrdtDoc(docId: string): TruffleCrdtDoc | null {
+    if (!this.#node) return null;
+    return this.#node.crdtDoc(docId);
+  }
+
+  /**
+   * Open a SyncedStore via the underlying NapiNode. Returns null if the
+   * node is not available.
+   */
+  getSyncedStore(storeId: string): TruffleSyncedStore | null {
+    if (!this.#node) return null;
+    return this.#node.syncedStore(storeId);
+  }
+
+  // ─── Health ───────────────────────────────────────────────────────────
+
+  /**
+   * Query truffle's network health. Returns null when offline.
+   */
+  async health(): Promise<TruffleHealthInfo | null> {
+    if (!this.#node) return null;
+    return this.#node.health();
+  }
+
+  // ─── Introspection ────────────────────────────────────────────────────
 
   get deviceId(): string {
     return this.#opts.deviceId;
@@ -148,7 +206,7 @@ export class MeshNode {
   }
 
   /** The underlying NapiNode, or null when offline / not started. */
-  get node(): TruffleNode | null {
+  get node(): TruffleNapiNode | null {
     return this.#node;
   }
 
