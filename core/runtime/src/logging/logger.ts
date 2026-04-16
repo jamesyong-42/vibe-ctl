@@ -15,6 +15,18 @@
  * every already-created scoped logger. This keeps the ~30 existing
  * `createScopedLogger` callsites working without API change.
  *
+ * ## On-disk layout (spec 05 §12)
+ *
+ * Entrypoints call `createLogger({ logDir, filename, stdoutInDev })`
+ * and install the result via `setRootLogger`. Today's producers:
+ *
+ *   - `main.log`   — shell main process. Also receives forwarded
+ *                    kernel-utility errors/warnings (via supervisor) and
+ *                    forwarded renderer console logs (via preload).
+ *   - `kernel.log` — kernel utility process. Only direct writes; bulk
+ *                    of events live here, not duplicated to main.log.
+ *   - `plugins/{pluginId}.log` — split-plugin utilities (Phase 6).
+ *
  * Production: raw JSON to stdout (unless the entrypoint installed a
  * rotating file root).
  *
@@ -44,7 +56,8 @@
  */
 
 import { createRequire } from 'node:module';
-import { type Logger, pino } from 'pino';
+import { join } from 'node:path';
+import { type Logger, type TransportTargetOptions, pino } from 'pino';
 
 export type LogLevel = 'trace' | 'debug' | 'info' | 'warn' | 'error' | 'fatal' | 'silent';
 
@@ -148,6 +161,96 @@ function createDefaultRootLogger(): Logger {
   }
 
   return pino({ level: process.env.LOG_LEVEL ?? 'debug' });
+}
+
+/**
+ * Build a `pino-roll` transport config targeting `{logDir}/{filename}`
+ * with daily rotation, 10MiB max per file, 7-day retention.
+ */
+export function createRotatingTransport(logDir: string, filename: string): TransportTargetOptions {
+  return {
+    target: 'pino-roll',
+    level: 'trace',
+    options: {
+      file: join(logDir, filename),
+      frequency: 'daily',
+      mkdir: true,
+      size: '10m',
+      limit: { count: 7 },
+    },
+  };
+}
+
+export interface CreateLoggerOptions {
+  /**
+   * Target directory for rotating file output. When omitted (CI, tests)
+   * the returned logger writes to stdout only.
+   */
+  logDir?: string;
+  /** Filename inside `logDir` (e.g. `main.log`, `kernel.log`). */
+  filename: string;
+  /**
+   * In dev, also emit to stdout via `pino-pretty`. Ignored in prod
+   * (utility processes keep stdout for supervisor forwarding).
+   */
+  stdoutInDev?: boolean;
+}
+
+/**
+ * Build a root pino logger configured for the given process.
+ *
+ *  - `logDir` + `filename` set → rotating file via `pino-roll`.
+ *  - dev + `stdoutInDev` → pino-pretty stdout stream is combined
+ *    alongside the file via a multistream transport.
+ *  - prod → file only (stdout is already piped by the supervisor for
+ *    utility processes; main process uses file for durability).
+ *  - no `logDir` → stdout only; behaves like the default root.
+ *
+ * Callers are expected to follow up with `setRootLogger(result)` so
+ * existing scoped loggers start routing to the new root.
+ */
+export function createLogger(opts: CreateLoggerOptions): Logger {
+  const isDev = process.env.NODE_ENV !== 'production';
+  const level = process.env.LOG_LEVEL ?? (isDev ? 'debug' : 'info');
+
+  if (!opts.logDir) {
+    // Fall back to stdout-only — matches `createDefaultRootLogger` but
+    // without re-evaluating env vars inconsistently.
+    if (isDev && tryResolvePinoPretty()) {
+      return pino({
+        level,
+        transport: {
+          target: 'pino-pretty',
+          options: { colorize: true, translateTime: 'SYS:HH:MM:ss.l' },
+        },
+      });
+    }
+    return pino({ level });
+  }
+
+  const fileTarget = createRotatingTransport(opts.logDir, opts.filename);
+  const targets: TransportTargetOptions[] = [fileTarget];
+
+  if (isDev && opts.stdoutInDev && tryResolvePinoPretty()) {
+    targets.push({
+      target: 'pino-pretty',
+      level: 'trace',
+      options: { colorize: true, translateTime: 'SYS:HH:MM:ss.l' },
+    });
+  } else if (!isDev) {
+    // Keep stdout available in prod for utility processes whose stdout
+    // the supervisor re-parses. No pino-pretty — raw JSON only.
+    targets.push({
+      target: 'pino/file',
+      level: 'trace',
+      options: { destination: 1 },
+    });
+  }
+
+  return pino({
+    level,
+    transport: { targets },
+  });
 }
 
 let rootLoggerRef: Logger = createDefaultRootLogger();

@@ -17,8 +17,14 @@
  *   6. Register app lifecycle hooks (activate / before-quit / all-closed).
  */
 
-import { resolve } from 'node:path';
-import { type EventPortMessage, Runtime, createScopedLogger } from '@vibe-ctl/runtime';
+import { join, resolve } from 'node:path';
+import {
+  type EventPortMessage,
+  Runtime,
+  createLogger,
+  createScopedLogger,
+  setRootLogger,
+} from '@vibe-ctl/runtime';
 import { app } from 'electron';
 // Side-effect: registerSchemesAsPrivileged MUST run before app.whenReady().
 import './protocols/register.js';
@@ -49,6 +55,20 @@ app.setName('vibe-ctl');
 // Enforce sandboxing for every renderer and utilityProcess. Must run
 // before app-ready.
 app.enableSandbox();
+
+// Install the rotating file-backed root logger before any sub-module's
+// scoped logger is touched. `createScopedLogger` returns live proxies
+// (see runtime/src/logging/logger.ts) so swapping the root here takes
+// effect across every existing scope — including the `shell:main` logger
+// on the next line. Writes to {userData}/logs/main.log with daily
+// rotation + 7-day retention (spec 05 §12).
+setRootLogger(
+  createLogger({
+    logDir: join(app.getPath('userData'), 'logs'),
+    filename: 'main.log',
+    stdoutInDev: true,
+  }),
+);
 
 const windowsRef: { current: WindowManager | null } = { current: null };
 const runtimeRef: { current: Runtime | null } = { current: null };

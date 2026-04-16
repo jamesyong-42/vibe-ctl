@@ -23,15 +23,16 @@
     "clean": "rm -rf dist .turbo"
   },
   "dependencies": {
-    "@vibe-ctl/plugin-api": "workspace:*",
-    "@jamesyong42/reactive-ecs": "^0.1.1",
     "@jamesyong42/infinite-canvas": "^1.0.0",
+    "@jamesyong42/reactive-ecs": "^0.1.1",
+    "@vibe-ctl/plugin-api": "workspace:*",
     "@vibecook/truffle": "^0.4.2",
+    "chokidar": "^4.0.0",
     "comlink": "^4.4.2",
     "pino": "^9.5.0",
-    "zod": "^3.23.0",
+    "pino-roll": "^4.0.0",
     "semver": "^7.6.0",
-    "chokidar": "^4.0.0"
+    "zod": "^3.23.0"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",

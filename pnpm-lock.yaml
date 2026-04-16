@@ -10,7 +10,7 @@ overrides:
   three: 0.183.2
   '@react-three/fiber': 9.5.0
 
-pnpmfileChecksum: sha256-Jjrj7+nkFxTW+KKtG3Dg37JdWwQU4BF0RGzF7t91s0s=
+pnpmfileChecksum: sha256-UJDjle1oZKh5tSr/T7RXVr8gBf61YtYSzs4gfPL6PuE=
 
 importers:
 
@@ -145,6 +145,9 @@ importers:
       pino:
         specifier: ^9.5.0
         version: 9.14.0
+      pino-roll:
+        specifier: ^4.0.0
+        version: 4.0.0
       semver:
         specifier: ^7.6.0
         version: 7.7.4
@@ -294,7 +297,7 @@ importers:
         version: 0.1.1
       '@vibecook/spaghetti-sdk':
         specifier: ^0.5.1
-        version: 0.5.1(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+        version: 0.5.2(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       '@vibecook/truffle':
         specifier: ^0.4.2
         version: 0.4.3
@@ -1805,8 +1808,8 @@ packages:
       xterm:
         optional: true
 
-  '@vibecook/spaghetti-sdk@0.5.1':
-    resolution: {integrity: sha512-8cf3HE1E1VvBDwUeODs651Q0/n7d4R5KNOR/kR3DxcFl9X9cyEfBWtPgJmufeDk61qxQXTkT5p006AVygXr/MQ==}
+  '@vibecook/spaghetti-sdk@0.5.2':
+    resolution: {integrity: sha512-WFWoyR6cL1bnVtZNQqf5pMxmGh8QFiO7ZxmutETNY8/yy7b7iZ9NsjkYDXpN9j5RT4ekm78dKxzi7VOwfg/OjQ==}
     engines: {node: '>=18'}
     peerDependencies:
       react: 19.2.5
@@ -2232,6 +2235,9 @@ packages:
 
   csstype@3.2.3:
     resolution: {integrity: sha512-z1HGKcYy2xA8AGQfwrn0PAy+PB7X/GSj3UVJW9qKyn43xWa+gl5nXmU4qqLMRzWVLFC8KusUX8T/0kCiOYpAIQ==}
+
+  date-fns@4.1.0:
+    resolution: {integrity: sha512-Ukq0owbQXxa/U3EGtsdVBkR1w7KOQ5gIBqdH2hkvknzZPYvBxb/aa6E8L7tmjFtkwZBu3UXBbjIgPo/Ez4xaNg==}
 
   dateformat@4.6.3:
     resolution: {integrity: sha512-2P0p0pFGzHS5EMnhdxQi7aJN+iMheud0UhG4dlE1DLAlvL8JHjJJTX/CSm4JXwV0Ka5nGk3zC5mcb5bUQUxxMA==}
@@ -3314,6 +3320,9 @@ packages:
   pino-pretty@11.3.0:
     resolution: {integrity: sha512-oXwn7ICywaZPHmu3epHGU2oJX4nPmKvHvB/bwrJHlGcbEWaVcotkpyVHMKLKmiVryWYByNp0jpgAcXpFJDXJzA==}
     hasBin: true
+
+  pino-roll@4.0.0:
+    resolution: {integrity: sha512-axI1aQaIxXdw1F4OFFli1EDxIrdYNGLowkw/ZoZogX8oCSLHUghzwVVXUS8U+xD/Savwa5IXpiXmsSGKFX/7Sg==}
 
   pino-std-serializers@7.1.0:
     resolution: {integrity: sha512-BndPH67/JxGExRgiX1dX0w1FvZck5Wa4aal9198SrRhZjH3GxKQUKIBnYJTdj2HDN3UQAS06HlfcSbQj2OHmaw==}
@@ -5074,7 +5083,7 @@ snapshots:
       react: 19.2.5
       three: 0.183.2
 
-  '@vibecook/spaghetti-sdk@0.5.1(react-dom@19.2.5(react@19.2.5))(react@19.2.5)':
+  '@vibecook/spaghetti-sdk@0.5.2(react-dom@19.2.5(react@19.2.5))(react@19.2.5)':
     dependencies:
       better-sqlite3: 12.9.0
       chokidar: 4.0.3
@@ -5527,6 +5536,8 @@ snapshots:
       which: 2.0.2
 
   csstype@3.2.3: {}
+
+  date-fns@4.1.0: {}
 
   dateformat@4.6.3: {}
 
@@ -6674,6 +6685,11 @@ snapshots:
       secure-json-parse: 2.7.0
       sonic-boom: 4.2.1
       strip-json-comments: 3.1.1
+
+  pino-roll@4.0.0:
+    dependencies:
+      date-fns: 4.1.0
+      sonic-boom: 4.2.1
 
   pino-std-serializers@7.1.0: {}
 
