@@ -33,3 +33,6 @@ export {
   HealthMonitorSystem,
   SyncBridgeSystem,
 } from './systems.js';
+
+export { createSyncBridge } from './systems/sync-bridge-system.js';
+export type { DocSubscription, SyncBridgeCallbacks } from './systems/sync-bridge-system.js';

@@ -85,10 +85,18 @@ export const HealthMonitorSystem = defineSystem({
  *   kernel/user-settings     → emits `settings.changed` events.
  *   kernel/canvas-layout     → handled by the canvas-sync adapter in
  *                              `@vibe-ctl/canvas`, not here.
+ *
+ * The concrete implementation lives in `systems/sync-bridge-system.ts`
+ * (createSyncBridge). This defineSystem stub remains for the kernel
+ * system scheduler to reference; the real bridge is wired via
+ * createSyncBridge() during bootstrap.
  */
 export const SyncBridgeSystem = defineSystem({
   name: 'SyncBridgeSystem',
   execute: () => {
-    throw new Error('not implemented: SyncBridgeSystem.run');
+    // No-op in the defineSystem stub. The actual bridge is wired via
+    // createSyncBridge() which uses direct doc subscriptions rather than
+    // the ECS system loop. This entry exists so the system scheduler
+    // has a named system for ordering purposes.
   },
 });
