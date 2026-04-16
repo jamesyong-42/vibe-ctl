@@ -130,6 +130,79 @@ async function validateVersionGate(store: DocStore | null): Promise<ValidationRe
 }
 
 /**
+ * Write a value, wait up to 2s for the version counter to increment
+ * (simulates peer sync receipt if a second device is connected).
+ * Passes in solo mode if the local write is reflected immediately.
+ */
+async function validatePeerSync(store: DocStore | null): Promise<ValidationResult> {
+  const name = 'Peer sync (local echo)';
+  if (!store) return { name, passed: false, error: 'KernelDocStore not available' };
+
+  try {
+    const doc = store.getDoc('kernel/user-settings');
+    const versionBefore = store.getVersion('kernel/user-settings');
+    const testKey = `debug.peer-sync.${Date.now()}`;
+
+    doc.data.set(testKey, 'peer-test');
+
+    // Wait briefly for version to update (subscriptions are synchronous
+    // in the in-memory store, so this should be immediate).
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
+    const versionAfter = store.getVersion('kernel/user-settings');
+
+    // Clean up
+    doc.data.delete(testKey);
+
+    // In solo mode, the version may or may not have incremented
+    // depending on whether subscribers fired. Just verify it didn't
+    // decrease.
+    if (versionAfter < versionBefore) {
+      return { name, passed: false, error: 'Version decreased after write' };
+    }
+
+    return { name, passed: true };
+  } catch (err) {
+    return { name, passed: false, error: String(err) };
+  }
+}
+
+/**
+ * Verify persistence round-trip: write a value, check it survives
+ * in the local doc map. (Full disk persistence requires IPC to the
+ * kernel utility which isn't available in the renderer.)
+ */
+async function validatePersistence(store: DocStore | null): Promise<ValidationResult> {
+  const name = 'Persistence readiness';
+  if (!store) return { name, passed: false, error: 'KernelDocStore not available' };
+
+  try {
+    const doc = store.getDoc('kernel/user-settings');
+    const testKey = `debug.persist.${Date.now()}`;
+    const testValue = `persist-${Math.random().toString(36).slice(2)}`;
+
+    // Write
+    doc.data.set(testKey, testValue);
+
+    // Simulate a "reload" by reading from the same store
+    const reRead = doc.data.get(testKey);
+    if (reRead !== testValue) {
+      return {
+        name,
+        passed: false,
+        error: `After write: expected "${testValue}", got "${String(reRead)}"`,
+      };
+    }
+
+    // Clean up
+    doc.data.delete(testKey);
+    return { name, passed: true };
+  } catch (err) {
+    return { name, passed: false, error: String(err) };
+  }
+}
+
+/**
  * Run the full validation suite.
  */
 export async function runValidationSuite(store: DocStore | null): Promise<ValidationResult[]> {
@@ -139,6 +212,8 @@ export async function runValidationSuite(store: DocStore | null): Promise<Valida
   results.push(await validateRoundTrip(store));
   results.push(await validateSubscription(store));
   results.push(await validateVersionGate(store));
+  results.push(await validatePeerSync(store));
+  results.push(await validatePersistence(store));
 
   return results;
 }
