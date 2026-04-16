@@ -40,20 +40,69 @@ export interface KernelSupervisor {
   kill(): void;
 }
 
+/**
+ * Pino numeric level → canonical level name. Pino writes `level: 30`
+ * (info), `level: 40` (warn), etc. to JSON. We remap to method names
+ * so main's logger emits at the *original* severity rather than
+ * flattening everything into `info`.
+ */
+const PINO_LEVEL_NAMES: Record<number, 'trace' | 'debug' | 'info' | 'warn' | 'error' | 'fatal'> = {
+  10: 'trace',
+  20: 'debug',
+  30: 'info',
+  40: 'warn',
+  50: 'error',
+  60: 'fatal',
+};
+
+type LevelName = 'trace' | 'debug' | 'info' | 'warn' | 'error' | 'fatal';
+
+/**
+ * Forward one line of kernel-utility stdout/stderr to main's logger.
+ *
+ * The utility is itself a pino emitter, so most lines are already JSON
+ * envelopes with `{ level, time, msg, scope, … }`. We parse them and
+ * re-emit at the *original* level with `originalScope` preserved —
+ * otherwise every kernel debug line lands as a double-wrapped `info` on
+ * main's stream (the previous bug).
+ *
+ * Non-JSON lines (crash stacks, panics from native code, early boot
+ * output before pino's transport attaches) are emitted at a sensible
+ * fallback severity with `raw: true` so `jq '.raw'` can surface them.
+ */
+function forwardKernelLine(line: string, streamFallback: LevelName): void {
+  const trimmed = line.trimEnd();
+  if (!trimmed) return;
+
+  if (trimmed.startsWith('{')) {
+    try {
+      const parsed = JSON.parse(trimmed) as Record<string, unknown>;
+      const numeric = typeof parsed.level === 'number' ? parsed.level : undefined;
+      const levelName: LevelName =
+        (numeric !== undefined && PINO_LEVEL_NAMES[numeric]) || streamFallback;
+      const msg = typeof parsed.msg === 'string' ? parsed.msg : '';
+      const originalScope = typeof parsed.scope === 'string' ? parsed.scope : undefined;
+      // Strip noisy/duplicated fields; keep application context.
+      // biome-ignore lint/correctness/noUnusedVariables: destructure-to-drop
+      const { level, time, pid, hostname, msg: _msg, scope: _scope, ...rest } = parsed;
+      kernelLog[levelName]({ ...rest, originalScope }, msg);
+      return;
+    } catch {
+      // Fall through to raw handling.
+    }
+  }
+
+  kernelLog[streamFallback]({ raw: true }, trimmed);
+}
+
 function pipeStdio(child: UtilityProcess): void {
   child.stdout?.setEncoding('utf8');
   child.stderr?.setEncoding('utf8');
   child.stdout?.on('data', (chunk: string) => {
-    for (const line of chunk.split('\n')) {
-      const trimmed = line.trimEnd();
-      if (trimmed) kernelLog.info(trimmed);
-    }
+    for (const line of chunk.split('\n')) forwardKernelLine(line, 'info');
   });
   child.stderr?.on('data', (chunk: string) => {
-    for (const line of chunk.split('\n')) {
-      const trimmed = line.trimEnd();
-      if (trimmed) kernelLog.error(trimmed);
-    }
+    for (const line of chunk.split('\n')) forwardKernelLine(line, 'error');
   });
 }
 
