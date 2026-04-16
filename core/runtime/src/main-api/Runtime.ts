@@ -78,7 +78,7 @@ export class Runtime {
     if (ctrl) {
       await ctrl.start();
       const version = await ctrl.getVersion();
-      this.#logger.info('[runtime] kernel utility ready', { kernelUtilityVersion: version });
+      this.#logger.info({ kernelUtilityVersion: version }, '[runtime] kernel utility ready');
     } else {
       this.#logger.warn('[runtime] start(): no kernelCtrl provided — Phase 1 dev-only path');
     }
@@ -95,7 +95,7 @@ export class Runtime {
     try {
       await this.#opts.kernelCtrl?.stop();
     } catch (err) {
-      this.#logger.warn('[runtime] kernelCtrl.stop() threw', { err: String(err) });
+      this.#logger.warn({ err: String(err) }, '[runtime] kernelCtrl.stop() threw');
     }
     this.#started = false;
   }

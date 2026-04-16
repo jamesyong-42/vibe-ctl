@@ -26,11 +26,19 @@ export type Breakpoint = 'micro' | 'compact' | 'normal' | 'expanded' | 'detailed
 /**
  * Scoped logger handed to each plugin via `ctx.logger`. Output is routed
  * to the plugin dev panel. Levels map to standard syslog severities.
+ *
+ * Signature matches pino's overloaded API: `log.info('msg')` or
+ * `log.info({ key: val }, 'msg')`.
  */
 export interface Logger {
-  trace(message: string, meta?: Record<string, unknown>): void;
-  debug(message: string, meta?: Record<string, unknown>): void;
-  info(message: string, meta?: Record<string, unknown>): void;
-  warn(message: string, meta?: Record<string, unknown>): void;
-  error(message: string, meta?: Record<string, unknown>): void;
+  trace(msg: string): void;
+  trace(obj: object, msg: string): void;
+  debug(msg: string): void;
+  debug(obj: object, msg: string): void;
+  info(msg: string): void;
+  info(obj: object, msg: string): void;
+  warn(msg: string): void;
+  warn(obj: object, msg: string): void;
+  error(msg: string): void;
+  error(obj: object, msg: string): void;
 }
