@@ -122,7 +122,6 @@ export class WidgetTypeRegistry {
       } catch (err) {
         // Listener errors must not break the registry. Surface via
         // console for now; kernel will wire a scoped logger later.
-        // biome-ignore lint/suspicious/noConsole: kernel logger not wired yet
         console.error('[canvas] widget-type-registry listener failed', err);
       }
     }

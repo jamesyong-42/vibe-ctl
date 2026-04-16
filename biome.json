@@ -13,7 +13,8 @@
       "**/.turbo/**",
       "**/release/**",
       "apps/desktop/resources/plugins/**",
-      "specs/outdated/**"
+      "specs/outdated/**",
+      "core/shell/src/renderer/styles/index.css"
     ]
   },
   "organizeImports": {

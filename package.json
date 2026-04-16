@@ -33,7 +33,7 @@
     "vitest": "^4.1.4"
   },
   "lint-staged": {
-    "*.{ts,tsx,js,mjs,cjs,jsx,json,jsonc}": [
+    "*.{ts,tsx,js,mjs,cjs,jsx,json,jsonc,css}": [
       "biome check --write --files-ignore-unknown=true --no-errors-on-unmatched"
     ]
   },
