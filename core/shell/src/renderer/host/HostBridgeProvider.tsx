@@ -65,7 +65,6 @@ export const HostBridgeProvider: FC<{ children: ReactNode; fallback?: ReactNode 
     const api = window.__vibeCtl;
     if (!api) {
       // Tests / storybook — no preload. Bail loudly rather than deadlock.
-      // biome-ignore lint/suspicious/noConsole: boot diagnostic
       console.error('[host-bridge] window.__vibeCtl is missing');
       return;
     }

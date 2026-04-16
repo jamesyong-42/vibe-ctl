@@ -74,7 +74,14 @@ export class Runtime {
    */
   async start(): Promise<void> {
     if (this.#started) return;
-    this.#logger.info('[runtime] start(): skeleton — no-op');
+    const ctrl = this.#opts.kernelCtrl;
+    if (ctrl) {
+      await ctrl.start();
+      const version = await ctrl.getVersion();
+      this.#logger.info('[runtime] kernel utility ready', { kernelUtilityVersion: version });
+    } else {
+      this.#logger.warn('[runtime] start(): no kernelCtrl provided — Phase 1 dev-only path');
+    }
     this.#started = true;
   }
 
@@ -85,7 +92,11 @@ export class Runtime {
    */
   async stop(): Promise<void> {
     if (!this.#started) return;
-    this.#logger.info('[runtime] stop(): skeleton — no-op');
+    try {
+      await this.#opts.kernelCtrl?.stop();
+    } catch (err) {
+      this.#logger.warn('[runtime] kernelCtrl.stop() threw', { err: String(err) });
+    }
     this.#started = false;
   }
 

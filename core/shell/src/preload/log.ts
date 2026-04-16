@@ -14,16 +14,12 @@ export function log(level: LogLevel, scope: string, msg: string, meta?: unknown)
   // TODO(phase-2): forward via ipcRenderer.send('vibe-ctl:log', {...}).
   const fn =
     level === 'debug'
-      ? // biome-ignore lint/suspicious/noConsole: renderer log fallback
-        console.debug
+      ? console.debug
       : level === 'info'
-        ? // biome-ignore lint/suspicious/noConsole: renderer log fallback
-          console.info
+        ? console.info
         : level === 'warn'
-          ? // biome-ignore lint/suspicious/noConsole: renderer log fallback
-            console.warn
-          : // biome-ignore lint/suspicious/noConsole: renderer log fallback
-            console.error;
+          ? console.warn
+          : console.error;
   if (meta === undefined) fn(`[${scope}] ${msg}`);
   else fn(`[${scope}] ${msg}`, meta);
 }
