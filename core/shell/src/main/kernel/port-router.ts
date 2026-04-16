@@ -50,3 +50,20 @@ export function setupDocSyncPorts(opts: {
   transferToKernel(opts.kernelChild, kernelPort);
   return rendererPort;
 }
+
+/**
+ * Mint a fresh doc-sync channel, ship the utility end to the kernel, and
+ * return the renderer end for transfer via the handshake.
+ *
+ * This is the single broker point for the kernel utility ↔ renderer
+ * doc-sync fabric described in spec 05 §6.4.
+ */
+export function brokerDocSyncPort(kernelChild: UtilityProcess): {
+  utilityPort: MessagePortMain;
+  rendererPort: MessagePortMain;
+} {
+  const { rendererPort, kernelPort } = mintDocSyncPair();
+  kernelChild.postMessage({ type: 'doc-sync-port' }, [kernelPort]);
+  log.debug('brokered doc-sync port to kernel utility');
+  return { utilityPort: kernelPort, rendererPort };
+}

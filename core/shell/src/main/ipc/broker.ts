@@ -5,8 +5,10 @@
  * belong to which window. On window close, the recorded ports are
  * closed so nothing leaks.
  *
- * Phase-1 scope: event + doc-sync pairs, plus a (currently empty)
- * per-plugin slot. Phase 6 fills in per-split-plugin RPC.
+ * Phase-1 scope: event pair + a (currently empty) per-plugin slot. The
+ * doc-sync pair is brokered separately via `brokerDocSyncPort()` so one
+ * end ships straight to the kernel utility and main never holds a copy.
+ * Phase 6 fills in per-split-plugin RPC.
  */
 
 import { MessageChannelMain, type MessagePortMain } from 'electron';
@@ -14,8 +16,6 @@ import { MessageChannelMain, type MessagePortMain } from 'electron';
 export interface HandshakePorts {
   /** Main keeps `event.remote`; renderer gets `event.local` via handshake. */
   event: { local: MessagePortMain; remote: MessagePortMain };
-  /** Doc-sync between renderer's Loro replica and the kernel utility's authority. */
-  docSync: { local: MessagePortMain; remote: MessagePortMain };
   /**
    * Per-split-plugin RPC channels. Empty in Phase 1 — Phase 6 mints one
    * entry per active split plugin at activation time.
@@ -44,7 +44,6 @@ export function createBroker(): Broker {
       if (existing) return existing;
       const ports: HandshakePorts = {
         event: pair(),
-        docSync: pair(),
         plugins: {},
       };
       tracked.set(windowId, ports);
@@ -57,8 +56,6 @@ export function createBroker(): Broker {
       const closeAll = [
         ports.event.local,
         ports.event.remote,
-        ports.docSync.local,
-        ports.docSync.remote,
         ...Object.values(ports.plugins).flatMap((p) => [p.local, p.remote]),
       ];
       for (const port of closeAll) {

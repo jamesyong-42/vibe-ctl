@@ -28,7 +28,7 @@ import { registerLifecycleHooks } from './app/lifecycle.js';
 import { acquireSingleInstanceLock } from './app/single-instance.js';
 import { initAutoUpdater } from './auto-updater.js';
 import { createBroker, registerHostDispatcher, sendHandshake } from './ipc/index.js';
-import { type KernelSupervisor, startKernelSupervisor } from './kernel/index.js';
+import { type KernelSupervisor, brokerDocSyncPort, startKernelSupervisor } from './kernel/index.js';
 import { createAppMenu } from './menu.js';
 import { registerHostProtocol, registerPluginProtocol } from './protocols/index.js';
 import { setupSessionSecurity } from './security/index.js';
@@ -95,6 +95,15 @@ async function boot(): Promise<void> {
   const win = windows.createMainWindow({
     onReadyToShow: (w) => {
       const ports = broker.mintForWindow(w.id);
+      // Broker the doc-sync port directly: utility end ships to the
+      // kernel utility over its parentPort, renderer end travels with
+      // the handshake. Main never inspects messages on either side.
+      const kernelChild = kernel.getChild();
+      if (!kernelChild) {
+        log.error('cannot broker doc-sync port: kernel utility not running');
+        return;
+      }
+      const { rendererPort: docSyncRenderer } = brokerDocSyncPort(kernelChild);
       sendHandshake(
         w,
         {
@@ -104,6 +113,7 @@ async function boot(): Promise<void> {
           pluginRpcOrder: [],
         },
         ports,
+        docSyncRenderer,
       );
     },
   });

@@ -28,6 +28,12 @@ const HEALTHY_THRESHOLD_MS = 30_000;
 export interface KernelSupervisor {
   /** Current Comlink proxy (null during restart window). */
   getCtrl(): Comlink.Remote<KernelCtrl> | null;
+  /**
+   * Current kernel utility child (null during restart window).
+   * Needed by main to broker per-window MessagePorts directly to the
+   * utility process — spec 05 §6.4.
+   */
+  getChild(): UtilityProcess | null;
   /** Subscribe to status changes. Returns unsubscribe function. */
   onStatusChange(cb: StatusListener): () => void;
   /** Intentional shutdown — does not trigger restart. */
@@ -143,6 +149,10 @@ export async function startKernelSupervisor(): Promise<KernelSupervisor> {
   return {
     getCtrl(): Comlink.Remote<KernelCtrl> | null {
       return ctrl;
+    },
+
+    getChild(): UtilityProcess | null {
+      return currentChild;
     },
 
     onStatusChange(cb: StatusListener): () => void {

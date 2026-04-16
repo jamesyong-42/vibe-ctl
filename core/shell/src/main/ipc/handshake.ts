@@ -8,22 +8,25 @@
  *
  * The port order in the transfer list is load-bearing: the receiver
  * splits them back into `{ eventPort, docSyncPort, pluginPorts[...] }`
- * using `HandshakePayload.pluginRpcOrder`.
+ * using `HandshakePayload.pluginRpcOrder`. The doc-sync renderer port
+ * is brokered separately by `brokerDocSyncPort()` so the other end
+ * goes directly to the kernel utility (spec 05 §6.4).
  */
 
 import { HandshakeChannel, type HandshakePayload } from '@vibe-ctl/runtime';
-import type { BrowserWindow } from 'electron';
+import type { BrowserWindow, MessagePortMain } from 'electron';
 import type { HandshakePorts } from './broker.js';
 
 export function sendHandshake(
   win: BrowserWindow,
   payload: HandshakePayload,
   ports: HandshakePorts,
+  docSyncRendererPort: MessagePortMain,
 ): void {
   const pluginRpcOrder = payload.pluginRpcOrder;
   const transfer = [
     ports.event.remote,
-    ports.docSync.remote,
+    docSyncRendererPort,
     ...pluginRpcOrder.map((id) => {
       const pair = ports.plugins[id];
       if (!pair) {
