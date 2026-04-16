@@ -3,8 +3,13 @@
  * (spec 05 §2.1, §6.4).
  *
  * Lives in the kernel utility process. Receives deltas from renderers (via
- * doc-sync ports) and from mesh peers (via MeshNode). Fans out to all
- * subscribed renderer ports and to peers.
+ * doc-sync ports) and fans out to all subscribed renderer ports.
+ *
+ * Peer-to-peer sync: when truffle is wired, the NapiCrdtDoc instances handle
+ * peer discovery and Loro delta exchange automatically via truffle's internal
+ * gossip protocol. DocAuthority only manages the utility↔renderer channel.
+ * When truffle is NOT wired (in-memory fallback), DocAuthority also fans out
+ * to mesh peers via MeshNode.broadcast().
  */
 
 import type { Disposable } from '@vibe-ctl/plugin-api';
@@ -41,8 +46,12 @@ export class DocAuthority {
   }
 
   /**
-   * Apply an incoming delta (from a renderer or peer) to the authoritative
-   * doc. After applying, fans out to other renderers and peers.
+   * Apply an incoming delta (from a renderer) to the authoritative doc.
+   * After applying, fans out to other renderers.
+   *
+   * When truffle is wired, peer-to-peer propagation is handled by
+   * NapiCrdtDoc's built-in sync — we only broadcast to peers when
+   * running in fallback (in-memory) mode.
    */
   applyDelta(docName: KernelDocName, delta: Uint8Array, source?: RendererPort): void {
     const doc = this.#docs.getDoc(docName);
@@ -51,8 +60,11 @@ export class DocAuthority {
     // Fan out to renderers (excluding the source that sent the delta).
     this.broadcastToRenderers(docName, delta, source);
 
-    // Fan out to mesh peers.
-    this.broadcastToPeers(docName, delta);
+    // Fan out to mesh peers only when NOT truffle-backed. Truffle handles
+    // its own peer gossip via the NapiCrdtDoc's internal Loro sync.
+    if (!this.#docs.isTruffleBacked) {
+      this.broadcastToPeers(docName, delta);
+    }
 
     // Notify internal subscribers.
     const docListeners = this.#listeners.get(docName);
@@ -88,6 +100,10 @@ export class DocAuthority {
   /**
    * Fan out a delta to all subscribed renderer ports for a given doc,
    * optionally excluding the source port (to prevent echo).
+   *
+   * The payload is opaque binary — when truffle is wired it's Loro binary
+   * deltas; when in fallback mode it's JSON-encoded ops. Renderers handle
+   * both formats via their KernelDocProvider.
    */
   broadcastToRenderers(docName: KernelDocName, delta: Uint8Array, exclude?: RendererPort): void {
     const ports = this.#rendererPorts.get(docName);
@@ -103,10 +119,43 @@ export class DocAuthority {
     }
   }
 
-  /** Send a delta to mesh peers via MeshNode. */
+  /**
+   * Send a delta to mesh peers via MeshNode (fallback mode only).
+   * When truffle is wired, peer sync is handled internally by NapiCrdtDoc.
+   */
   broadcastToPeers(docName: KernelDocName, delta: Uint8Array): void {
     if (!this.#mesh.hasNode) return;
     this.#mesh.broadcast(`doc:${docName}`, delta);
+  }
+
+  /**
+   * Wire up mesh peer→authority delta reception (fallback mode only).
+   * Subscribes to incoming mesh messages for each kernel doc namespace
+   * and applies them to the authoritative replica.
+   */
+  subscribeToPeerDeltas(): Disposable[] {
+    if (this.#docs.isTruffleBacked) {
+      // Truffle handles peer sync internally — no mesh subscription needed.
+      return [];
+    }
+
+    const disposables: Disposable[] = [];
+    const docNames: KernelDocName[] = [
+      'kernel/plugin-inventory',
+      'kernel/canvas-layout',
+      'kernel/user-settings',
+      'kernel/permissions',
+    ];
+    for (const docName of docNames) {
+      const d = this.#mesh.subscribe(`doc:${docName}`, (msg) => {
+        const doc = this.#docs.getDoc(docName);
+        doc.applyDelta(msg.data);
+        // Fan out to renderers (this came from a peer, not a renderer).
+        this.broadcastToRenderers(docName, msg.data);
+      });
+      disposables.push(d);
+    }
+    return disposables;
   }
 
   /** Register a renderer port to receive deltas for a doc. */
