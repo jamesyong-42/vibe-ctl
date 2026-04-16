@@ -23,6 +23,7 @@ import { runFuseCheck } from './app/fuse-check.js';
 import { registerLifecycleHooks } from './app/lifecycle.js';
 import { acquireSingleInstanceLock } from './app/single-instance.js';
 import { initAutoUpdater } from './auto-updater.js';
+import { registerHostDispatcher } from './ipc/index.js';
 import { createAppMenu } from './menu.js';
 import { registerProtocols } from './protocol.js';
 import { setupSecurity } from './security.js';
@@ -58,6 +59,7 @@ async function boot(): Promise<void> {
   registerProtocols();
   createAppMenu();
   registerDeepLinks({});
+  registerHostDispatcher();
 
   // --- Step 3: construct + start the runtime -----------------------------
   const runtime = new Runtime({
