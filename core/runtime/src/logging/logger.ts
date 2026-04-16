@@ -4,18 +4,123 @@
  * One root pino instance per process; every module gets a child via
  * `createScopedLogger(scope)` so logs carry `{ scope }` automatically.
  *
- * Production: raw JSON to stdout. Main-process shell code collects
- * stdout/stderr from the kernel utility and split-plugin utilities and
- * pipes it into its own log file rotation (Phase 1 — not here).
+ * ## Root logger swapping
+ *
+ * Process entrypoints (shell main, kernel utility) can install a
+ * file-backed root via `setRootLogger()` — see `createLogger()`. Because
+ * `createScopedLogger` is called at module-scope in many files (before
+ * the entrypoint has a chance to swap roots), scoped loggers are
+ * **live** proxies: every method invocation re-derives the child off the
+ * current root. Swapping the root therefore picks up instantly across
+ * every already-created scoped logger. This keeps the ~30 existing
+ * `createScopedLogger` callsites working without API change.
+ *
+ * Production: raw JSON to stdout (unless the entrypoint installed a
+ * rotating file root).
  *
  * Development: `pino-pretty` transport when available. We probe for it
  * lazily and fall back to raw JSON if it isn't resolvable — the kernel
  * utility process may not have `pino-pretty` on its resolution path and
  * we don't want logger construction to throw.
+ *
+ * ## Per-scope log levels — `LOG_LEVEL_SCOPES`
+ *
+ * Fine-grained log noise control without recompiling. Syntax:
+ *
+ *     LOG_LEVEL_SCOPES=shell:kernel=trace,doc-router=debug,*=info
+ *
+ * Rules:
+ *   - Entries are comma-separated; each entry is `glob=level`.
+ *   - Plain strings match exactly (e.g. `doc-router=debug` only fires
+ *     for `createScopedLogger('doc-router')`).
+ *   - A trailing `*` means prefix match (`shell:*` matches `shell:foo`,
+ *     `shell:foo:bar`). The `*` alone is the default for all scopes.
+ *   - When both a prefix rule and an exact rule apply, the more specific
+ *     (longer) prefix wins; exact beats any prefix.
+ *   - Fallback order: scope-specific rule → `*` default → `LOG_LEVEL`
+ *     env var → pino default.
+ *
+ * Level values: one of `trace|debug|info|warn|error|fatal|silent`.
  */
 
 import { createRequire } from 'node:module';
 import { type Logger, pino } from 'pino';
+
+export type LogLevel = 'trace' | 'debug' | 'info' | 'warn' | 'error' | 'fatal' | 'silent';
+
+const VALID_LEVELS: ReadonlySet<string> = new Set<string>([
+  'trace',
+  'debug',
+  'info',
+  'warn',
+  'error',
+  'fatal',
+  'silent',
+]);
+
+interface ScopeLevelRules {
+  exact: Map<string, LogLevel>;
+  /** Prefix (without trailing `*`) → level. */
+  prefix: Map<string, LogLevel>;
+  defaultLevel?: LogLevel;
+}
+
+/**
+ * Parse a `LOG_LEVEL_SCOPES` value into a lookup structure. Tolerates
+ * whitespace around entries and silently drops malformed/invalid rules
+ * (with no crash) — environment parsing should never refuse to boot.
+ */
+export function parseScopeLevels(raw: string | undefined): ScopeLevelRules {
+  const exact = new Map<string, LogLevel>();
+  const prefix = new Map<string, LogLevel>();
+  let defaultLevel: LogLevel | undefined;
+  if (!raw) return { exact, prefix, defaultLevel };
+
+  for (const rawEntry of raw.split(',')) {
+    const entry = rawEntry.trim();
+    if (!entry) continue;
+    const eq = entry.indexOf('=');
+    if (eq < 0) continue;
+    const lhs = entry.slice(0, eq).trim();
+    const rhs = entry
+      .slice(eq + 1)
+      .trim()
+      .toLowerCase();
+    if (!lhs || !VALID_LEVELS.has(rhs)) continue;
+    const level = rhs as LogLevel;
+
+    if (lhs === '*') {
+      defaultLevel = level;
+    } else if (lhs.endsWith('*')) {
+      prefix.set(lhs.slice(0, -1), level);
+    } else {
+      exact.set(lhs, level);
+    }
+  }
+  return { exact, prefix, defaultLevel };
+}
+
+/**
+ * Look up the configured level for a given scope.
+ * Exact match > longest prefix match > default > undefined (caller decides).
+ */
+function lookupScopeLevel(rules: ScopeLevelRules, scope: string): LogLevel | undefined {
+  const exact = rules.exact.get(scope);
+  if (exact) return exact;
+
+  let bestPrefix: string | null = null;
+  let bestLevel: LogLevel | undefined;
+  for (const [p, level] of rules.prefix) {
+    if (scope.startsWith(p) && (bestPrefix === null || p.length > bestPrefix.length)) {
+      bestPrefix = p;
+      bestLevel = level;
+    }
+  }
+  if (bestLevel) return bestLevel;
+  return rules.defaultLevel;
+}
+
+const scopeRules: ScopeLevelRules = parseScopeLevels(process.env.LOG_LEVEL_SCOPES);
 
 function tryResolvePinoPretty(): boolean {
   try {
@@ -26,7 +131,7 @@ function tryResolvePinoPretty(): boolean {
   }
 }
 
-function createRootLogger(): Logger {
+function createDefaultRootLogger(): Logger {
   const isDev = process.env.NODE_ENV !== 'production';
   if (!isDev) {
     return pino({ level: process.env.LOG_LEVEL ?? 'info' });
@@ -45,10 +150,63 @@ function createRootLogger(): Logger {
   return pino({ level: process.env.LOG_LEVEL ?? 'debug' });
 }
 
-/** Process-wide root logger. */
-export const rootLogger: Logger = createRootLogger();
+let rootLoggerRef: Logger = createDefaultRootLogger();
 
-/** Create a child logger tagged with `{ scope }`. */
+/**
+ * Process-wide root logger. Exported as a live proxy — if an entrypoint
+ * calls `setRootLogger()` later, this reference picks up the new root
+ * instantly.
+ */
+export const rootLogger: Logger = new Proxy({} as Logger, {
+  get(_, prop) {
+    const value = Reflect.get(rootLoggerRef, prop);
+    return typeof value === 'function' ? value.bind(rootLoggerRef) : value;
+  },
+  set(_, prop, value) {
+    return Reflect.set(rootLoggerRef, prop, value);
+  },
+});
+
+/**
+ * Swap the process-wide root logger. Intended for process entrypoints
+ * (shell main, kernel utility) to install a file-backed root. Every
+ * already-created scoped logger routes through `rootLoggerRef` lazily,
+ * so the swap takes effect immediately with no refactor needed.
+ */
+export function setRootLogger(next: Logger): void {
+  rootLoggerRef = next;
+}
+
+/**
+ * Create a child logger tagged with `{ scope }`. The returned logger is
+ * a **live proxy**: calls are forwarded to a fresh `rootLoggerRef.child`
+ * on each invocation, so roots swapped after module-init still take
+ * effect. A scope-level override from `LOG_LEVEL_SCOPES` is applied on
+ * every child construction (cheap — the child constructor is a plain
+ * prototype chain).
+ */
 export function createScopedLogger(scope: string): Logger {
-  return rootLogger.child({ scope });
+  const override = lookupScopeLevel(scopeRules, scope);
+  let cachedRoot: Logger | null = null;
+  let cachedChild: Logger | null = null;
+
+  const current = (): Logger => {
+    if (cachedRoot !== rootLoggerRef || cachedChild === null) {
+      cachedRoot = rootLoggerRef;
+      cachedChild = rootLoggerRef.child({ scope });
+      if (override) cachedChild.level = override;
+    }
+    return cachedChild;
+  };
+
+  return new Proxy({} as Logger, {
+    get(_, prop) {
+      const target = current();
+      const value = Reflect.get(target, prop);
+      return typeof value === 'function' ? value.bind(target) : value;
+    },
+    set(_, prop, value) {
+      return Reflect.set(current(), prop, value);
+    },
+  });
 }
