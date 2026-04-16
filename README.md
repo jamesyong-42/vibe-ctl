@@ -74,7 +74,25 @@ pnpm build                        # Build all packages (turbo)
 pnpm dev                          # Watch mode + Electron dev
 ```
 
-### Useful scripts
+### Dev script aliases
+
+| Script | Purpose |
+|---|---|
+| `pnpm install` | Normal install — resolves deps from the npm registry |
+| `pnpm install:local` | Links sibling checkouts (truffle, infinite-canvas, etc.) via `VIBE_LINK_LOCAL=1`. Do not commit the resulting lockfile. |
+| `pnpm dev` | Normal dev — skips onboarding if already completed |
+| `pnpm dev:first-run` | Force the onboarding flow to replay (`VITE_VIBE_FORCE_FIRST_RUN=1`) |
+| `pnpm dev:local` | Dev + local module links + forced first-run |
+
+### `.env.local`
+
+Copy `.env.example` → `.env.local` to set `VITE_*` variables persistently
+without typing them on every command. `VITE_*` vars are picked up by Vite
+automatically; non-`VITE_` vars (like `VIBE_LINK_LOCAL`) need to be in your
+shell at install time — either via the `pnpm install:local` alias, or set
+up `direnv` with an `.envrc` that sources `.env.local`.
+
+### Other useful scripts
 
 ```bash
 pnpm typecheck                    # tsc --noEmit across all packages

@@ -8,6 +8,9 @@
   },
   "scripts": {
     "dev": "turbo run dev",
+    "dev:first-run": "VITE_VIBE_FORCE_FIRST_RUN=1 turbo run dev",
+    "dev:local": "VIBE_LINK_LOCAL=1 VITE_VIBE_FORCE_FIRST_RUN=1 turbo run dev",
+    "install:local": "VIBE_LINK_LOCAL=1 pnpm install",
     "build": "turbo run build",
     "package": "turbo run package --filter=@vibe-ctl/desktop",
     "typecheck": "turbo run typecheck",

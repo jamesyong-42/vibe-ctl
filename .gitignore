@@ -13,7 +13,7 @@ apps/desktop/resources/plugins/
 *.log
 .DS_Store
 
-# Environment
+# Local env overrides (committed template is .env.example)
 .env
 .env.local
 .env.*.local
