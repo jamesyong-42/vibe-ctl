@@ -9,6 +9,7 @@ import type { KernelCtrl, KernelHealth, Peer } from '../ipc/kernel-ctrl.js';
 import type { DocAuthority } from '../sync/doc-authority.js';
 import type { KernelDocs } from '../sync/kernel-docs.js';
 import type { MeshNode } from '../sync/mesh-node.js';
+import type { DocRouter } from './doc-router.js';
 import type { DocPersistence } from './persistence.js';
 
 const KERNEL_UTILITY_VERSION = '0.1.0';
@@ -18,6 +19,7 @@ interface SyncStack {
   docs: KernelDocs;
   authority: DocAuthority;
   persistence: DocPersistence;
+  docRouter: DocRouter;
   truffleAvailable: boolean;
 }
 

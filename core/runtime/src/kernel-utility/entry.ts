@@ -33,6 +33,7 @@ import { MeshNode } from '../sync/mesh-node.js';
 import { loadTruffle } from '../sync/truffle-types.js';
 import { VersionBeacons } from '../sync/version-beacons.js';
 import { createCtrlService } from './ctrl-service.js';
+import { DocRouter, type DocSyncPort } from './doc-router.js';
 import { DocPersistence } from './persistence.js';
 import { onShutdown } from './shutdown.js';
 
@@ -66,6 +67,7 @@ interface SyncStack {
   authority: DocAuthority;
   persistence: DocPersistence;
   versionBeacons: VersionBeacons;
+  docRouter: DocRouter;
   truffleAvailable: boolean;
 }
 
@@ -161,7 +163,29 @@ async function bootSyncStack(): Promise<SyncStack> {
   }
   persistence.startPeriodicSave(docs);
 
-  return { meshNode, docs, authority, persistence, versionBeacons, truffleAvailable };
+  // 9. DocRouter — per-renderer port fanout. addRenderer() is called as
+  //    each window's doc-sync port arrives over parentPort (see main()).
+  const docRouter = new DocRouter({ authority });
+
+  // When any doc changes (local commit or peer sync), fan out to all
+  // subscribed renderer ports via DocAuthority.broadcastToRenderers.
+  // Renderers apply the delta to their in-memory replica; if they can't
+  // decode it they reissue request-snapshot.
+  for (const name of KERNEL_DOC_NAMES) {
+    docs.getDoc(name).subscribe((delta) => {
+      authority.broadcastToRenderers(name, delta);
+    });
+  }
+
+  return {
+    meshNode,
+    docs,
+    authority,
+    persistence,
+    versionBeacons,
+    docRouter,
+    truffleAvailable,
+  };
 }
 
 // --- Fallback version beacon store (in-memory) ---------------------------
@@ -253,12 +277,15 @@ function main(): void {
 
   onShutdown(async () => {
     if (!syncStack) return;
-    const { persistence, docs, meshNode } = syncStack;
+    const { persistence, docs, meshNode, docRouter } = syncStack;
 
-    // 1. Stop periodic saves.
+    // 1. Disconnect renderer ports.
+    docRouter.removeAll();
+
+    // 2. Stop periodic saves.
     persistence.stopPeriodicSave();
 
-    // 2. Final save.
+    // 3. Final save.
     try {
       await persistence.saveAll(docs);
       log.info('final snapshot save complete');
@@ -266,36 +293,67 @@ function main(): void {
       log.error({ err: String(err) }, 'final snapshot save failed');
     }
 
-    // 3. Close docs.
+    // 4. Close docs.
     await docs.close();
 
-    // 4. Stop mesh node.
+    // 5. Stop mesh node.
     await meshNode.stop();
     log.info('sync stack shut down');
   });
 
-  // Main transfers exactly one MessagePortMain (the ctrl port) on the
-  // first parentPort message. Once received, wire Comlink and move on.
-  const onFirstMessage = (ev: { data: unknown; ports?: unknown[] }): void => {
+  // Main transfers ports over parentPort in several messages:
+  //   1. First message (data=null) carries the ctrl port.
+  //   2. Each subsequent { type: 'doc-sync-port' } message carries one
+  //      renderer's doc-sync port end.
+  //   3. { type: 'shutdown' } is handled by onShutdown() above.
+  //
+  // The listener stays registered for the utility's lifetime so windows
+  // created after boot still have their doc-sync ports brokered.
+  let ctrlWired = false;
+  const onParentMessage = (ev: { data: unknown; ports?: unknown[] }): void => {
     const ports = ev.ports ?? [];
-    if (ports.length === 0) {
-      log.warn({ msg: ev.data }, 'first parentPort message had no ports — ignoring');
+    const data = ev.data as { type?: string } | null;
+
+    // 1. First message — ctrl port. Arrives with data=null.
+    if (!ctrlWired) {
+      if (ports.length === 0) {
+        log.warn({ msg: ev.data }, 'first parentPort message had no ports — ignoring');
+        return;
+      }
+      const ctrlPort = ports[0] as NodeMessagePort | undefined;
+      if (!ctrlPort) return;
+      ctrlPort.start?.();
+      Comlink.expose(
+        createCtrlService({
+          getStack: () => syncStack,
+          bootPromise,
+        }),
+        nodeEndpoint(ctrlPort),
+      );
+      ctrlWired = true;
+      log.info('ctrl port wired; kernel utility ready');
       return;
     }
-    parentPort.off?.('message', onFirstMessage);
-    const ctrlPort = ports[0] as NodeMessagePort | undefined;
-    if (!ctrlPort) return;
-    ctrlPort.start?.();
-    Comlink.expose(
-      createCtrlService({
-        getStack: () => syncStack,
-        bootPromise,
-      }),
-      nodeEndpoint(ctrlPort),
-    );
-    log.info('ctrl port wired; kernel utility ready');
+
+    // 2. Subsequent doc-sync-port messages — one port each.
+    if (data && typeof data === 'object' && data.type === 'doc-sync-port') {
+      const port = ports[0] as DocSyncPort | undefined;
+      if (!port) {
+        log.warn('doc-sync-port message arrived without a port — ignoring');
+        return;
+      }
+      // Queue the attach until the sync stack boots, then add to the
+      // router. If boot fails, drop the port silently (main will notice
+      // via supervisor and re-handshake on restart — spec 05 §6.4).
+      void bootPromise.then(() => {
+        if (!syncStack) return;
+        syncStack.docRouter.addRenderer(port);
+        log.info({ count: syncStack.docRouter.rendererCount }, 'doc-sync port attached');
+      });
+      return;
+    }
   };
-  parentPort.on('message', onFirstMessage);
+  parentPort.on('message', onParentMessage);
 }
 
 main();
