@@ -125,3 +125,46 @@ export const PluginPermissions = defineComponent<{
 export const PluginDisposables = defineComponent<{ count: number }>('PluginDisposables', {
   count: 0,
 });
+
+// ─── Service registry entries (one entity per registered service) ────
+export const ServiceEntry = defineComponent<{
+  id: string;
+  version: string;
+  providerId: string;
+  warmup: boolean;
+  tierRestriction: string;
+}>('ServiceEntry', {
+  id: '',
+  version: '',
+  providerId: '',
+  warmup: false,
+  tierRestriction: '',
+});
+
+// ─── Widget type registry entries (one entity per registered widget type) ──
+export const WidgetType = defineComponent<{
+  type: string;
+  ownedByPlugin: string;
+  placements: string[];
+  component: unknown;
+  configSchema: unknown;
+}>('WidgetType', {
+  type: '',
+  ownedByPlugin: '',
+  placements: [],
+  component: null,
+  configSchema: null,
+});
+
+// ─── Permission grants (one entity per grant decision) ───────────────
+export const PermissionGrant = defineComponent<{
+  pluginId: string;
+  permission: string;
+  grantedAt: number;
+  revokedAt: number;
+}>('PermissionGrant', {
+  pluginId: '',
+  permission: '',
+  grantedAt: 0,
+  revokedAt: 0,
+});

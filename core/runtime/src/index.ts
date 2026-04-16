@@ -15,5 +15,6 @@ export type {
   CanvasEngineHandle,
 } from './types.js';
 
+export * from './ecs/index.js';
 export * from './ipc/index.js';
 export * from './logging/index.js';

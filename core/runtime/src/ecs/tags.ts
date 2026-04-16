@@ -15,3 +15,6 @@ export const Failed = defineTag('Failed');
 
 /** Plugin is installed locally but at a version below one of its peers. */
 export const NeedsUpdate = defineTag('NeedsUpdate');
+
+/** Plugin has `eagerActivation: true` in its manifest. */
+export const Eager = defineTag('Eager');
