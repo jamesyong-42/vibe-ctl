@@ -139,6 +139,17 @@ export interface TruffleModule {
   NapiFileTransfer: unknown;
   NapiProxy: unknown;
   NapiOfferResponder: unknown;
+  /**
+   * Resolve the platform-specific Tailscale sidecar binary path.
+   * Exported from `@vibecook/truffle/helpers.js` and re-exported at
+   * the package root.
+   */
+  resolveSidecarPath(): string;
+  /**
+   * Open a URL in the system's default browser. Used as a fallback for
+   * interactive Tailscale auth flows. Exported from the same helpers.
+   */
+  openUrl(url: string): void;
 }
 
 /**
