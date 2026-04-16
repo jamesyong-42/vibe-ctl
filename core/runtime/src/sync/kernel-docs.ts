@@ -99,13 +99,28 @@ const ROOT_MAP = 'root';
 function createTruffleCrdtDoc(id: string, nativeDoc: TruffleCrdtDoc): CrdtDocHandle {
   const listeners = new Set<DocChangeListener>();
 
+  /**
+   * Serialise the current doc state as a full snapshot.
+   *
+   * Truffle's `NapiCrdtDoc` does not expose a frontier-based
+   * `exportFromFrontier()` or a raw `export()` API at NAPI level — only
+   * `getDeepValue()` which returns the materialised JSON. So "delta
+   * capture on commit" degrades to full snapshots: every onChange fires
+   * with the entire current state. DocAuthority routes this as a
+   * `snapshot` message so the renderer replaces its replica wholesale.
+   * Less efficient than true deltas, but correct (no lost state).
+   */
+  function exportFullSnapshot(): Uint8Array {
+    const deep = nativeDoc.getDeepValue();
+    return new TextEncoder().encode(JSON.stringify(deep ?? {}));
+  }
+
   // Subscribe to truffle's onChange for remote + local change notifications.
   nativeDoc.onChange(() => {
-    // Truffle's CrdtDoc syncs automatically with peers; the onChange fires
-    // for both local and remote changes. We notify subscribers with a
-    // zero-length delta as a signal (the actual state is in the doc).
-    const signal = new Uint8Array(0);
-    for (const cb of listeners) cb(signal);
+    // Emit the current full state so downstream subscribers can fan out
+    // an up-to-date snapshot to renderers and persistence can mark dirty.
+    const snapshot = exportFullSnapshot();
+    for (const cb of listeners) cb(snapshot);
   });
 
   function readAll(): Map<string, unknown> {
@@ -131,17 +146,15 @@ function createTruffleCrdtDoc(id: string, nativeDoc: TruffleCrdtDoc): CrdtDocHan
     set(key, value) {
       nativeDoc.mapInsert(ROOT_MAP, key, value);
       nativeDoc.commit();
-      // Return a signal delta (truffle handles binary sync internally).
-      const delta = new TextEncoder().encode(JSON.stringify({ op: 'set', key, value }));
-      for (const cb of listeners) cb(delta);
-      return delta;
+      // commit() triggers onChange which fans out a full snapshot to
+      // listeners. Return an opaque JSON op for callers that want to
+      // replicate the mutation manually (no longer the primary path).
+      return new TextEncoder().encode(JSON.stringify({ op: 'set', key, value }));
     },
     delete(key) {
       nativeDoc.mapDelete(ROOT_MAP, key);
       nativeDoc.commit();
-      const delta = new TextEncoder().encode(JSON.stringify({ op: 'delete', key }));
-      for (const cb of listeners) cb(delta);
-      return delta;
+      return new TextEncoder().encode(JSON.stringify({ op: 'delete', key }));
     },
     entries() {
       return [...readAll().entries()];

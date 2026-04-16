@@ -120,6 +120,32 @@ export class DocAuthority {
   }
 
   /**
+   * Fan out a full snapshot to all subscribed renderer ports for a given
+   * doc. Used when truffle surfaces an onChange notification and the
+   * adapter produces a full-state snapshot (truffle's NAPI does not expose
+   * a frontier-based binary delta export). Renderers treat `type: 'snapshot'`
+   * as a wholesale replacement, matching the initial `request-snapshot`
+   * response.
+   */
+  broadcastSnapshotToRenderers(
+    docName: KernelDocName,
+    snapshot: Uint8Array,
+    exclude?: RendererPort,
+  ): void {
+    const ports = this.#rendererPorts.get(docName);
+    if (!ports) return;
+    const msg: DocSyncMessage = { type: 'snapshot', docName, payload: snapshot };
+    for (const port of ports) {
+      if (port === exclude) continue;
+      try {
+        port.postMessage(msg);
+      } catch (err) {
+        log.warn({ err: String(err), docName }, 'failed to post snapshot to renderer');
+      }
+    }
+  }
+
+  /**
    * Send a delta to mesh peers via MeshNode (fallback mode only).
    * When truffle is wired, peer sync is handled internally by NapiCrdtDoc.
    */

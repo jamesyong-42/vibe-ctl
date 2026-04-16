@@ -168,12 +168,18 @@ async function bootSyncStack(): Promise<SyncStack> {
   const docRouter = new DocRouter({ authority });
 
   // When any doc changes (local commit or peer sync), fan out to all
-  // subscribed renderer ports via DocAuthority.broadcastToRenderers.
-  // Renderers apply the delta to their in-memory replica; if they can't
-  // decode it they reissue request-snapshot.
+  // subscribed renderer ports. For truffle-backed docs the adapter emits
+  // the full current state on onChange (truffle's NAPI doesn't expose a
+  // frontier-based delta export), so we broadcast as 'snapshot' —
+  // renderers replace their replica wholesale. For in-memory fallback
+  // docs the payload is a compact JSON op, so we broadcast as 'delta'.
   for (const name of KERNEL_DOC_NAMES) {
-    docs.getDoc(name).subscribe((delta) => {
-      authority.broadcastToRenderers(name, delta);
+    docs.getDoc(name).subscribe((payload) => {
+      if (docs.isTruffleBacked) {
+        authority.broadcastSnapshotToRenderers(name, payload);
+      } else {
+        authority.broadcastToRenderers(name, payload);
+      }
     });
   }
 
