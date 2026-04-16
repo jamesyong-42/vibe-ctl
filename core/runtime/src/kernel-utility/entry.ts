@@ -76,6 +76,38 @@ let syncStack: SyncStack | null = null;
 
 // --- Boot sync stack -----------------------------------------------------
 
+/**
+ * Best-effort pre-start read of `kernel/user-settings.loro` looking for
+ * `kernel.mesh.authKey`. Returns undefined if the file is missing, the
+ * encoding can't be parsed, or the key isn't set.
+ *
+ * Runs before NapiNode.start() so truffle can skip the interactive
+ * Tailscale flow for power users who provision an auth key out-of-band.
+ * Once this is plumbed through a dedicated CLI / settings UI, callers
+ * can write to the doc normally and the next launch picks it up.
+ */
+async function readPersistedAuthKey(dataDir: string): Promise<string | undefined> {
+  const { readFile } = await import('node:fs/promises');
+  const { join } = await import('node:path');
+  const candidates = [
+    join(dataDir, 'truffle', 'kernel_user-settings.loro'),
+    join(dataDir, 'truffle', 'kernel_user-settings.snapshot'),
+  ];
+  for (const path of candidates) {
+    try {
+      const buf = await readFile(path);
+      const text = new TextDecoder().decode(buf);
+      const obj = JSON.parse(text) as Record<string, unknown>;
+      const rootMap = obj.root as Record<string, unknown> | undefined;
+      const value = rootMap?.['kernel.mesh.authKey'];
+      if (typeof value === 'string' && value.length > 0) return value;
+    } catch {
+      // Not present or unreadable — try the next candidate.
+    }
+  }
+  return undefined;
+}
+
 async function bootSyncStack(eventSink: EventSink): Promise<SyncStack> {
   const dataDir = process.env.VIBE_CTL_DATA_DIR ?? process.cwd();
   const deviceId = process.env.VIBE_CTL_DEVICE_ID ?? `dev-${Date.now().toString(36)}`;
@@ -101,12 +133,20 @@ async function bootSyncStack(eventSink: EventSink): Promise<SyncStack> {
         log.info({ url }, 'tailscale auth required — dispatching event');
         eventSink.emit('mesh.auth.required', { url });
       });
+      // Power users can set `kernel.mesh.authKey` in the settings doc (via
+      // a future CLI or settings UI) to bypass the browser-based Tailscale
+      // login. When present, truffle uses it and skips the interactive flow.
+      const authKey = await readPersistedAuthKey(dataDir);
+      if (authKey) {
+        log.info('using persisted mesh.authKey for headless Tailscale auth');
+      }
       await napiNode.start({
         appId: APP_ID,
         deviceName,
         deviceId,
         sidecarPath,
         stateDir: `${dataDir}/truffle/${APP_ID}`,
+        authKey,
       });
       log.info({ deviceId, deviceName }, 'NapiNode started');
 
