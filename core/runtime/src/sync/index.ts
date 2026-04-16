@@ -30,8 +30,9 @@ export { checkVersionGate, publishVersionBeacon } from './version-gate.js';
 export type { VersionGateOptions, VersionGateResult } from './version-gate.js';
 
 export {
+  OfflineMode,
   resolveOfflineMode,
   shouldSyncKernelDoc,
   shouldSyncPlugin,
 } from './offline-mode.js';
-export type { OfflineModeConfig } from './offline-mode.js';
+export type { OfflineModeConfig, OfflineModeOptions } from './offline-mode.js';
