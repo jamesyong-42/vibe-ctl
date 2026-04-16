@@ -237,15 +237,11 @@ export function createLogger(opts: CreateLoggerOptions): Logger {
       level: 'trace',
       options: { colorize: true, translateTime: 'SYS:HH:MM:ss.l' },
     });
-  } else if (!isDev) {
-    // Keep stdout available in prod for utility processes whose stdout
-    // the supervisor re-parses. No pino-pretty — raw JSON only.
-    targets.push({
-      target: 'pino/file',
-      level: 'trace',
-      options: { destination: 1 },
-    });
   }
+  // In production the file is authoritative; we deliberately drop the
+  // stdout target so supervisor re-parsing doesn't duplicate every line
+  // into main.log. Stderr from native crashes still reaches the
+  // supervisor outside of pino (which is the whole point of forwarding).
 
   return pino({
     level,

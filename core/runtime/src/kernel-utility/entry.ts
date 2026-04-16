@@ -23,10 +23,11 @@
  *   4. Stop NapiNode.
  */
 
+import { join } from 'node:path';
 import * as Comlink from 'comlink';
 import type { NodeMessagePort } from '../ipc/comlink-node-adapter.js';
 import { nodeEndpoint } from '../ipc/comlink-node-adapter.js';
-import { createScopedLogger } from '../logging/index.js';
+import { createLogger, createScopedLogger, setRootLogger } from '../logging/index.js';
 import { DocAuthority } from '../sync/doc-authority.js';
 import { KERNEL_DOC_NAMES, KernelDocs } from '../sync/kernel-docs.js';
 import { MeshNode } from '../sync/mesh-node.js';
@@ -37,6 +38,24 @@ import { DocRouter, type DocSyncPort } from './doc-router.js';
 import { type EventSink, createEventSink } from './event-sink.js';
 import { DocPersistence } from './persistence.js';
 import { onShutdown } from './shutdown.js';
+
+// Install a kernel-utility-specific rotating root logger the moment this
+// module loads — before any sibling imports create their scoped loggers.
+// Main hands us the data dir via VIBE_CTL_DATA_DIR (set in commit 1388566);
+// without it we fall back to stdout only, which the supervisor then
+// re-parses into main.log (spec 05 §10, §12).
+{
+  const dataDir = process.env.VIBE_CTL_DATA_DIR;
+  if (dataDir) {
+    setRootLogger(
+      createLogger({
+        logDir: join(dataDir, 'logs'),
+        filename: 'kernel.log',
+        stdoutInDev: true,
+      }),
+    );
+  }
+}
 
 const log = createScopedLogger('kernel-utility');
 
