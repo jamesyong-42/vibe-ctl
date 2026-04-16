@@ -7,7 +7,7 @@
  */
 
 import { contextBridge } from 'electron';
-import { type VibeCtlBridge, buildBridge } from './bridge.js';
+import { buildBridge, type VibeCtlBridge } from './bridge.js';
 import { initHandshakeBridge } from './handshake.js';
 
 contextBridge.exposeInMainWorld('__vibeCtl', buildBridge());

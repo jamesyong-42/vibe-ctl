@@ -4,24 +4,22 @@
  * the runtime via `ctx.*` façades from `@vibe-ctl/plugin-api`.
  */
 
-export { Runtime } from './main-api/index.js';
-export type { RuntimeOptions } from './main-api/index.js';
-export type {
-  PluginInfo,
-  PluginState,
-  PluginSource,
-  DiscoveryResult,
-  ResolutionResult,
-  CanvasEngineHandle,
-} from './types.js';
-
 export * from './ecs/index.js';
 export * from './ipc/index.js';
 export * from './logging/index.js';
-export * from './registries/index.js';
-
-export { CrashRecovery } from './plugin-host/crash-recovery.js';
+export type { RuntimeOptions } from './main-api/index.js';
+export { Runtime } from './main-api/index.js';
 export type { CrashRecoveryOptions } from './plugin-host/crash-recovery.js';
+export { CrashRecovery } from './plugin-host/crash-recovery.js';
+export * from './registries/index.js';
+export type { KernelDocName } from './sync/kernel-docs.js';
 
 export { KERNEL_DOC_NAMES } from './sync/kernel-docs.js';
-export type { KernelDocName } from './sync/kernel-docs.js';
+export type {
+  CanvasEngineHandle,
+  DiscoveryResult,
+  PluginInfo,
+  PluginSource,
+  PluginState,
+  ResolutionResult,
+} from './types.js';

@@ -12,25 +12,6 @@ import { Separator } from './Separator.js';
 import { Spinner } from './Spinner.js';
 import { Tooltip } from './Tooltip.js';
 
-export {
-  Badge,
-  Button,
-  Icon,
-  Input,
-  List,
-  ListItem,
-  Modal,
-  Panel,
-  Select,
-  Separator,
-  Spinner,
-  Tooltip,
-};
-
-// Shell-level primitives (not part of the ctx.ui runtime bundle —
-// plugins don't consume these, only host shells do).
-export { FloatingButton, type FloatingButtonProps } from './FloatingButton.js';
-
 // Re-export component prop types (canonically declared in
 // @vibe-ctl/plugin-api) for convenient import from @vibe-ctl/ui.
 export type {
@@ -48,6 +29,24 @@ export type {
   TooltipProps,
   UI,
 } from '@vibe-ctl/plugin-api';
+
+// Shell-level primitives (not part of the ctx.ui runtime bundle —
+// plugins don't consume these, only host shells do).
+export { FloatingButton, type FloatingButtonProps } from './FloatingButton.js';
+export {
+  Badge,
+  Button,
+  Icon,
+  Input,
+  List,
+  ListItem,
+  Modal,
+  Panel,
+  Select,
+  Separator,
+  Spinner,
+  Tooltip,
+};
 
 /**
  * The runtime implementation of `ctx.ui`. The kernel assigns this to

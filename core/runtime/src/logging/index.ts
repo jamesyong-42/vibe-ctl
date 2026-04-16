@@ -1,3 +1,5 @@
+export type { Logger } from 'pino';
+export type { CreateLoggerOptions, LogLevel } from './logger.js';
 export {
   createLogger,
   createRotatingTransport,
@@ -6,5 +8,3 @@ export {
   rootLogger,
   setRootLogger,
 } from './logger.js';
-export type { CreateLoggerOptions, LogLevel } from './logger.js';
-export type { Logger } from 'pino';

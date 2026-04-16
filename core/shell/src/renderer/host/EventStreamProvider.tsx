@@ -12,15 +12,15 @@
 
 import type { VibeEvents } from '@vibe-ctl/runtime';
 import {
+  createContext,
   type FC,
   type ReactNode,
-  createContext,
   useContext,
   useEffect,
   useMemo,
   useRef,
+  useSyncExternalStore,
 } from 'react';
-import { useSyncExternalStore } from 'react';
 import { useHostBridgeOptional } from './useHostInvoke.js';
 
 type EventMap = { [K in keyof VibeEvents]?: VibeEvents[K] };

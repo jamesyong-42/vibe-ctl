@@ -14,7 +14,7 @@
  */
 
 import type { HandshakePayload, HostMethod, HostRequest, HostResponse } from '@vibe-ctl/runtime';
-import { type FC, type ReactNode, createContext, useEffect, useState } from 'react';
+import { createContext, type FC, type ReactNode, useEffect, useState } from 'react';
 
 /** Channel constant matching the preload's `initHandshakeBridge()`. */
 const WINDOW_CHANNEL = 'vibe-ctl:handshake-ports' as const;

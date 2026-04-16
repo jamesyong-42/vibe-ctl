@@ -19,7 +19,7 @@ import { type FC, useCallback, useEffect, useReducer, useState } from 'react';
 import { useKernelDocStoreOptional } from '../../host/KernelDocProvider.js';
 import { useEvent } from '../../host/useEventStream.js';
 import { useHostBridgeOptional } from '../../host/useHostInvoke.js';
-import { type ValidationResult, runValidationSuite } from './validation.js';
+import { runValidationSuite, type ValidationResult } from './validation.js';
 
 // ─── Section: Mesh Peers ────────────────────────────────────────────────────
 

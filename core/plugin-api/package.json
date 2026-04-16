@@ -13,7 +13,9 @@
       "import": "./dist/index.js"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
@@ -29,8 +31,12 @@
     "@vibecook/truffle": "^0.4.2"
   },
   "peerDependenciesMeta": {
-    "react": { "optional": true },
-    "@vibecook/truffle": { "optional": true }
+    "react": {
+      "optional": true
+    },
+    "@vibecook/truffle": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@types/react": "^19.0.0",

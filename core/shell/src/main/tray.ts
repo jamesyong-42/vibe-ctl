@@ -6,7 +6,7 @@
  * plugin API surface is wired. For now, we render a static skeleton.
  */
 
-import { BrowserWindow, Menu, Tray, app, nativeImage } from 'electron';
+import { app, BrowserWindow, Menu, nativeImage, Tray } from 'electron';
 
 export interface TrayHandle {
   readonly tray: Tray;

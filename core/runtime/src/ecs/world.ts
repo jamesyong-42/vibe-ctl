@@ -10,7 +10,7 @@
  * plugin state (plugin manager UI, "peers have plugin X" badges, etc).
  */
 
-import { type World, createWorld } from '@jamesyong42/reactive-ecs';
+import { createWorld, type World } from '@jamesyong42/reactive-ecs';
 
 /** Alias used across the runtime so consumers don't import reactive-ecs directly. */
 export type KernelWorld = World;

@@ -9,7 +9,7 @@
  */
 
 import type { LayoutEngine } from '@jamesyong42/infinite-canvas';
-import { type ReactNode, createContext } from 'react';
+import { createContext, type ReactNode } from 'react';
 
 export const EngineContext = createContext<LayoutEngine | null>(null);
 

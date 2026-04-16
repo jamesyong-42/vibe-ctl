@@ -12,11 +12,11 @@
  */
 
 import {
+  createScopedLogger,
   HOST_CHANNEL,
   type HostMethod,
   type HostRequest,
   type HostResponse,
-  createScopedLogger,
   hostSchemas,
 } from '@vibe-ctl/runtime';
 import { ipcMain } from 'electron';

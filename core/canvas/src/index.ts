@@ -7,25 +7,23 @@
  * tomorrow). UI primitives live in `@vibe-ctl/ui`.
  */
 
-// ─── Engine ─────────────────────────────────────────────────────────
-export {
-  KernelCanvasEngine,
-  type InfiniteCanvasEngine,
-  type KernelCanvasEngineOptions,
-} from './engine.js';
-
-// ─── Widget type registry ───────────────────────────────────────────
-export {
-  WidgetTypeRegistry,
-  type WidgetTypeChange,
-  type WidgetTypeEntry,
-  type WidgetTypeId,
-  type WidgetTypeListener,
-} from './widget-type-registry.js';
-
 // ─── Canvas sync adapter ────────────────────────────────────────────
 export {
   CanvasSyncAdapter,
   type CanvasSyncAdapterOptions,
   type CrdtDocLike,
 } from './canvas-sync-adapter.js';
+// ─── Engine ─────────────────────────────────────────────────────────
+export {
+  type InfiniteCanvasEngine,
+  KernelCanvasEngine,
+  type KernelCanvasEngineOptions,
+} from './engine.js';
+// ─── Widget type registry ───────────────────────────────────────────
+export {
+  type WidgetTypeChange,
+  type WidgetTypeEntry,
+  type WidgetTypeId,
+  type WidgetTypeListener,
+  WidgetTypeRegistry,
+} from './widget-type-registry.js';

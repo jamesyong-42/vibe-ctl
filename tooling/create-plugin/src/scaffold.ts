@@ -8,7 +8,7 @@
 
 import { mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-
+import type { ExecutionContext } from './prompts.js';
 import { gitignoreTemplate } from './templates/gitignore.js';
 import { indexTsTemplate } from './templates/index.ts.js';
 import { mainTsTemplate } from './templates/main.ts.js';
@@ -19,8 +19,6 @@ import { rendererTsTemplate } from './templates/renderer.ts.js';
 import { tsconfigJsonTemplate } from './templates/tsconfig.json.js';
 import { tsupConfigTemplate } from './templates/tsup.config.ts.js';
 import { widgetTsxTemplate } from './templates/widget.tsx.js';
-
-import type { ExecutionContext } from './prompts.js';
 
 export interface ScaffoldContext {
   targetDir: string;

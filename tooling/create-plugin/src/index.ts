@@ -19,8 +19,8 @@ import process from 'node:process';
 import kleur from 'kleur';
 
 import { runPrompts } from './prompts.js';
-import { scaffold } from './scaffold.js';
 import type { ScaffoldContext } from './scaffold.js';
+import { scaffold } from './scaffold.js';
 
 interface ParsedArgs {
   positional: string | null;
