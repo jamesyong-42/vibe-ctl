@@ -19,3 +19,6 @@ export * from './ecs/index.js';
 export * from './ipc/index.js';
 export * from './logging/index.js';
 export * from './registries/index.js';
+
+export { CrashRecovery } from './plugin-host/crash-recovery.js';
+export type { CrashRecoveryOptions } from './plugin-host/crash-recovery.js';

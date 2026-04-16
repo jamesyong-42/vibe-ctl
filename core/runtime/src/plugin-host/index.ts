@@ -16,6 +16,9 @@ export type { DeactivationSystemOptions } from './deactivation.js';
 
 export { DisposableTracker } from './disposable-tracker.js';
 
+export { CrashRecovery } from './crash-recovery.js';
+export type { CrashRecoveryOptions } from './crash-recovery.js';
+
 export {
   ContextBuilder,
   getPluginAbortController,
