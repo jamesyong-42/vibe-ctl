@@ -4,9 +4,9 @@
  * the runtime via `ctx.*` façades from `@vibe-ctl/plugin-api`.
  */
 
-export { Runtime } from './runtime.js';
+export { Runtime } from './main-api/index.js';
+export type { RuntimeOptions } from './main-api/index.js';
 export type {
-  RuntimeOptions,
   PluginInfo,
   PluginState,
   PluginSource,

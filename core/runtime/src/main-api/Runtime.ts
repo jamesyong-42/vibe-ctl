@@ -8,36 +8,29 @@
  *
  * The platform layer (Electron shell, windows, canvas substrate) lives in
  * `@vibe-ctl/shell` and `@vibe-ctl/canvas` and constructs the Runtime,
- * never the other way round.
+ * never the other way round. In the tri-process topology (spec 05 §2) the
+ * runtime does not fork the kernel utility itself — the shell does, and
+ * passes a Comlink-wrapped `KernelCtrl` in via `RuntimeOptions.kernelCtrl`.
  *
  * Follows the bootstrap sequence of spec 02 §10.
  */
 
 import type { Logger } from '@vibe-ctl/plugin-api';
-import type { KernelWorld } from './ecs/world.js';
-import type {
-  DiscoveryResult,
-  PluginInfo,
-  PluginState,
-  ResolutionResult,
-  RuntimeOptions,
-} from './types.js';
-
-export type { RuntimeOptions } from './types.js';
+import type { DiscoveryResult, PluginInfo, PluginState, ResolutionResult } from '../types.js';
+import type { RuntimeOptions } from './options.js';
 
 export class Runtime {
   readonly #opts: RuntimeOptions;
   readonly #logger: Logger;
-
-  /** Lazily initialised on start(). */
-  #world: KernelWorld | null = null;
   #started = false;
 
   constructor(opts: RuntimeOptions) {
     this.#opts = opts;
     this.#logger = opts.logger;
     // Intentional: no heavy work in the constructor. All I/O, NapiNode
-    // creation, doc opening, and ECS world materialisation happens in start().
+    // creation, doc opening, and ECS world materialisation happens in
+    // start() — once the shell has forked the kernel utility and handed
+    // us the ctrl proxy.
   }
 
   // ─── Lifecycle ───────────────────────────────────────────────────────
@@ -47,10 +40,9 @@ export class Runtime {
    * entities. Does NOT activate. Corresponds to step 6 of the bootstrap
    * sequence in spec 02 §10.
    *
-   * Scaffold stub: returns an empty result with a warning log. Real
-   * implementation lives in `DiscoverySystem` (spec 02 §7). Kept as a
-   * viable no-op so the shell's dev loop can run end-to-end while the
-   * plugin host is being built out.
+   * Phase-1 stub — real implementation lives in `DiscoverySystem`
+   * (spec 02 §7). Kept as a viable no-op so the shell's dev loop can run
+   * end-to-end while the plugin host is being built out (Phase 3).
    */
   async discover(): Promise<DiscoveryResult> {
     this.#logger.warn('[runtime] discover(): stub — returning empty result');
@@ -60,10 +52,7 @@ export class Runtime {
   /**
    * Topologically resolve dependencies across discovered plugins. Produces
    * an activation order or a list of unresolved reasons (cycles, missing
-   * non-optional deps, incompatible semver). Handled in the
-   * `DependencyResolutionSystem`.
-   *
-   * Scaffold stub — see `discover()`.
+   * non-optional deps, incompatible semver). Phase-1 stub.
    */
   async resolve(): Promise<ResolutionResult> {
     this.#logger.warn('[runtime] resolve(): stub — returning empty result');
@@ -80,11 +69,12 @@ export class Runtime {
    *   4. Discover + resolve plugins.
    *   5. Activate eager plugins in topological order.
    *
-   * Scaffold stub — marks started so `stop()` pairs cleanly.
+   * Phase-1 wiring lives in commit 10; this commit only marks started
+   * so stop() pairs cleanly.
    */
   async start(): Promise<void> {
     if (this.#started) return;
-    this.#logger.warn('[runtime] start(): stub — no-op, marking started');
+    this.#logger.info('[runtime] start(): skeleton — no-op');
     this.#started = true;
   }
 
@@ -92,11 +82,10 @@ export class Runtime {
    * Reverse-topological teardown. Fires AbortSignals, runs each plugin's
    * onDeactivate (5s timeout), invalidates provided services, disposes
    * tracked disposables, closes sync docs, stops the NapiNode.
-   *
-   * Scaffold stub.
    */
   async stop(): Promise<void> {
     if (!this.#started) return;
+    this.#logger.info('[runtime] stop(): skeleton — no-op');
     this.#started = false;
   }
 
@@ -112,25 +101,15 @@ export class Runtime {
 
   // ─── Introspection ──────────────────────────────────────────────────
 
-  /** Projected view of all plugin entities currently known to the kernel. */
   queryPlugins(): PluginInfo[] {
     return [];
   }
 
-  /** Returns null if the plugin is not known to the kernel. */
   getPluginState(_id: string): PluginState | null {
     return null;
   }
 
   // ─── Internals exposed to sibling kernel modules ────────────────────
-
-  /** The kernel ECS world. Internal; plugins never query this directly. */
-  get world(): KernelWorld {
-    if (!this.#world) {
-      throw new Error('Runtime.world accessed before start()');
-    }
-    return this.#world;
-  }
 
   /** The kernel logger, scoped to 'runtime'. */
   get logger(): Logger {
