@@ -1,30 +1,65 @@
 /**
- * Phase-1 stub implementation of the `KernelCtrl` Comlink service
- * (spec 05 §6.4). The real sync fabric + mesh wiring lands in Phase 4;
- * this factory exists so main can call `getVersion()` and prove the
- * ctrl port round-trips.
+ * `KernelCtrl` Comlink service (spec 05 §6.4).
+ *
+ * When the sync stack is booted, delegates to the real MeshNode and
+ * truffle health APIs. Before boot completes, returns safe defaults.
  */
 
-import type { KernelCtrl } from '../ipc/kernel-ctrl.js';
+import type { KernelCtrl, KernelHealth, Peer } from '../ipc/kernel-ctrl.js';
+import type { DocAuthority } from '../sync/doc-authority.js';
+import type { KernelDocs } from '../sync/kernel-docs.js';
+import type { MeshNode } from '../sync/mesh-node.js';
+import type { DocPersistence } from './persistence.js';
 
-const KERNEL_UTILITY_VERSION = '0.0.0-phase1';
+const KERNEL_UTILITY_VERSION = '0.1.0';
 
-export function createCtrlService(): KernelCtrl {
+interface SyncStack {
+  meshNode: MeshNode;
+  docs: KernelDocs;
+  authority: DocAuthority;
+  persistence: DocPersistence;
+  truffleAvailable: boolean;
+}
+
+export interface CtrlServiceOptions {
+  getStack: () => SyncStack | null;
+  bootPromise: Promise<void>;
+}
+
+export function createCtrlService(opts?: CtrlServiceOptions): KernelCtrl {
+  const getStack = opts?.getStack ?? (() => null);
+  const bootPromise = opts?.bootPromise ?? Promise.resolve();
+
   return {
     async getVersion() {
       return KERNEL_UTILITY_VERSION;
     },
-    async getPeers() {
-      return [];
+
+    async getPeers(): Promise<Peer[]> {
+      const stack = getStack();
+      if (!stack) return [];
+      return stack.meshNode.getPeers();
     },
-    async health() {
-      return 'ok';
+
+    async health(): Promise<KernelHealth> {
+      const stack = getStack();
+      if (!stack) return 'offline';
+      if (!stack.meshNode.hasNode) return 'offline';
+      const h = await stack.meshNode.health();
+      if (!h) return 'offline';
+      if (h.healthy) return 'ok';
+      return 'degraded';
     },
+
     async start() {
-      // Phase-1: no-op. NapiNode + Loro snapshots land in Phase 4.
+      // The sync stack boots asynchronously in entry.ts. This call
+      // ensures the caller can await boot completion.
+      await bootPromise;
     },
+
     async stop() {
-      // Phase-1: no-op. Graceful drain lands alongside Phase 4.
+      // Graceful shutdown is handled by onShutdown in entry.ts.
+      // This is a no-op signal; actual drain happens on process exit.
     },
   };
 }
