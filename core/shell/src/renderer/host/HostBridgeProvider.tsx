@@ -1,20 +1,23 @@
 /**
  * HostBridgeProvider — renderer-side boot synchronisation (spec 05 §5, §9.1).
  *
- * On mount, subscribes to `window.__vibeCtl.onHostHandshake(…)` and
- * stashes the payload + ports. Always renders children — the provider
- * manages state only and does not participate in UI rendering. The
- * screen-router decides what to show based on bridge readiness (the
- * `'boot'` screen state maps to the handshake-pending phase).
+ * Listens directly on `window` for the `'vibe-ctl:handshake-ports'`
+ * message posted by the preload's `initHandshakeBridge()`. This is the
+ * only way to receive real `MessagePort` instances in the renderer's
+ * main world — `contextBridge` cannot transfer `MessagePort` objects
+ * (they lose their prototype methods during structured clone).
  *
- * Placing this provider outermost (just inside `<LogProvider>` when
- * that lands in Phase 2) means the theme / i18n / screen-state
- * providers below can freely call `useHostBridgeOptional()` to check
- * readiness without guarding for mount order.
+ * Always renders children — the provider manages state only and does
+ * not participate in UI rendering. The screen-router decides what to
+ * show based on bridge readiness (the `'boot'` screen state maps to
+ * the handshake-pending phase).
  */
 
 import type { HandshakePayload, HostMethod, HostRequest, HostResponse } from '@vibe-ctl/runtime';
 import { type FC, type ReactNode, createContext, useEffect, useState } from 'react';
+
+/** Channel constant matching the preload's `initHandshakeBridge()`. */
+const WINDOW_CHANNEL = 'vibe-ctl:handshake-ports' as const;
 
 export interface HostBridge {
   payload: HandshakePayload;
@@ -24,23 +27,9 @@ export interface HostBridge {
   invoke<M extends HostMethod>(method: M, args: HostRequest<M>): Promise<HostResponse<M>>;
 }
 
-/**
- * Shape of the preload-exposed `window.__vibeCtl`. We declare this in
- * the renderer package too (the preload also declares it for its own
- * build) — the type is load-bearing in the renderer even though the
- * runtime object comes from preload.
- */
-interface HandshakeCallbackArg {
-  payload: HandshakePayload;
-  eventPort: MessagePort;
-  docSyncPort: MessagePort;
-  pluginPorts: Record<string, MessagePort>;
-}
-
 interface VibeCtlWindow {
   platform: NodeJS.Platform;
   invoke<M extends HostMethod>(method: M, args: HostRequest<M>): Promise<HostResponse<M>>;
-  onHostHandshake(cb: (ev: HandshakeCallbackArg) => void): () => void;
   log(level: 'debug' | 'info' | 'warn' | 'error', scope: string, msg: string, meta?: unknown): void;
 }
 
@@ -64,11 +53,32 @@ export const HostBridgeProvider: FC<{ children: ReactNode }> = ({ children }) =>
   useEffect(() => {
     const api = window.__vibeCtl;
     if (!api) {
-      // Tests / storybook — no preload. Bail loudly rather than deadlock.
       console.error('[host-bridge] window.__vibeCtl is missing');
       return;
     }
-    const dispose = api.onHostHandshake(({ payload, eventPort, docSyncPort, pluginPorts }) => {
+
+    // Listen directly on window for ports transferred by the preload's
+    // initHandshakeBridge(). This bypasses contextBridge entirely so
+    // MessagePort instances arrive with their full prototype intact.
+    const onMessage = (ev: MessageEvent): void => {
+      if (ev.source !== window) return;
+      if (ev.data?.channel !== WINDOW_CHANNEL) return;
+
+      const payload = ev.data.payload as HandshakePayload;
+      const ports = ev.ports;
+      if (ports.length < 2) return;
+
+      const [eventPort, docSyncPort, ...rest] = ports;
+      if (!eventPort || !docSyncPort) return;
+
+      const pluginPorts: Record<string, MessagePort> = {};
+      if (payload.pluginRpcOrder) {
+        payload.pluginRpcOrder.forEach((id: string, i: number) => {
+          const port = rest[i];
+          if (port) pluginPorts[id] = port;
+        });
+      }
+
       setBridge({
         payload,
         eventPort,
@@ -76,8 +86,12 @@ export const HostBridgeProvider: FC<{ children: ReactNode }> = ({ children }) =>
         pluginPorts,
         invoke: api.invoke,
       });
-    });
-    return dispose;
+    };
+
+    window.addEventListener('message', onMessage);
+    return () => {
+      window.removeEventListener('message', onMessage);
+    };
   }, []);
 
   return <HostBridgeContext.Provider value={bridge}>{children}</HostBridgeContext.Provider>;

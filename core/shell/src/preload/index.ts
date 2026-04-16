@@ -8,8 +8,10 @@
 
 import { contextBridge } from 'electron';
 import { type VibeCtlBridge, buildBridge } from './bridge.js';
+import { initHandshakeBridge } from './handshake.js';
 
 contextBridge.exposeInMainWorld('__vibeCtl', buildBridge());
+initHandshakeBridge();
 
 declare global {
   interface Window {
