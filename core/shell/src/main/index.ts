@@ -18,7 +18,8 @@
  */
 
 import { resolve } from 'node:path';
-import { Runtime, createScopedLogger } from '@vibe-ctl/runtime';
+import { type EventPortMessage, Runtime, createScopedLogger } from '@vibe-ctl/runtime';
+import * as Comlink from 'comlink';
 import { app } from 'electron';
 // Side-effect: registerSchemesAsPrivileged MUST run before app.whenReady().
 import './protocols/register.js';
@@ -91,6 +92,24 @@ async function boot(): Promise<void> {
   const windows = createWindowManager();
   windowsRef.current = windows;
   createTray();
+
+  // Forward kernel-utility-originated events (e.g. mesh.auth.required)
+  // onto every open renderer's event port. Main is the sole broker
+  // between kernel utility and renderer (spec 05 §2).
+  const forwardKernelEvent = (msg: EventPortMessage): void => {
+    for (const port of broker.eventPorts()) {
+      try {
+        port.postMessage(msg);
+      } catch (err) {
+        log.warn({ err, type: msg.type }, 'failed to forward kernel event to renderer');
+      }
+    }
+  };
+  try {
+    await kernel.getCtrl()?.onEvent(Comlink.proxy(forwardKernelEvent));
+  } catch (err) {
+    log.warn({ err }, 'failed to register kernel event forwarder');
+  }
 
   const win = windows.createMainWindow({
     onReadyToShow: (w) => {

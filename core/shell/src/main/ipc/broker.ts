@@ -28,6 +28,13 @@ export interface Broker {
   mintForWindow(windowId: number): HandshakePorts;
   /** Close every port tracked for `windowId`. Called on window close. */
   releaseWindow(windowId: number): void;
+  /**
+   * All currently-tracked event.local ports — used by main to fan out
+   * events received from the kernel utility via the ctrl channel to
+   * every open renderer window (spec 05 §2: main is the sole broker
+   * between kernel utility and renderer).
+   */
+  eventPorts(): MessagePortMain[];
 }
 
 function pair(): { local: MessagePortMain; remote: MessagePortMain } {
@@ -46,8 +53,14 @@ export function createBroker(): Broker {
         event: pair(),
         plugins: {},
       };
+      // Start the main-side event port so postMessage() can flow out
+      // without waiting for the renderer to touch the channel first.
+      ports.event.local.start();
       tracked.set(windowId, ports);
       return ports;
+    },
+    eventPorts() {
+      return [...tracked.values()].map((p) => p.event.local);
     },
     releaseWindow(windowId) {
       const ports = tracked.get(windowId);

@@ -34,6 +34,7 @@ import { loadTruffle } from '../sync/truffle-types.js';
 import { VersionBeacons } from '../sync/version-beacons.js';
 import { createCtrlService } from './ctrl-service.js';
 import { DocRouter, type DocSyncPort } from './doc-router.js';
+import { type EventSink, createEventSink } from './event-sink.js';
 import { DocPersistence } from './persistence.js';
 import { onShutdown } from './shutdown.js';
 
@@ -75,7 +76,7 @@ let syncStack: SyncStack | null = null;
 
 // --- Boot sync stack -----------------------------------------------------
 
-async function bootSyncStack(): Promise<SyncStack> {
+async function bootSyncStack(eventSink: EventSink): Promise<SyncStack> {
   const dataDir = process.env.VIBE_CTL_DATA_DIR ?? process.cwd();
   const deviceId = process.env.VIBE_CTL_DEVICE_ID ?? `dev-${Date.now().toString(36)}`;
   const deviceName = process.env.VIBE_CTL_DEVICE_NAME ?? 'vibe-ctl-dev';
@@ -97,7 +98,8 @@ async function bootSyncStack(): Promise<SyncStack> {
       napiNode = new truffle.NapiNode();
       const sidecarPath = truffle.resolveSidecarPath();
       napiNode.onAuthRequired((url: string) => {
-        log.info({ url }, 'tailscale auth required');
+        log.info({ url }, 'tailscale auth required — dispatching event');
+        eventSink.emit('mesh.auth.required', { url });
       });
       await napiNode.start({
         appId: APP_ID,
@@ -108,7 +110,9 @@ async function bootSyncStack(): Promise<SyncStack> {
       });
       log.info({ deviceId, deviceName }, 'NapiNode started');
     } catch (err) {
-      log.error({ err: String(err) }, 'failed to start NapiNode — falling back to offline');
+      const reason = err instanceof Error ? err.message : String(err);
+      log.error({ err: reason }, 'failed to start NapiNode — falling back to offline');
+      eventSink.emit('mesh.auth.failed', { reason });
       napiNode = null;
     }
   }
@@ -271,8 +275,12 @@ function main(): void {
 
   log.info('kernel-utility process started');
 
+  // Event sink: kernel-utility → main (→ renderer) event stream. Buffers
+  // until main attaches via ctrlService.onEvent(cb) over Comlink.
+  const eventSink = createEventSink();
+
   // Boot the sync stack asynchronously.
-  const bootPromise = bootSyncStack()
+  const bootPromise = bootSyncStack(eventSink)
     .then((stack) => {
       syncStack = stack;
       log.info({ truffleAvailable: stack.truffleAvailable }, 'sync stack booted');
@@ -333,6 +341,7 @@ function main(): void {
         createCtrlService({
           getStack: () => syncStack,
           bootPromise,
+          eventSink,
         }),
         nodeEndpoint(ctrlPort),
       );
