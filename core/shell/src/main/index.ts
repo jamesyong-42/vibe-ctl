@@ -33,7 +33,12 @@ import { runFuseCheck } from './app/fuse-check.js';
 import { registerLifecycleHooks } from './app/lifecycle.js';
 import { acquireSingleInstanceLock } from './app/single-instance.js';
 import { initAutoUpdater } from './auto-updater.js';
-import { createBroker, registerHostDispatcher, sendHandshake } from './ipc/index.js';
+import {
+  createBroker,
+  registerHostDispatcher,
+  sendHandshake,
+  setupLogReceiver,
+} from './ipc/index.js';
 import {
   type KernelSupervisor,
   brokerDocSyncPort,
@@ -87,6 +92,7 @@ async function boot(): Promise<void> {
   createAppMenu();
   registerDeepLinks({});
   registerHostDispatcher();
+  setupLogReceiver();
 
   // --- Step 3: fork + wrap the kernel utility ----------------------------
   // Pass userData as VIBE_CTL_DATA_DIR — the utility's entry.ts uses this
