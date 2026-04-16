@@ -22,6 +22,18 @@ export interface ScreenController {
 const HAS_ONBOARDED_KEY = 'vibe-ctl.onboarded';
 
 /**
+ * Dev override — set `VITE_VIBE_FORCE_FIRST_RUN=1` when launching
+ * (e.g. `VITE_VIBE_FORCE_FIRST_RUN=1 pnpm dev`) to force onboarding even
+ * if `vibe-ctl.onboarded` is already set in localStorage. Useful for
+ * re-running the first-run flow without manually clearing storage.
+ *
+ * The override only affects *this* session — it does not clear the
+ * persisted flag, so dropping the env var restores normal behaviour.
+ */
+const FORCE_FIRST_RUN =
+  typeof import.meta !== 'undefined' && import.meta.env?.VITE_VIBE_FORCE_FIRST_RUN === '1';
+
+/**
  * Drives the screen state machine (spec 05 §9.2).
  *
  * Starts in `boot` — the HostBridgeProvider always renders children,
@@ -63,8 +75,16 @@ export function useScreenState(): ScreenController {
 /**
  * Called by the LoadingScreen's `onReady`. Decides whether to jump
  * straight to main (returning user) or onboarding (first run).
+ *
+ * Honours `VITE_VIBE_FORCE_FIRST_RUN=1` as a dev override — always
+ * routes to onboarding regardless of persisted state.
  */
 export function decideAfterBoot(controller: ScreenController): void {
+  if (FORCE_FIRST_RUN) {
+    console.info('[screen-state] VITE_VIBE_FORCE_FIRST_RUN=1 — forcing onboarding');
+    controller.goToOnboarding();
+    return;
+  }
   const onboarded =
     typeof window !== 'undefined' && localStorage.getItem(HAS_ONBOARDED_KEY) === 'true';
   if (onboarded) controller.goToMain();
