@@ -174,9 +174,34 @@ export class ContextBuilder {
 
       rpc: undefined,
 
-      get settings(): never {
-        return notImplemented('settings');
-      },
+      settings: {
+        get: <T = unknown>(key: string): T | undefined => opts.settings.read<T>(pluginId, key),
+        async set<T = unknown>(key: string, value: T): Promise<void> {
+          opts.settings.write(pluginId, key, value);
+        },
+        async update<T = unknown>(
+          key: string,
+          updater: (current: T | undefined) => T,
+        ): Promise<void> {
+          const current = opts.settings.read<T>(pluginId, key);
+          const next = updater(current);
+          opts.settings.write(pluginId, key, next);
+        },
+        onChange(cb: (key: string, value: unknown) => void) {
+          // Subscribe to all changes on the userSettings doc scoped to this plugin.
+          const prefix = `${pluginId}.`;
+          const doc = opts.docs.userSettings;
+          const sub = doc.subscribe((_delta) => {
+            // Coarse-grained: on any doc change, scan for this plugin's keys.
+            for (const [fullKey, value] of doc.entries()) {
+              if (fullKey.startsWith(prefix)) {
+                cb(fullKey.slice(prefix.length), value);
+              }
+            }
+          });
+          return tracker.track(pluginId, sub);
+        },
+      } as PluginContext['settings'],
       get storage(): never {
         return notImplemented('storage');
       },
