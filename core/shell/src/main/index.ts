@@ -78,7 +78,7 @@ async function boot(): Promise<void> {
     userDataDir: app.getPath('userData'),
     deviceId: `${process.env.HOSTNAME ?? 'unknown'}-${process.pid}`,
     deviceName: process.env.HOSTNAME ?? 'unknown',
-    kernelCtrl: kernel.ctrl,
+    kernelCtrl: kernel.getCtrl()!,
   });
   runtimeRef.current = runtime;
 
