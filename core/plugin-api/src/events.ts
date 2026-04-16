@@ -35,4 +35,16 @@ export interface VibeEvents {
   'mesh.peer.joined': { peerId: string; deviceName: string };
   'mesh.peer.left': { peerId: string };
   'mesh.status.changed': { connected: boolean; peerCount: number };
+
+  /**
+   * Fired by the kernel utility when truffle's Tailscale provider needs
+   * interactive authentication. Renderer onboarding surfaces the URL so
+   * the user can open it and sign in. Only fires when no auth key was
+   * pre-provisioned (see `mesh.authKey` in kernel/user-settings).
+   */
+  'mesh.auth.required': { url: string };
+  /** Fired once the first peer connection succeeds after startup. */
+  'mesh.auth.completed': void;
+  /** Fired when `NapiNode.start()` rejects with an auth error. */
+  'mesh.auth.failed': { reason: string };
 }
