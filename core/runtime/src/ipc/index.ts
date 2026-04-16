@@ -10,3 +10,5 @@ export type {
 } from './doc-sync.js';
 export { HandshakeChannel } from './handshake.js';
 export type { HandshakePayload } from './handshake.js';
+export { nodeEndpoint } from './comlink-node-adapter.js';
+export type { NodeMessagePort } from './comlink-node-adapter.js';
