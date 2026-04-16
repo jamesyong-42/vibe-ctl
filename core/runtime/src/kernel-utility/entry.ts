@@ -109,6 +109,28 @@ async function bootSyncStack(eventSink: EventSink): Promise<SyncStack> {
         stateDir: `${dataDir}/truffle/${APP_ID}`,
       });
       log.info({ deviceId, deviceName }, 'NapiNode started');
+
+      // Emit mesh.auth.completed on the first peer join (or if peers
+      // are already present). Once fired, no further `completed` events
+      // are emitted in this process lifetime — repeats would churn the
+      // onboarding UI.
+      let authCompleted = false;
+      const markCompleted = (): void => {
+        if (authCompleted) return;
+        authCompleted = true;
+        eventSink.emit('mesh.auth.completed', undefined);
+        log.info('mesh auth completed — first peer observed');
+      };
+      napiNode.onPeerChange((event) => {
+        if (event.eventType === 'joined') markCompleted();
+      });
+      // Catch already-connected peers (e.g. on a fast rejoin).
+      try {
+        const peers = await napiNode.getPeers();
+        if (peers.length > 0) markCompleted();
+      } catch (err) {
+        log.debug({ err: String(err) }, 'initial getPeers() after start failed');
+      }
     } catch (err) {
       const reason = err instanceof Error ? err.message : String(err);
       log.error({ err: reason }, 'failed to start NapiNode — falling back to offline');
