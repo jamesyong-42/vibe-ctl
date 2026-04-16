@@ -9,6 +9,9 @@
 export { MeshNode } from './mesh-node.js';
 export type { MeshNodeOptions, Peer, PeerChangeEvent, TruffleNode } from './mesh-node.js';
 
+export { DocAuthority } from './doc-authority.js';
+export type { DocAuthorityOptions, RendererPort } from './doc-authority.js';
+
 export { KernelDocs, KERNEL_DOC_NAMES } from './kernel-docs.js';
 export type {
   CrdtDocHandle,
