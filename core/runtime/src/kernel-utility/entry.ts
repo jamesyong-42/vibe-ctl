@@ -379,9 +379,14 @@ function main(): void {
 
   // Main transfers ports over parentPort in several messages:
   //   1. First message (data=null) carries the ctrl port.
-  //   2. Each subsequent { type: 'doc-sync-port' } message carries one
-  //      renderer's doc-sync port end.
-  //   3. { type: 'shutdown' } is handled by onShutdown() above.
+  //   2. { type: 'event-port' } carries the kernel→main event channel.
+  //   3. { type: 'doc-sync-port' } carries one renderer's doc-sync port.
+  //   4. { type: 'shutdown' } is handled by onShutdown() above.
+  //
+  // Events use a dedicated MessagePort pair rather than a Comlink.proxy
+  // callback — Electron's MessagePortMain cannot transfer a Web
+  // MessageChannel port (which Comlink.proxy creates), so we mint a
+  // raw port in main and push EventPortMessage envelopes through it.
   //
   // The listener stays registered for the utility's lifetime so windows
   // created after boot still have their doc-sync ports brokered.
@@ -403,7 +408,6 @@ function main(): void {
         createCtrlService({
           getStack: () => syncStack,
           bootPromise,
-          eventSink,
         }),
         nodeEndpoint(ctrlPort),
       );
@@ -412,7 +416,26 @@ function main(): void {
       return;
     }
 
-    // 2. Subsequent doc-sync-port messages — one port each.
+    // 2. Event port — subscribe eventSink to post messages through it.
+    if (data && typeof data === 'object' && data.type === 'event-port') {
+      const port = ports[0] as NodeMessagePort | undefined;
+      if (!port) {
+        log.warn('event-port message arrived without a port — ignoring');
+        return;
+      }
+      port.start?.();
+      eventSink.setSubscriber((msg) => {
+        try {
+          port.postMessage(msg);
+        } catch (err) {
+          log.warn({ err: String(err), type: msg.type }, 'event port postMessage failed');
+        }
+      });
+      log.info('event port wired');
+      return;
+    }
+
+    // 3. Doc-sync port — one renderer's channel.
     if (data && typeof data === 'object' && data.type === 'doc-sync-port') {
       const port = ports[0] as DocSyncPort | undefined;
       if (!port) {

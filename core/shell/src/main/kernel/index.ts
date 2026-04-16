@@ -5,6 +5,7 @@ export { startKernelSupervisor } from './supervisor.js';
 export type { KernelSupervisor, SupervisorStatus } from './supervisor.js';
 export {
   brokerDocSyncPort,
+  brokerEventPort,
   mintDocSyncPair,
   setupDocSyncPorts,
   transferToKernel,

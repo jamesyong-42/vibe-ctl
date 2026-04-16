@@ -67,3 +67,23 @@ export function brokerDocSyncPort(kernelChild: UtilityProcess): {
   log.debug('brokered doc-sync port to kernel utility');
   return { utilityPort: kernelPort, rendererPort };
 }
+
+/**
+ * Mint an event-port pair and ship the kernel end to the kernel utility.
+ * The kernel utility's EventSink posts EventPortMessage envelopes through
+ * its end; main listens on the returned `mainPort` and forwards to every
+ * renderer's event port.
+ *
+ * This replaces the earlier Comlink.proxy(cb) callback approach — Electron's
+ * MessagePortMain cannot transfer a Web MessageChannel port (which
+ * Comlink.proxy mints internally) so callback-over-Comlink throws
+ * "object could not be cloned".
+ */
+export function brokerEventPort(kernelChild: UtilityProcess): {
+  mainPort: MessagePortMain;
+} {
+  const { port1, port2 } = new MessageChannelMain();
+  kernelChild.postMessage({ type: 'event-port' }, [port2]);
+  log.debug('brokered event port to kernel utility');
+  return { mainPort: port1 };
+}

@@ -5,12 +5,11 @@
  * truffle health APIs. Before boot completes, returns safe defaults.
  */
 
-import type { KernelCtrl, KernelEventCallback, KernelHealth, Peer } from '../ipc/kernel-ctrl.js';
+import type { KernelCtrl, KernelHealth, Peer } from '../ipc/kernel-ctrl.js';
 import type { DocAuthority } from '../sync/doc-authority.js';
 import type { KernelDocs } from '../sync/kernel-docs.js';
 import type { MeshNode } from '../sync/mesh-node.js';
 import type { DocRouter } from './doc-router.js';
-import type { EventSink } from './event-sink.js';
 import type { DocPersistence } from './persistence.js';
 
 const KERNEL_UTILITY_VERSION = '0.1.0';
@@ -27,15 +26,10 @@ interface SyncStack {
 export interface CtrlServiceOptions {
   getStack: () => SyncStack | null;
   bootPromise: Promise<void>;
-  /**
-   * Sink for kernel-utility-originated VibeEvents. Main subscribes via
-   * `onEvent()` and forwards messages to connected renderers.
-   */
-  eventSink: EventSink;
 }
 
 export function createCtrlService(opts: CtrlServiceOptions): KernelCtrl {
-  const { getStack, bootPromise, eventSink } = opts;
+  const { getStack, bootPromise } = opts;
 
   return {
     async getVersion() {
@@ -67,10 +61,6 @@ export function createCtrlService(opts: CtrlServiceOptions): KernelCtrl {
     async stop() {
       // Graceful shutdown is handled by onShutdown in entry.ts.
       // This is a no-op signal; actual drain happens on process exit.
-    },
-
-    async onEvent(cb: KernelEventCallback) {
-      eventSink.setSubscriber(cb);
     },
   };
 }

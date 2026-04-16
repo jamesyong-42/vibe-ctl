@@ -19,7 +19,6 @@
 
 import { resolve } from 'node:path';
 import { type EventPortMessage, Runtime, createScopedLogger } from '@vibe-ctl/runtime';
-import * as Comlink from 'comlink';
 import { app } from 'electron';
 // Side-effect: registerSchemesAsPrivileged MUST run before app.whenReady().
 import './protocols/register.js';
@@ -29,7 +28,12 @@ import { registerLifecycleHooks } from './app/lifecycle.js';
 import { acquireSingleInstanceLock } from './app/single-instance.js';
 import { initAutoUpdater } from './auto-updater.js';
 import { createBroker, registerHostDispatcher, sendHandshake } from './ipc/index.js';
-import { type KernelSupervisor, brokerDocSyncPort, startKernelSupervisor } from './kernel/index.js';
+import {
+  type KernelSupervisor,
+  brokerDocSyncPort,
+  brokerEventPort,
+  startKernelSupervisor,
+} from './kernel/index.js';
 import { createAppMenu } from './menu.js';
 import { registerHostProtocol, registerPluginProtocol } from './protocols/index.js';
 import { setupSessionSecurity } from './security/index.js';
@@ -96,19 +100,29 @@ async function boot(): Promise<void> {
   // Forward kernel-utility-originated events (e.g. mesh.auth.required)
   // onto every open renderer's event port. Main is the sole broker
   // between kernel utility and renderer (spec 05 §2).
-  const forwardKernelEvent = (msg: EventPortMessage): void => {
-    for (const port of broker.eventPorts()) {
-      try {
-        port.postMessage(msg);
-      } catch (err) {
-        log.warn({ err, type: msg.type }, 'failed to forward kernel event to renderer');
+  //
+  // Uses a dedicated MessagePortMain pair, NOT Comlink.proxy — Electron's
+  // MessagePortMain cannot transfer a Web MessageChannel port (which is
+  // what Comlink.proxy mints), so callback-over-Comlink throws "object
+  // could not be cloned".
+  const kernelChild = kernel.getChild();
+  if (kernelChild) {
+    const { mainPort: kernelEventPort } = brokerEventPort(kernelChild);
+    kernelEventPort.on('message', (ev) => {
+      const msg = ev.data as EventPortMessage;
+      if (!msg || typeof msg !== 'object' || !('type' in msg)) return;
+      for (const port of broker.eventPorts()) {
+        try {
+          port.postMessage(msg);
+        } catch (err) {
+          log.warn({ err, type: msg.type }, 'failed to forward kernel event to renderer');
+        }
       }
-    }
-  };
-  try {
-    await kernel.getCtrl()?.onEvent(Comlink.proxy(forwardKernelEvent));
-  } catch (err) {
-    log.warn({ err }, 'failed to register kernel event forwarder');
+    });
+    kernelEventPort.start();
+    log.info('kernel event forwarder active');
+  } else {
+    log.warn('kernel utility not running — events will not be forwarded');
   }
 
   const win = windows.createMainWindow({

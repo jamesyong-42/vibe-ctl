@@ -10,7 +10,10 @@ const path = require('node:path');
 // run `VIBE_LINK_LOCAL=1 pnpm install` and are responsible for not
 // committing the resulting lockfile.
 const LOCAL_MODULES = {
-  '@vibecook/truffle': '../p008/truffle/crates/truffle-napi',
+  // packages/core is the high-level wrapper that re-exports the NAPI
+  // crate AND exposes `resolveSidecarPath` + `createMeshNode` helpers.
+  // The lower-level `crates/truffle-napi` package is @vibecook/truffle-native.
+  '@vibecook/truffle': '../p008/truffle/packages/core',
   '@vibecook/spaghetti-sdk': '../p008/spaghetti/packages/sdk',
   '@vibecook/avocado-sdk': '../p008/avocado/packages/sdk',
   '@jamesyong42/infinite-canvas': '../infinite-canvas/packages/infinite-canvas',
