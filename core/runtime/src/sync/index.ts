@@ -9,9 +9,12 @@
 export { MeshNode } from './mesh-node.js';
 export type { MeshNodeOptions, Peer, PeerChangeEvent, TruffleNode } from './mesh-node.js';
 
-export { KernelDocs } from './kernel-docs.js';
+export { KernelDocs, KERNEL_DOC_NAMES } from './kernel-docs.js';
 export type {
   CrdtDocHandle,
+  DocChangeListener,
+  KernelDocName,
+  KernelDocsOptions,
   SyncedStoreHandle,
   PluginInventoryEntry,
   PluginInventorySlice,
