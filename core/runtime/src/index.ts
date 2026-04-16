@@ -18,3 +18,4 @@ export type {
 export * from './ecs/index.js';
 export * from './ipc/index.js';
 export * from './logging/index.js';
+export * from './registries/index.js';

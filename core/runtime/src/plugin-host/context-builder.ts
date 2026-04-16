@@ -9,10 +9,17 @@
  * impersonate another).
  */
 
-import type { Disposable, Logger, PluginContext, PluginTier } from '@vibe-ctl/plugin-api';
-import type { CommandRegistry } from '../command-registry.js';
+import type {
+  Disposable,
+  Logger,
+  PluginContext,
+  PluginTier,
+  WidgetDef,
+} from '@vibe-ctl/plugin-api';
 import type { PermissionManager } from '../permission-manager.js';
-import type { ServiceRegistry } from '../service-registry.js';
+import type { CommandRegistry } from '../registries/command-registry.js';
+import type { ServiceRegistry } from '../registries/service-registry.js';
+import type { WidgetTypeRegistry } from '../registries/widget-type-registry.js';
 import type { SettingsManager } from '../settings-manager.js';
 import type { KernelDocs } from '../sync/kernel-docs.js';
 import type { MeshNode } from '../sync/mesh-node.js';
@@ -23,6 +30,7 @@ export interface ContextBuilderOptions {
   docs: KernelDocs;
   services: ServiceRegistry;
   commands: CommandRegistry;
+  widgets: WidgetTypeRegistry;
   settings: SettingsManager;
   permissions: PermissionManager;
   tracker: DisposableTracker;
@@ -92,13 +100,35 @@ export class ContextBuilder {
         return tracker.track(pluginId, d) as T;
       },
 
-      // Registration APIs — stubbed for Phase 3
-      get widgets(): never {
-        return notImplemented('widgets');
+      // Registration APIs — widgets, commands wired; others stubbed
+      widgets: {
+        register<Config = unknown>(def: WidgetDef<Config>) {
+          const disposable = opts.widgets.register(def);
+          return tracker.track(pluginId, disposable);
+        },
       },
-      get commands(): never {
-        return notImplemented('commands');
-      },
+      commands: {
+        register(def: {
+          id: string;
+          title: string;
+          description?: string;
+          icon?: string;
+          category?: string;
+          run(...args: never[]): unknown;
+        }) {
+          const disposable = opts.commands.register({
+            id: def.id,
+            title: def.title,
+            description: def.description,
+            icon: def.icon,
+            category: def.category,
+            ownerPluginId: pluginId,
+            handler: (...args: unknown[]) => def.run(...(args as never[])),
+          });
+          return tracker.track(pluginId, disposable);
+        },
+        execute: (id: string, ...args: unknown[]) => opts.commands.execute(id, ...args),
+      } as PluginContext['commands'],
       get keybindings(): never {
         return notImplemented('keybindings');
       },
@@ -117,10 +147,19 @@ export class ContextBuilder {
         return notImplemented('emit');
       },
 
-      // Services — stubbed
-      get services(): never {
-        return notImplemented('services');
-      },
+      // Services — wired to registry
+      services: {
+        provide: (
+          id: string,
+          impl: unknown,
+          provideOpts?: { warmup?: Promise<void>; tierRestriction?: PluginTier },
+        ) => {
+          const disposable = opts.services.provide(id, impl, provideOpts, pluginId);
+          return tracker.track(pluginId, disposable);
+        },
+        require: (id: string) => opts.services.require(id),
+        optional: (id: string) => opts.services.optional(id),
+      } as PluginContext['services'],
 
       // Kernel surfaces — stubbed
       get canvas(): never {
