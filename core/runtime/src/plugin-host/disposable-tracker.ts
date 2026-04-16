@@ -30,8 +30,39 @@ export class DisposableTracker {
    * order. Each dispose runs inside a try/catch so one failure does not
    * prevent the rest from running. Errors are collected and returned.
    */
-  async disposeAll(_pluginId: string): Promise<Error[]> {
-    throw new Error('not implemented: DisposableTracker.disposeAll');
+  async disposeAll(pluginId: string): Promise<Error[]> {
+    const stack = this.#byPlugin.get(pluginId);
+    if (!stack || stack.length === 0) {
+      this.#byPlugin.delete(pluginId);
+      return [];
+    }
+
+    // Reverse so later-registered disposables (which may depend on
+    // earlier ones) tear down first.
+    const reversed = stack.slice().reverse();
+    this.#byPlugin.delete(pluginId);
+
+    const errors: Error[] = [];
+    for (const d of reversed) {
+      try {
+        // Support all three shapes from the Disposable interface:
+        //   { dispose() }, { [Symbol.dispose]() }, { [Symbol.asyncDispose]() }
+        const disposeFn = d.dispose;
+        const asyncDisposeFn = d[Symbol.asyncDispose];
+        const syncDisposeFn = d[Symbol.dispose];
+        if (disposeFn) {
+          await disposeFn.call(d);
+        } else if (asyncDisposeFn) {
+          await asyncDisposeFn.call(d);
+        } else if (syncDisposeFn) {
+          syncDisposeFn.call(d);
+        }
+      } catch (err) {
+        errors.push(err instanceof Error ? err : new Error(String(err)));
+      }
+    }
+
+    return errors;
   }
 
   /** Number of tracked disposables for a plugin. */
