@@ -29,7 +29,7 @@ import { createBroker, registerHostDispatcher, sendHandshake } from './ipc/index
 import { type KernelSupervisor, startKernelSupervisor } from './kernel/index.js';
 import { createAppMenu } from './menu.js';
 import { registerProtocols } from './protocol.js';
-import { setupSecurity } from './security.js';
+import { setupSessionSecurity } from './security/index.js';
 import { createTray } from './tray.js';
 import { type WindowManager, createWindowManager } from './windows/index.js';
 
@@ -54,7 +54,7 @@ async function boot(): Promise<void> {
 
   // --- Step 2: platform layer --------------------------------------------
   runFuseCheck();
-  setupSecurity();
+  setupSessionSecurity();
   registerProtocols();
   createAppMenu();
   registerDeepLinks({});
