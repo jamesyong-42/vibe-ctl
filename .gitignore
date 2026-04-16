@@ -13,6 +13,14 @@ apps/desktop/resources/plugins/
 *.log
 .DS_Store
 
+# Truffle runtime state (snapshots + tailscale dir) — should live in
+# userData, but if anything accidentally spawns the kernel utility without
+# VIBE_CTL_DATA_DIR set, it falls back to cwd and lands here. Ignore
+# defensively so stray writes don't pollute the repo.
+core/shell/truffle/
+core/runtime/truffle/
+*.loro
+
 # Local env overrides (committed template is .env.example)
 .env
 .env.local

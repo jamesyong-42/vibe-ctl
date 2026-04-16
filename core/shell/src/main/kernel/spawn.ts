@@ -30,6 +30,17 @@ export interface KernelSpawnResult {
   ctrlPort: MessagePortMain;
 }
 
+export interface SpawnKernelOptions {
+  /**
+   * Directory the kernel utility should use for persisted Loro snapshots,
+   * tailscale state, and the truffle sidecar's runtime dir. Mapped to the
+   * `VIBE_CTL_DATA_DIR` env var which the utility's entry.ts picks up —
+   * without it the utility falls back to `process.cwd()` which is wrong
+   * (writes land inside the repo).
+   */
+  dataDir: string;
+}
+
 function resolveKernelEntry(): string {
   const require = createRequire(import.meta.url);
   return require.resolve('@vibe-ctl/runtime/kernel-utility');
@@ -41,13 +52,17 @@ function resolveKernelEntry(): string {
  * that event fires so the utility's `onFirstMessage` handler can pick
  * it up in the order this function returns.
  */
-export async function spawnKernel(): Promise<KernelSpawnResult> {
+export async function spawnKernel(opts: SpawnKernelOptions): Promise<KernelSpawnResult> {
   const entry = resolveKernelEntry();
-  log.info({ entry }, 'forking kernel utility');
+  log.info({ entry, dataDir: opts.dataDir }, 'forking kernel utility');
 
   const child = utilityProcess.fork(entry, [], {
     serviceName: 'vibe-ctl-kernel',
     stdio: 'pipe',
+    env: {
+      ...process.env,
+      VIBE_CTL_DATA_DIR: opts.dataDir,
+    },
   });
 
   await new Promise<void>((resolvePromise, reject) => {

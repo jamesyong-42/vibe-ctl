@@ -69,18 +69,23 @@ async function boot(): Promise<void> {
   registerHostDispatcher();
 
   // --- Step 3: fork + wrap the kernel utility ----------------------------
-  const kernel = await startKernelSupervisor();
+  // Pass userData as VIBE_CTL_DATA_DIR — the utility's entry.ts uses this
+  // for Loro snapshot persistence + truffle's tailscale stateDir. Without
+  // it, the utility falls back to process.cwd() which is the shell package
+  // dir in dev and writes snapshots into the repo.
+  const userDataDir = app.getPath('userData');
+  const kernel = await startKernelSupervisor({ dataDir: userDataDir });
   kernelRef.current = kernel;
 
   // --- Step 4: construct + start the runtime -----------------------------
   const runtime = new Runtime({
     builtInPluginRoots: [resolve(process.resourcesPath ?? '', 'plugins')],
-    pluginDirs: [resolve(app.getPath('userData'), 'plugins')],
+    pluginDirs: [resolve(userDataDir, 'plugins')],
     devPluginRoots: process.env.VIBE_CTL_DEV_PLUGINS?.split(',').filter(Boolean),
     canvasEngine: null,
     logger: createScopedLogger('runtime'),
     kernelVersion: app.getVersion(),
-    userDataDir: app.getPath('userData'),
+    userDataDir,
     deviceId: `${process.env.HOSTNAME ?? 'unknown'}-${process.pid}`,
     deviceName: process.env.HOSTNAME ?? 'unknown',
     kernelCtrl: kernel.getCtrl()!,

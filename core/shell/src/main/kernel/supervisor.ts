@@ -57,7 +57,12 @@ function pipeStdio(child: UtilityProcess): void {
   });
 }
 
-export async function startKernelSupervisor(): Promise<KernelSupervisor> {
+export interface SupervisorOptions {
+  /** Forwarded to each spawn — sets VIBE_CTL_DATA_DIR for the utility. */
+  dataDir: string;
+}
+
+export async function startKernelSupervisor(opts: SupervisorOptions): Promise<KernelSupervisor> {
   let ctrl: Comlink.Remote<KernelCtrl> | null = null;
   let currentChild: UtilityProcess | null = null;
   let intentionalKill = false;
@@ -84,7 +89,7 @@ export async function startKernelSupervisor(): Promise<KernelSupervisor> {
   }
 
   async function spawnAndWire(): Promise<void> {
-    const { child, ctrlPort } = await spawnKernel();
+    const { child, ctrlPort } = await spawnKernel({ dataDir: opts.dataDir });
     pipeStdio(child);
 
     currentChild = child;
