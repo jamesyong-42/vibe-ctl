@@ -16,7 +16,11 @@ export type { DeactivationSystemOptions } from './deactivation.js';
 
 export { DisposableTracker } from './disposable-tracker.js';
 
-export { ContextBuilder } from './context-builder.js';
+export {
+  ContextBuilder,
+  getPluginAbortController,
+  removePluginAbortController,
+} from './context-builder.js';
 export type { ContextBuilderOptions } from './context-builder.js';
 
 export { HotReloader } from './hot-reloader.js';
