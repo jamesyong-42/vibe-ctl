@@ -6,7 +6,8 @@ export type ScreenState =
   | { kind: 'loading' }
   | { kind: 'onboarding' }
   | { kind: 'version-gate'; currentVersion: string; requiredVersion: string }
-  | { kind: 'main' };
+  | { kind: 'main' }
+  | { kind: 'debug' };
 
 export interface ScreenController {
   state: ScreenState;
@@ -14,6 +15,8 @@ export interface ScreenController {
   goToOnboarding: () => void;
   finishOnboarding: () => void;
   triggerVersionGate: (current: string, required: string) => void;
+  /** Dev-only: navigate to the sync debug screen. */
+  goToDebug: () => void;
 }
 
 const HAS_ONBOARDED_KEY = 'vibe-ctl.onboarded';
@@ -53,6 +56,7 @@ export function useScreenState(): ScreenController {
     },
     triggerVersionGate: (currentVersion, requiredVersion) =>
       setState({ kind: 'version-gate', currentVersion, requiredVersion }),
+    goToDebug: () => setState({ kind: 'debug' }),
   };
 }
 
