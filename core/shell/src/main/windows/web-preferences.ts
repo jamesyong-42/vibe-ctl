@@ -17,7 +17,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 /** Resolve the esbuild-emitted CJS preload script. */
-export const PRELOAD_PATH = join(__dirname, '../../preload-cjs/index.js');
+export const PRELOAD_PATH = join(__dirname, '../preload-cjs/index.js');
 
 export const SECURE_WEB_PREFERENCES = {
   preload: PRELOAD_PATH,
